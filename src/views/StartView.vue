@@ -5,7 +5,7 @@
     </div>
     <div class="logo">
       <img src="/img/logo.png">
-      Polly polling tool 
+      Power Hour
       <img src="../assets/logo.svg">
     </div>
   </header>
