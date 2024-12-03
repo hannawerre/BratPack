@@ -2,7 +2,7 @@
   <div>
     {{pollId}}
     <div v-if="!joined">
-      <input type="text" v-model="userName">
+      <input type="text" v-model="userName" :placeholder=this.uiLabels.userName>
       <button v-on:click="participateInPoll">
         {{ this.uiLabels.participateInPoll }}
       </button>
