@@ -21,15 +21,14 @@
     </a>
     <a href="">FAQ</a>
   </ResponsiveNav>
-  <h1>{{ uiLabels["sales-pitch"] }}</h1>
-  <h2>{{ uiLabels.subHeading }}</h2>
-  <label>
-    Write poll id: 
-    <input type="text" v-model="newPollId">
-  </label>
-  <router-link v-bind:to="'/lobby/' + newPollId">
-    {{ uiLabels.participatePoll }}
-  </router-link>
+
+  <div class="items">
+    <input type="text" v-model="newPollId" :placeholder="'Lobby ID'">
+    
+    <router-link v-bind:to="'/lobby/' + newPollId">
+      <button>Join</button>
+    </router-link>
+  </div>
 </template>
 
 <script>
@@ -72,6 +71,7 @@ export default {
 }
 </script>
 <style scoped>
+  
   header {
     background-color: gray;
     width: 100%;
@@ -103,6 +103,35 @@ export default {
     cursor: pointer;
     font-size: 1.5rem;
   }
+  /* Items */
+  .items {
+    display: flex;
+    align-items: center;
+
+    margin: 20% 0% 20% 40%;
+    
+  }
+  .items input {
+    width:30%;
+    font-size: 1.5rem; 
+
+    outline: none; /* Remove browser default focus outline */
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+  .items button {
+    color: rgb(0, 0, 0);
+    background-color: rgb(149, 235, 153);
+    font-size: 1.5rem;
+    cursor: pointer;
+
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+  .items button:hover {
+    background-color: rgb(126, 201, 130);
+  }
+
 
 @media screen and (max-width:50em) {
   .logo {
