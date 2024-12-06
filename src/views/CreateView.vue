@@ -1,4 +1,5 @@
 <template>
+
   <div>
     Poll link: 
     <input type="text" v-model="pollId">
