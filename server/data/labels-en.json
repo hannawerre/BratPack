@@ -8,5 +8,7 @@
 	"changeLanguage": "Byt till svenska",
 	"about": "About",
 	"userName": "Username",
-	"participateInPoll": "Participate in poll"
+	"participateInPoll": "Join game",
+	"players": "Players",
+	"waitingForHost": "Waiting for host to start..."
 }

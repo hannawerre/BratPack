@@ -8,5 +8,7 @@
 	"changeLanguage": "Change to English",
 	"about": "Om oss",
 	"userName": "Användarnamn",
-	"participateInPoll": "Delta i enkäten"
+	"participateInPoll": "Gå med",
+	"players": "Spelare",
+	"waitingForHost": "Väntar på spelledaren..."
 }

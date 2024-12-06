@@ -26,7 +26,7 @@
     <button v-if="!isPlay" @click="togglePlay">Join Game</button>
     <div v-if="isPlay" class="modal" ref="modal">
       <input type="text" v-model="newPollId" :placeholder="'Lobby ID'">
-      <router-link v-bind:to="'/lobby/' + newPollId">
+      <router-link v-if="pollExists(newPollId)" v-bind:to="'/lobby/' + newPollId">
         <button>Join</button>
       </router-link>
     </div>
@@ -73,6 +73,15 @@ export default {
     toggleNav: function () {
       this.hideNav = ! this.hideNav;
     },
+    // sebbes test på att kolla om pollen finns... 
+    pollExists: function(pollId, callback) {
+    console.log("Checking if poll with id:", pollId, "exists");
+    
+    socket.emit("pollExists", pollId, (exists) => {
+    console.log("Poll exists:", exists);
+    callback(exists);
+  });
+},
     togglePlay: function () {
       console.log("togglePlay")
       this.isPlay = !this.isPlay;
@@ -140,7 +149,8 @@ export default {
     font-size: 1.5rem;
     cursor: pointer;
     border-radius: 6px;
-    border: 2px solid rgb(12, 66, 1);
+    border: 2px solid rgb(177, 242, 164);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.7);
     padding: 10px;
     margin: 0% 20% 0% 20%
   }
@@ -171,6 +181,7 @@ export default {
     cursor: pointer;
     border-radius: 6px;
     border: 2px solid rgb(12, 66, 1);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0);
     padding: 10px;
     margin: 0;
   }
@@ -179,6 +190,7 @@ export default {
   }
   #create {
     background-color: rgb(179, 179, 179);
+    border-color: rgb(197, 197, 197);
     border-radius: 6px;
   }
   #create:hover {
