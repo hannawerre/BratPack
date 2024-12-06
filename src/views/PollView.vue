@@ -5,6 +5,10 @@
               v-on:answer="submitAnswer($event)"/>
     <hr>
     <span>{{submittedAnswers}}</span>
+
+    <hr>
+    <TimerComponent />
+    <hr/>
   </div>
 </template>
 
@@ -12,12 +16,15 @@
 // @ is an alias to /src
 import QuestionComponent from '@/components/QuestionComponent.vue';
 import io from 'socket.io-client';
+import TimerComponent from '../components/TimerComponent.vue';
 const socket = io("localhost:3000");
 
 export default {
   name: 'PollView',
   components: {
-    QuestionComponent
+    QuestionComponent,
+    TimerComponent
+    
   },
   data: function () {
     return {
