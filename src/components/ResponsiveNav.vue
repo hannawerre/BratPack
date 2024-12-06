@@ -1,57 +1,92 @@
 <template>
-  <nav v-bind:class="{'hide': hideNav}">
-    <slot>
-    </slot>
+  <nav :class="{'hide': hideNav}">
+    <div id="Logo">
+      <router-link to="/">
+        <img src="/public/img/logo.png" alt="Logo" />
+      </router-link>
+    </div>
+    <div id="Language">
+          <LanguageSwitcher 
+      :lang="lang" 
+      :uiLabels="uiLabels"
+      @language-changed="emitLanguageChangeToParent"
+    />
+    </div>
   </nav>
 </template>
 
 <script>
+import LanguageSwitcher from './LanguageSwitcher.vue'
 
 export default {
   name: 'ResponsiveNav',
+  components: {
+    LanguageSwitcher
+  },
   props: {
-      hideNav: Boolean
+    hideNav: {
+      type: Boolean,
+      default: false
+    },
+    uiLabels: {
+      type: Object,
+      default: () => ({ home: 'Home', about: 'About', changeLanguage: 'Change Language' })
+    },
+    lang: {
+      type: String,
+      default: 'en'
+    }
+  },
+  methods: {
+    emitLanguageChangeToParent(newLang) {
+      this.$emit('language-changed', newLang);
+    }
   }
-}
+};
 </script>
+
 <style scoped>
-  nav {
-    background-color: lightgray;
-    width:100%;
-    height: 4em;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, 10em);
-  }
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 3rem;
+  background-color: rgba(0,0,0,0);
+  color: #000;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
 
-  nav ::v-slotted(a) {
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    text-decoration: none;
-    color: gray;
-    display: grid;
-    align-items: center;
-    justify-content: center;
-    border-left: 1px solid gray;
-  }
+#Logo img {
+  height: 40px;
+  cursor: pointer;
+}
 
-@media screen and (max-width:50em) {
-  nav {
-    position: absolute;
-    height:100vh;
-    top: 3em;
-    left: 0;
-    width:12em;
-    display: grid;
-    grid-template-rows: repeat(auto-fit, 2em);
-    transition: 0.5s;
-  }
-  nav ::v-slotted(a) {
-    justify-content: left;
-    padding-left: 1em;
-  }
-  .hide {
-    left:-12em;
-  }
+#Links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+#Links a {
+  color: black;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+
+
+.hide {
+  display: none;
 }
 </style>
+
+
+
+
+
