@@ -26,7 +26,7 @@
     <button v-if="!isPlay" @click="togglePlay">Join Game</button>
     <div v-if="isPlay" class="modal" ref="modal">
       <input type="text" v-model="newPollId" :placeholder="'Lobby ID'">
-      <router-link v-if="pollExists(newPollId)" v-bind:to="'/lobby/' + newPollId">
+      <router-link v-bind:to="'/lobby/' + newPollId">
         <button>Join</button>
       </router-link>
     </div>
