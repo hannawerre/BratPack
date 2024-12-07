@@ -1,22 +1,13 @@
 <template>
 
-  <!-- TVÅ STORA PROBLEM, VERKAR SOM ATT GAMLA TIMERS FINNS KVAR NÄR MAN STARTAR NYA IBLAND, DEN RINGER LITE RANDOM IBLAND -->
-   <!-- DEN RINGER ALLTID DIREKT, DET SKA DEN INTE GÖRA -->
-   <!-- DEN RINGER IBLAND EFTER SISTA MINUTEN -->
+
   <div>
     <h1>Power Hour</h1>
  
- 
-    
     <div class="input-container">
-      <button @click="adjustMinutes(-1)">-</button>
-      <input
-        type="number"
-        v-model.number="minutesInput"
-        placeholder="Ange antal minuter"
-        min="1"
-      />
-      <button @click="adjustMinutes(1)">+</button>
+      <button @click="adjustMinutes(-10)">-</button>
+          {{ minutesInput }}
+      <button @click="adjustMinutes(10)">+</button>
     </div>
  
  
@@ -33,24 +24,25 @@
   name: "Timer",
   data() {
     return {
-      minutesInput: 1,      
-      timerInterval: null,   
+      minutesInput: 60,     
+      timerInterval: null,  
       timerDisplay: "",      
-      countDownDate: null,   
+      countDownDate: null, 
       alarmSound: null,    
-      lastMinute: null       
+      lastMinute: null  
     };
   },
   mounted() {
-    
+   
     this.alarmSound = new Audio('/audio/alarm.mp3'); 
+    this.silenceSound = new Audio('/audio/silence.mp3'); 
   },
   methods: {
     adjustMinutes(delta) {
-      
+     
       this.minutesInput += delta;
-      if (this.minutesInput < 1) {
-        this.minutesInput = 1; 
+      if (this.minutesInput < 11) {
+        this.minutesInput = 10; 
       }
     },
     startTimer() {
@@ -110,18 +102,31 @@
  
  
       
-      if (minutes !== this.lastMinute) {
-       
-        this.lastMinute = minutes; 
-        this.playAlarm(); 
+      if (this.lastMinute === null)  {
+
+        this.lastMinute = minutes;
+        this.playSilence();
+      } if (totalSeconds % 60 === 0) {
+        this.lastMinute = minutes;
+
+        this.playAlarm();
+        
+      }
+     
+    },
+
+    playSilence() {
+      if (this.silenceSound) {
+        this.silenceSound.play();
       }
     },
+
     playAlarm() {
-      
       if (this.alarmSound) {
         this.alarmSound.play();
       }
     }
+   
   },
   beforeDestroy() {
     
