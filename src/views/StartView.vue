@@ -25,8 +25,10 @@
   <div class="items">
     <button v-if="!isPlay" @click="togglePlay">Join Game</button>
     <div v-if="isPlay" class="modal" ref="modal">
-      <input type="text" v-model="newPollId" :placeholder="'Lobby ID'">
-      <router-link  v-bind:to="'/lobby/' + newPollId">
+      <input type="text" @input="checkPollExists(newPollId)" v-model="newPollId" :placeholder="'Lobby ID'">
+
+      <! -- The router link only appears if the input poll actually exists -->
+      <router-link v-if="this.pollExists" v-bind:to="'/lobby/' + newPollId">
         <button>Join</button>
       </router-link>
     </div>
@@ -52,12 +54,15 @@ export default {
       newPollId: "",
       lang: localStorage.getItem( "lang") || "en",
       hideNav: true,
-      isPlay: false
+      isPlay: false,
+      pollExists: false
     }
   },
   created: function () {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.emit( "getUILabels", this.lang );
+    // Listening for "pollExists" from socket.js
+    socket.on("pollExists", exists => this.pollExists = exists)
   },
   methods: {
     switchLanguage: function() {
@@ -73,19 +78,16 @@ export default {
     toggleNav: function () {
       this.hideNav = ! this.hideNav;
     },
-    // sebbes test på att kolla om pollen finns... 
-    pollExists: function(pollId, callback) {
-    console.log("Checking if poll with id:", pollId, "exists");
-    
-    socket.emit("pollExists", pollId, (exists) => {
-    console.log("Poll exists:", exists);
-    callback(exists);
-  });
-},
+    // Checking if poll exists. StartView.vue -> socket.js -> Data.js -> socket.js -> StartView.vue
+    checkPollExists: function(pollId) {
+      console.log("Checking if poll with id:", pollId, "exists");
+      socket.emit("pollExists", pollId);
+      console.log("Poll exists: ", this.pollExists)
+    },
     togglePlay: function () {
       console.log("togglePlay")
       this.isPlay = !this.isPlay;
-      event.stopPropagation(); // Hindrar eventet från när man klickar var som helst på skärmen.
+      event.stopPropagation(); // Stops the event listener when the input box isn't up.
     },
     closeOnClickOutside: function(event) {
       console.log("closeOnClickOutside")

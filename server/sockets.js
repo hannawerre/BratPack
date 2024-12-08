@@ -1,5 +1,11 @@
 function sockets(io, socket, data) {
-  
+
+  // Check if poll exists
+  socket.on('pollExists', function(poll) {
+    socket.emit('pollExists', data.pollExists(poll))
+  });
+
+
   socket.on('getUILabels', function(lang) {
     socket.emit('uiLabels', data.getUILabels(lang));
   });
