@@ -10,5 +10,8 @@
 	"userName": "Användarnamn",
 	"participateInPoll": "Gå med",
 	"players": "Spelare",
-	"waitingForHost": "Väntar på spelledaren..."
+	"waitingForHost": "Väntar på spelledaren...",
+	"Lang": "Svenska",
+	"Welcome": "Välkommen"
+
 }

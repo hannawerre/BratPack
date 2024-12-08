@@ -10,5 +10,7 @@
 	"userName": "Username",
 	"participateInPoll": "Join game",
 	"players": "Players",
-	"waitingForHost": "Waiting for host to start..."
+	"waitingForHost": "Waiting for host to start...",
+	"Lang": "English",
+	"Welcome": "Welcome"
 }
