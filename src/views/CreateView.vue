@@ -30,15 +30,24 @@
     </button>
     <router-link v-bind:to="'/result/' + pollId">Check result</router-link>
     Data: {{ pollData }}
+    <hr>
+    <TimerComponent />
+    <hr/>
   </div>
 </template>
 
 <script>
 import io from 'socket.io-client';
+import TimerComponent from '../components/TimerComponent.vue';
 const socket = io("localhost:3000");
 
 export default {
   name: 'CreateView',
+  components: {
+    TimerComponent
+    
+  },
+
   data: function () {
     return {
       lang: localStorage.getItem("lang") || "en",
@@ -49,6 +58,7 @@ export default {
       pollData: {},
       uiLabels: {},
     }
+    
   },
   created: function () {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
