@@ -15,6 +15,12 @@ function sockets(io, socket, data) {
     socket.emit('pollData', data.getPoll(d.pollId));
   });
 
+  socket.on('createGame', function(lang) {
+    const pin = data.createGameWithPin(lang); // Generera Game PIN och skapa spel
+    socket.emit('gameCreated', { pin }); // Skicka tillbaka Game PIN till klienten
+  });
+  
+
   socket.on('addQuestion', function(d) {
     data.addQuestion(d.pollId, {q: d.q, a: d.a});
     socket.emit('questionUpdate', data.getQuestion(d.pollId));
