@@ -30,6 +30,22 @@ Data.prototype.pollExists = function (pollId) {
   return typeof this.polls[pollId] !== "undefined"
 }
 
+Data.prototype.generateGamePin = function () {
+  // Generera en unik 6-siffrig PIN
+  let pin;
+  do {
+    pin = Math.floor(100000 + Math.random() * 900000).toString();
+  } while (this.pollExists(pin)); // Säkerställ att PIN är unik
+  return pin;
+};
+
+Data.prototype.createGameWithPin = function (lang = "en") {
+  const pin = this.generateGamePin(); // Generera unik PIN
+  this.createPoll(pin, lang); // Skapa en enkät med genererad PIN
+  return pin;
+};
+
+
 Data.prototype.getUILabels = function (lang) {
   //check if lang is valid before trying to load the dictionary file
   if (!["en", "sv"].some( el => el === lang))
