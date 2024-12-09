@@ -1,5 +1,7 @@
 <template>
-    <h1>Game PIN: 123456</h1>
+    <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
+    <h1 v-else>Loading Game PIN...</h1>
+
     
     <div>
         <p>Choose the time in minutes:</p>
@@ -22,7 +24,7 @@
         <label :for="game.id">{{ game.name }}</label>
         
         <router-link v-bind:to="{ name: 'EditView', params: { gameId: game.id } }" class="edit-button">
-            Edit
+            <img src="/img/Gear-icon.png" alt="Edit" class="edit-icon" />
         </router-link>
 
     </div>
@@ -51,9 +53,14 @@
             { id: 'game4', name: 'Quiz4'}
           ],
           selectedGames: [],
-          players: ['Player 1']
+          players: ['Player 1'],
+          gamePin: null
         };
     },
+    
+  created: function () {
+      this.gamePin = this.$route.query.gamePin; 
+  },
   methods: {
   
       incrementMinutes: function() {
@@ -155,11 +162,11 @@
 
 .edit-button {
   display: inline-block;
-  background-color: blue;
+  background-color: rgb(183, 183, 183);
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
+  border-radius: 40px;
+  padding: 6px 8px;
   text-align: center;
   text-decoration: none;
   font-size: 14px;
@@ -168,14 +175,20 @@
 }
 
 .edit-button:hover {
-  background-color: darkblue;
-  transform: scale(1.05);
-  box-shadow: 0 0 5px 2px rgba(0, 0, 255, 0.3);
+  background-color: rgb(170, 168, 168);
+  transform: scale(1.02);
+  box-shadow: 0 0 5px 2px  rgba(0, 0, 0, 0.5);
 }
 
 .edit-button:active {
   transform: scale(1);
-  box-shadow: 0 0 2px 1px rgba(0, 0, 255, 0.5);
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.5);
 }
+.edit-icon {
+  width: 30px; 
+  height: 30px; 
+  vertical-align: middle; 
+}
+
 
 </style>

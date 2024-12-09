@@ -6,34 +6,25 @@
         <div class="button-container">
             <button class="decrement-button" @click="decrementMinutes">-</button>
                 {{ amountMinutes }}
-            <button class="increment-buttton" @click="incrementMinutes">+</button>
+            <button class="increment-button" @click="incrementMinutes">+</button>
         </div>
     </div>
   
     <h2>Choose your custom games below:</h2>
   
-    <div>
-        <input type="checkbox" id="game1" name="games" value="game1" v-model="selectedGames">
-        <label for="game1">Game 1</label>
-        <button class="edit-button" @click="editGame('game1')">Edit</button>
-    </div>
-  
-    <div>
-        <input type="checkbox" id="game2" name="games" value="game2" v-model="selectedGames">
-        <label for="game2">Game 2</label>
-        <button class="edit-button" @click="editGame('game2')">Edit</button>
-    </div>
-  
-    <div>
-        <input type="checkbox" id="game3" name="games" value="game3" v-model="selectedGames">
-        <label for="game3">Game 3</label>
-        <button class="edit-button" @click="editGame('game3')">Edit</button>
-    </div>
-  
-    <div>
-        <input type="checkbox" id="game4" name="games" value="game4" v-model="selectedGames">
-        <label for="game4">Game 4</label>
-        <button class="edit-button" @click="editGame('game4')">Edit</button>
+    <div v-for="game in games" :key="game.id" class="game-item">
+        <input 
+            type="checkbox" 
+            :id="game.id" 
+            :value="game.id" 
+            v-model="selectedGames"
+        />
+        <label :for="game.id">{{ game.name }}</label>
+        
+        <router-link v-bind:to="{ name: 'EditView', params: { gameId: game.id } }" class="edit-button">
+            <img src="public/img/Gear-icon.png" alt="Edit" class="edit-icon" />
+        </router-link>
+
     </div>
   
     <div class="startbutton-container">
@@ -53,6 +44,12 @@
   data: function() {
       return{
           amountMinutes: 60,
+          games: [
+            { id: 'game1', name: 'Quiz1'} ,
+            { id: 'game2', name: 'Quiz2'},
+            { id: 'game3', name: 'Quiz3'},
+            { id: 'game4', name: 'Quiz4'}
+          ],
           selectedGames: [],
           players: ['Player 1']
         };
@@ -92,17 +89,35 @@
 
 <style>
 
-.decrementbutton{
-	background-color: red;
+.decrement-button{
+	background-color: rgb(213, 8, 8);
+    border: none;
 	border-radius: 4px;
 	color: white;
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
 }
 
-.incrementbutton{
+.decrement-button:hover{
+    background-color: rgb(247, 44, 44);
+    box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
+    transform: scale(1.05);
+}
+.increment-button{
 	background-color: green;
+    border: none;
 	border-radius: 4px;
 	color: white;
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+}
 
+.increment-button:hover{
+    background-color: rgb(8, 179, 8);
+    box-shadow: 0 0 5px 2px rgba(8, 179, 8, 0.5);
+    transform: scale(1.05);
 }
 
 .startbutton{
@@ -126,8 +141,41 @@
     transform: scale(1.05);
 }
 
+.game-item {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  margin-bottom: 20px; 
+}
 
+.game-item label {
+  margin-left: 10px; 
+  margin-right: 20px; 
+}
 
-  
-  
-  </style>
+.edit-button {
+  display: inline-block;
+  background-color: blue;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.edit-button:hover {
+  background-color: darkblue;
+  transform: scale(1.05);
+  box-shadow: 0 0 5px 2px rgba(0, 0, 255, 0.3);
+}
+
+.edit-button:active {
+  transform: scale(1);
+  box-shadow: 0 0 2px 1px rgba(0, 0, 255, 0.5);
+}
+
+</style>
