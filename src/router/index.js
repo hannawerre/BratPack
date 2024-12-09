@@ -28,6 +28,12 @@ const router = createRouter({
       path: '/result/:id',
       name: 'ResultView',
       component: () => import('../views/ResultView.vue')
+    },
+    {
+      path: '/edit/:gameId',
+      name: 'EditView',
+      component: () => import('../views/EditView.vue'),
+      props: true,
     }
   ]
 })
