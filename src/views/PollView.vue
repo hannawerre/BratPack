@@ -61,6 +61,7 @@
   return;
   }
   this.hasAnswerd = true;
+  console.log("Submitting answer for pollId:", this.pollId); // Debug
   socket.emit("submitAnswer", {pollId: this.pollId, answer: answer})
   },
   handleLanguageChange(newLang) {
@@ -76,7 +77,7 @@
   
   <style scoped>
   h1 {
-  margin-top: 0;
+  margin-top: 10px;
   color: black;
   }
   </style>
