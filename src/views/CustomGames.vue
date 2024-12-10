@@ -56,7 +56,7 @@
           ],
           selectedGames: [],
           players: ['Player 1'],
-          gamePin: null
+          gamePin: ''
         };
     },
     
@@ -66,40 +66,39 @@
   methods: {
   
       incrementMinutes: function() {
-            this.selectedMinutes += 10;
+          this.selectedMinutes += 10;
         },
   
       decrementMinutes: function () {
-          if(this.selectedMinutes > 10){
+        if(this.selectedMinutes > 10){
             this.selectedMinutes -= 10;
         }
       },
   
       startGame: function () {
-          if (this.selectedGames.length === 0) {
-              alert("Please select at least one game.");
-              return;
+        if (this.selectedGames.length === 0) {
+            alert("Please select at least one game.");
+            return;
         }
   
-          if (this.players.length === 0) {
-              alert("No players have joined yet.");
-              return;
+        if (this.players.length === 0) {
+            alert("No players have joined yet.");
+            return;
         }
-  
           
-          const gameData = {
-              //detta är vad vi ska skicka till servern
-              gamePin: this.gamePin,
-              selectedGames: this.selectedGames,
-              players: this.players,
-              selectedMinutes: this.selectedMinutes
-              //add gamesettings
-          }
+        const gameData = {
+            //detta är vad vi ska skicka till servern
+            gamePin: this.gamePin,
+            selectedGames: this.selectedGames,
+            players: this.players,
+            selectedMinutes: this.selectedMinutes
+            //add gamesettings
+        }
   
-          socket.emit('startGame', gameData),
-  
-          this.$router.push({
-            name: 'GameView',
+        socket.emit('startGame', gameData),
+
+        this.$router.push({
+          name: 'GameView',
         });   
       }
     }
