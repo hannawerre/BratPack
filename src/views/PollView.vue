@@ -49,6 +49,7 @@ export default {
     socket.on( "questionUpdate", q => this.question = q );
     socket.on( "submittedAnswersUpdate", answers => this.submittedAnswers = answers );
     socket.on( "uiLabels", labels => this.uiLabels = labels );
+    
     socket.emit( "getUILabels", this.lang );
     socket.emit( "joinPoll", this.pollId );
   },
