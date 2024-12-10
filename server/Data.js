@@ -16,7 +16,13 @@ function Data() {
     ],
     answers: [],
     currentQuestion: 0,
-    participants: []
+    participants: [],
+
+    // Game data
+    selectedGames: [],
+    gamePin: '',
+    players: [],
+    selectedMinutes: 60
   }
 }
 
@@ -42,8 +48,16 @@ Data.prototype.generateGamePin = function () {
 Data.prototype.createGameWithPin = function (lang = "en") {
   const pin = this.generateGamePin(); // Generera unik PIN
   this.createPoll(pin, lang); // Skapa en enkät med genererad PIN
+  this.gamePin = pin;
   return pin;
 };
+
+Data.prototype.storeGameData = function (gameData){
+  this.selectedGames = gameData.selectedGames;
+  this.players = gameData.players;
+  this.selectedMinutes = gameData.selectedMinutes;
+  console.log("Reached to data.storeGameData")
+}
 
 
 Data.prototype.getUILabels = function (lang) {

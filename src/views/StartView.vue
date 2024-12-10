@@ -79,7 +79,7 @@ export default {
       console.log("Game created with PIN:", data.pin);
       this.$router.push({ name: 'CreateView', query: { gamePin: data.pin } });
   });
-},
+}, //genererar gamepin, lyssnar på backend
 
 
     switchLanguage: function() {

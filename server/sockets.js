@@ -5,7 +5,6 @@ function sockets(io, socket, data) {
     socket.emit('pollExists', data.pollExists(poll))
   });
 
-
   socket.on('getUILabels', function(lang) {
     socket.emit('uiLabels', data.getUILabels(lang));
   });
@@ -20,6 +19,10 @@ function sockets(io, socket, data) {
     socket.emit('gameCreated', { pin }); // Skicka tillbaka Game PIN till klienten
   });
   
+  socket.on('startGame', function(gameData) {
+    data.storeGameData(gameData)
+    //socket emit
+  });
 
   socket.on('addQuestion', function(d) {
     data.addQuestion(d.pollId, {q: d.q, a: d.a});

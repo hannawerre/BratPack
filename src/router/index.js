@@ -34,7 +34,14 @@ const router = createRouter({
       name: 'EditView',
       component: () => import('../views/EditView.vue'),
       props: true,
+    },
+    {
+      path: '/game/',
+      name: 'GameView',
+      component: () => import('../views/GameView.vue'),
+      props: true,
     }
+
   ]
 })
 
