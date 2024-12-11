@@ -56,29 +56,25 @@ export default {
       hideNav: true,
       isPlay: false,
       pollExists: false,
-      gamePin: null
+      gamePin: null //is this really needed in StartView.vue? 
     }
   },
   created: function () {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.emit( "getUILabels", this.lang );
     // Listening for "pollExists" from socket.js
-    socket.on("pollExists", exists => this.pollExists = exists)
-
-    socket.on("gameCreated", (data) => {
-    console.log("Game created with PIN:", data.pin);
-    
-  });
+    socket.on("pollExists", exists => this.pollExists = exists);
   },
   methods: {
 
   createGame: function(){
       console.log("Requesting to create game...");
       socket.emit("createGame", this.lang);
+      /*
       socket.on("gameCreated", (data) => {
       console.log("Game created with PIN:", data.pin);
       this.$router.push({ name: 'CustomGamesView', query: { gamePin: data.pin } });
-  });
+  });*/
 }, //genererar gamepin, lyssnar på backend
 
 

@@ -15,8 +15,12 @@ function sockets(io, socket, data) {
   });
 
   socket.on('createGame', function(lang) {
-    const pin = data.createGameWithPin(lang); // Generera Game PIN och skapa spel
-    socket.emit('gameCreated', { pin }); // Skicka tillbaka Game PIN till klienten
+    data.createCustomGame(lang); 
+    // Implement error handling if game could not be created
+  });
+  socket.on('readyForPin', function() {
+    const pin = data.getPin();
+    socket.emit('gameCreated', pin);
   });
   
   socket.on('startGame', function(gameData) {

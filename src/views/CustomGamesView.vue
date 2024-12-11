@@ -37,8 +37,8 @@
   </template>
   
   <script>
-  import io from 'socket.io-client' // samma
-  const socket = io("localhost:3000") //tror vi behöver dessa /sebbe
+  import io from 'socket.io-client';  // These are needed for the socket communication
+  const socket = io("localhost:3000");// ------
   export default {
     name: 'CustomGames',
     components: {
@@ -61,7 +61,11 @@
     },
     
   created: function () {
-      this.gamePin = this.$route.query.gamePin; 
+    // First setup listener for 'gameCreated', then emit 'readyForPin' back to socket.js. 
+    // This ensures the message comes AFTER the listener is up.
+    socket.on('gameCreated', pin => this.gamePin = pin);
+    console.log("Listener for 'gameCreated' in CustomGamesView.vue is active")
+    socket.emit('readyForPin');
   },
   methods: {
   
@@ -85,9 +89,9 @@
             alert("No players have joined yet.");
             return;
         }
-          
-        const gameData = {
-            //detta är vad vi ska skicka till servern
+        
+        // This is what we send to Data.js
+        let gameData = {
             gamePin: this.gamePin,
             selectedGames: this.selectedGames,
             players: this.players,

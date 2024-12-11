@@ -37,7 +37,6 @@ Data.prototype.pollExists = function (pollId) {
 }
 
 Data.prototype.generateGamePin = function () {
-  // Generera en unik 6-siffrig PIN
   let pin;
   do {
     pin = Math.floor(100000 + Math.random() * 900000).toString();
@@ -45,11 +44,14 @@ Data.prototype.generateGamePin = function () {
   return pin;
 };
 
-Data.prototype.createGameWithPin = function (lang = "en") {
-  const pin = this.generateGamePin(); // Generera unik PIN
+Data.prototype.createCustomGame = function (lang = "en") {
+  const pin = this.generateGamePin(); 
   this.createPoll(pin, lang); 
   this.gamePin = pin;
-  return pin;
+};
+
+Data.prototype.getPin = function(){
+  return this.gamePin;
 };
 
 Data.prototype.storeGameData = function (gameData){
