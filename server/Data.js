@@ -40,7 +40,7 @@ Data.prototype.generateGamePin = function () {
   let pin;
   do {
     pin = Math.floor(100000 + Math.random() * 900000).toString();
-  } while (this.pollExists(pin)); // Säkerställ att PIN är unik
+  } while (this.pollExists(pin)); // Säkerställ att PIN är unik... behövs detta? /sebbe
   return pin;
 };
 
