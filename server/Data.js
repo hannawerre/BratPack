@@ -16,7 +16,13 @@ function Data() {
     ],
     answers: [],
     currentQuestion: 0,
-    participants: []
+    participants: [],
+
+    // Game data
+    selectedGames: [],
+    gamePin: '',
+    players: [],
+    selectedMinutes: 60
   }
 }
 
@@ -29,6 +35,34 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
 Data.prototype.pollExists = function (pollId) {
   return typeof this.polls[pollId] !== "undefined"
 }
+
+Data.prototype.generateGamePin = function () {
+  let pin;
+  do {
+    pin = Math.floor(100000 + Math.random() * 900000).toString();
+  } while (this.pollExists(pin)); // Säkerställ att PIN är unik... behövs detta? /sebbe
+  return pin;
+};
+
+Data.prototype.createCustomGame = function (lang = "en") {
+  const pin = this.generateGamePin(); 
+  this.createPoll(pin, lang); 
+  this.gamePin = pin;
+};
+
+Data.prototype.getPin = function(){
+  return this.gamePin;
+};
+
+Data.prototype.storeGameData = function (gameData){
+
+  // Store the gameData
+  this.selectedGames = gameData.selectedGames;
+  this.players = gameData.players;
+  this.selectedMinutes = gameData.selectedMinutes;
+  console.log("Reached to data.storeGameData")
+}
+
 
 Data.prototype.getUILabels = function (lang) {
   //check if lang is valid before trying to load the dictionary file

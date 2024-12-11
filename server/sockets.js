@@ -5,7 +5,6 @@ function sockets(io, socket, data) {
     socket.emit('pollExists', data.pollExists(poll))
   });
 
-
   socket.on('getUILabels', function(lang) {
     socket.emit('uiLabels', data.getUILabels(lang));
   });
@@ -13,6 +12,20 @@ function sockets(io, socket, data) {
   socket.on('createPoll', function(d) {
     data.createPoll(d.pollId, d.lang)
     socket.emit('pollData', data.getPoll(d.pollId));
+  });
+
+  socket.on('createGame', function(lang) {
+    data.createCustomGame(lang); 
+    // Implement error handling if game could not be created
+  });
+  socket.on('readyForPin', function() {
+    const pin = data.getPin();
+    socket.emit('gameCreated', pin);
+  });
+  
+  socket.on('startGame', function(gameData) {
+    data.storeGameData(gameData)
+    //socket emit
   });
 
   socket.on('addQuestion', function(d) {

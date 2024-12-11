@@ -13,7 +13,7 @@
     <button v-on:click="switchLanguage">
       {{ uiLabels.changeLanguage }}
     </button>
-    <router-link to="/create/">
+    <router-link to="//">
       {{ uiLabels.createPoll }}
     </router-link>
     <a href="">
@@ -32,8 +32,8 @@
         <button>Join</button>
       </router-link>
     </div>
-      <router-link to="/create/">
-        <button v-if="!isPlay" id="create">Create Game</button>
+      <router-link to="/customgames/">
+        <button v-if="!isPlay" @click="createGame" id="create">Create Game</button>
       </router-link>
   </div>
 </template>
@@ -55,16 +55,29 @@ export default {
       lang: localStorage.getItem( "lang") || "en",
       hideNav: true,
       isPlay: false,
-      pollExists: false
+      pollExists: false,
+      gamePin: null //is this really needed in StartView.vue? 
     }
   },
   created: function () {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.emit( "getUILabels", this.lang );
     // Listening for "pollExists" from socket.js
-    socket.on("pollExists", exists => this.pollExists = exists)
+    socket.on("pollExists", exists => this.pollExists = exists);
   },
   methods: {
+
+  createGame: function(){
+      console.log("Requesting to create game...");
+      socket.emit("createGame", this.lang);
+      /*
+      socket.on("gameCreated", (data) => {
+      console.log("Game created with PIN:", data.pin);
+      this.$router.push({ name: 'CustomGamesView', query: { gamePin: data.pin } });
+  });*/
+}, //genererar gamepin, lyssnar på backend
+
+
     switchLanguage: function() {
       if (this.lang === "en") {
         this.lang = "sv"
