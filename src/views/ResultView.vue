@@ -1,4 +1,10 @@
 <template>
+    <Nav :hideNav="false"
+  :uiLabels="uiLabels"
+  :lang="lang"
+  @language-changed="handleLanguageChange">
+  </Nav>
+
   <div>
     lang: {{ lang }}
     {{ question.q }}
@@ -10,22 +16,26 @@
 
 <script>
 // @ is an alias to /src
+import Nav from '@/components/ResponsiveNav.vue'
 import BarsComponent from '@/components/BarsComponent.vue';
 import io from 'socket.io-client';
-const socket = io("localhost:3000");
+const socket = io("ws://localhost:3000");
 
 export default {
   name: 'ResultView',
   components: {
-    BarsComponent
+    BarsComponent,
+    Nav
   },
   data: function () {
     return {
       lang: localStorage.getItem("lang") || "en",
       pollId: "",
       question: "",
-      submittedAnswers: {}
+      submittedAnswers: {},
+      uiLabels: {},
     }
+    
   },
   created: function () {
     this.pollId = this.$route.params.id
@@ -34,6 +44,13 @@ export default {
     socket.on("questionUpdate", update => this.question = update );
     socket.emit( "getUILabels", this.lang );
     socket.emit( "joinPoll", this.pollId );
+  },
+  methods: {
+    handleLanguageChange(newLang) {
+      this.lang = newLang;
+      localStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+    }
   }
 }
 </script>

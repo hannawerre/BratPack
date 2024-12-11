@@ -4,9 +4,10 @@
          v-on:click="toggleNav">
     </div>
     <div class="logo">
-      <img src="/img/logo.png">
-      Power Hour
-      <img src="../assets/logo.svg">
+      <!--<img src="/img/powerhour_logo.png">-->
+      <img id="header" src="/img/Header_pwrHour.png">
+      
+      <!--<img src="../assets/logo.svg">-->
     </div>
   </header>
   <ResponsiveNav v-bind:hideNav="hideNav">
@@ -121,10 +122,15 @@ export default {
 <style scoped>
   
   header {
-    background-color: gray;
+    background-color: rgb(71, 71, 255);
     width: 100%;
     display: grid;
     grid-template-columns: 2em auto;
+    justify-content: center;
+  }
+  #header {
+    width: 500px;
+    height: fit-content;
   }
   .logo {
     text-transform: uppercase;
