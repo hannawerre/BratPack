@@ -40,6 +40,11 @@ const router = createRouter({
       name: 'GameView',
       component: () => import('../views/GameView.vue'),
       props: true,
+    },
+    {
+      path: '/customgames/',
+      name: 'CustomGamesView',
+      component: () => import ('../views/CustomGamesView.vue')
     }
 
   ]

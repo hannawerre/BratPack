@@ -7,7 +7,7 @@
   
   <script>
   export default {
-    props: ['gameId'], // Ta emot gameId från route
+    props: ['gameId'], 
   };
   </script>
   

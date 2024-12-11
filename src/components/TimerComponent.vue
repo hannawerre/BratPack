@@ -46,30 +46,21 @@
       }
     },
     startTimer() {
-      
       if (isNaN(this.minutesInput) || this.minutesInput <= 0) {
         this.timerDisplay = "Skriv in antal minuter i rutan";
         return;
       }
- 
- 
-      
+
       this.countDownDate = new Date().getTime() + this.minutesInput * 60 * 1000;
- 
- 
       
       if (this.timerInterval) {
         clearInterval(this.timerInterval);
       }
- 
- 
-      
+
       this.lastMinute = null;
- 
- 
-      
       this.timerInterval = setInterval(this.updateTimer, 1000);
     },
+
     updateTimer() {
       const now = new Date().getTime();
       const distance = this.countDownDate - now;

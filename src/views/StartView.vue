@@ -13,7 +13,7 @@
     <button v-on:click="switchLanguage">
       {{ uiLabels.changeLanguage }}
     </button>
-    <router-link to="/create/">
+    <router-link to="//">
       {{ uiLabels.createPoll }}
     </router-link>
     <a href="">
@@ -32,7 +32,7 @@
         <button>Join</button>
       </router-link>
     </div>
-      <router-link to="/create/">
+      <router-link to="/customgames/">
         <button v-if="!isPlay" @click="createGame" id="create">Create Game</button>
       </router-link>
   </div>
@@ -77,7 +77,7 @@ export default {
       socket.emit("createGame", this.lang);
       socket.on("gameCreated", (data) => {
       console.log("Game created with PIN:", data.pin);
-      this.$router.push({ name: 'CreateView', query: { gamePin: data.pin } });
+      this.$router.push({ name: 'CustomGamesView', query: { gamePin: data.pin } });
   });
 }, //genererar gamepin, lyssnar på backend
 
