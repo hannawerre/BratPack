@@ -1,5 +1,12 @@
 <template>
-
+   <Nav :hideNav="false"
+  :uiLabels="uiLabels"
+  :lang="lang"
+  @language-changed="handleLanguageChange">
+  </Nav>
+  <br>
+  <br>
+  <br>
   <div>
     Poll link: 
     <input type="text" v-model="pollId">
@@ -38,6 +45,7 @@
 </template>
 
 <script>
+import Nav from '@/components/ResponsiveNav.vue'
 import io from 'socket.io-client';
 import TimerComponent from '../components/TimerComponent.vue';
 const socket = io("localhost:3000");
@@ -45,8 +53,8 @@ const socket = io("localhost:3000");
 export default {
   name: 'CreateView',
   components: {
-    TimerComponent
-    
+    TimerComponent,
+    Nav
   },
 
   data: function () {
@@ -83,7 +91,12 @@ export default {
     },
     runQuestion: function () {
       socket.emit("runQuestion", {pollId: this.pollId, questionNumber: this.questionNumber})
-    }
+    },
+    handleLanguageChange(newLang) {
+      this.lang = newLang;
+      localStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+  }
   }
 }
 </script>
