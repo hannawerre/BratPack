@@ -2,7 +2,7 @@
   <nav :class="{'hide': hideNav}">
     <div id="Logo">
       <router-link to="/">
-        <img src="/public/img/logo.png" alt="Logo" />
+        <img src="/img/logo_pwr_hour2.0.png" alt="Logo" />
       </router-link>
     </div>
     <div id="Language">
@@ -63,7 +63,9 @@ nav {
 }
 
 #Logo img {
-  height: 40px;
+  padding-top: 30px;
+  margin-top: 5px;
+  height: 90px;
   cursor: pointer;
 }
 

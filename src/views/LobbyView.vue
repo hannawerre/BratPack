@@ -1,4 +1,10 @@
 <template>
+  <Nav :hideNav="false"
+  :uiLabels="uiLabels"
+  :lang="lang"
+  @language-changed="handleLanguageChange">
+  </Nav>
+  
   <div>
     <h3>Lobby ID: {{pollId}}</h3>
     <div class="usernameInput" v-if="!joined">
@@ -18,11 +24,13 @@
 </template>
 
 <script>
+import Nav from '@/components/ResponsiveNav.vue'
 import io from 'socket.io-client';
 const socket = io("localhost:3000");
 
 export default {
   name: 'LobbyView',
+  components: {Nav},
   data: function () {
     return {
       userName: "",
@@ -30,7 +38,9 @@ export default {
       uiLabels: {},
       joined: false,
       lang: localStorage.getItem("lang") || "en",
-      participants: []
+      participants: [],
+      uiLabels: {},
+      lang: localStorage.getItem("lang") || "en",
     }
   },
   created: function () {
@@ -45,7 +55,12 @@ export default {
     participateInPoll: function () {
       socket.emit( "participateInPoll", {pollId: this.pollId, name: this.userName} )
       this.joined = true;
-    }
+    },
+    handleLanguageChange(newLang) {
+      this.lang = newLang;
+      localStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+  }
   }
 }
 </script>
