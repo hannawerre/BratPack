@@ -3,6 +3,18 @@ import {readFileSync} from "fs";
 
 // Store data in an object to keep the global namespace clean. In an actual implementation this would be interfacing a database...
 function Data() {
+  
+  // Custom Game
+  this.customGames = {};
+  this.customGames['test'] = {
+    lang: "en",
+    participants: [],
+    selectedGames: [],
+    gamePin: '', //game pin sparas som namnet på objektet, behövs den då här? /sebbe
+    selectedMinutes: 60// Var ska tiden sparas? Vi vill kunna hämta tiden som är kvar för att veta när nästa spel ska köras igång! /sebbe
+  };
+
+  // Poll
   this.polls = {};
   this.polls['test'] = {
     lang: "en",
@@ -16,13 +28,7 @@ function Data() {
     ],
     answers: [],
     currentQuestion: 0,
-    participants: [],
-
-    // Game data
-    selectedGames: [],
-    gamePin: '',
-    players: [],
-    selectedMinutes: 60
+    participants: []
   }
 }
 
@@ -36,6 +42,8 @@ Data.prototype.pollExists = function (pollId) {
   return typeof this.polls[pollId] !== "undefined"
 }
 
+// - Custom Game -
+
 Data.prototype.generateGamePin = function () {
   let pin;
   do {
@@ -44,25 +52,54 @@ Data.prototype.generateGamePin = function () {
   return pin;
 };
 
-Data.prototype.createCustomGame = function (lang = "en") {
+Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   const pin = this.generateGamePin(); 
   this.createPoll(pin, lang); 
   this.gamePin = pin;
+
+  if (!this.pollExists(pin)) { //behövs denna if-sats? /sebbe
+    let customGame = {};
+    customGame.lang = lang;  
+    customGame.participants = [];
+    customGame.selectedGames = [];
+    customGame.selectedMinutes = 60;
+    this.customGames[pin] = customGame;
+    console.log("Custom Game created", pin, customGame);
+  };
+  return pin;
 };
 
 Data.prototype.getPin = function(){
-  return this.gamePin;
+  return 10; //fix this
 };
 
 Data.prototype.storeGameData = function (gameData){
 
-  // Store the gameData
-  this.selectedGames = gameData.selectedGames;
-  this.players = gameData.players;
-  this.selectedMinutes = gameData.selectedMinutes;
-  console.log("Reached to data.storeGameData")
+  // Update the gameData
+  let customGame = {};
+  // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
+  customGame.participants = gameData.participants;
+  customGame.selectedGames = gameData.selectedGames;
+  customGame.selectedMinutes = gameData.selectedMinutes;
+  this.customGames[gameData.gamePin] = customGame;
+
+  console.log("Reached to data.storeGameData");
+}
+Data.prototype.getCustomGameParticipants = function(gamePin) {
+  const game = this.customGames[gamePin];
+  console.log("participants requested for custom game: ", gamePin);
+  if (this.pollExists(gamePin)) { 
+    return game.participants;
+  }
+  return [];
 }
 
+Data.prototype.participateInCustomGame = function(gamePin, name) {
+  console.log("Participant will be added to custom game:", gamePin, name);
+  if (this.pollExists(gamePin)) {
+    this.customGames[gamePin].participants.push({name: name})
+  }
+}
 
 Data.prototype.getUILabels = function (lang) {
   //check if lang is valid before trying to load the dictionary file
@@ -72,6 +109,8 @@ Data.prototype.getUILabels = function (lang) {
   return JSON.parse(labels);
 }
 
+
+// - Poll -
 Data.prototype.createPoll = function(pollId, lang="en") {
   if (!this.pollExists(pollId)) {
     let poll = {};

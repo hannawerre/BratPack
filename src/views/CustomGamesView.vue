@@ -38,7 +38,7 @@
   
   <script>
   import io from 'socket.io-client';  // These are needed for the socket communication
-  const socket = io("localhost:3000");// ------
+  const socket = io("localhost:3000"); // ------
   export default {
     name: 'CustomGames',
     components: {
@@ -47,6 +47,7 @@
   
   data: function() {
       return{
+          lang:'en',
           selectedMinutes: 60,
           games: [
             { id: 'game1', name: 'Quiz 1'} ,
@@ -55,17 +56,18 @@
             { id: 'game4', name: 'Quiz 4'}
           ],
           selectedGames: [],
-          players: ['Player 1'],
+          participants: ['Player 1'],
           gamePin: ''
         };
     },
     
   created: function () {
+    socket.emit("createGame", this.lang);
     // First setup listener for 'gameCreated', then emit 'readyForPin' back to socket.js. 
     // This ensures the message comes AFTER the listener is up.
     socket.on('gameCreated', pin => this.gamePin = pin);
-    console.log("Listener for 'gameCreated' in CustomGamesView.vue is active")
-    socket.emit('readyForPin');
+    console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
+    //socket.emit('readyForPin');
   },
   methods: {
   
@@ -85,7 +87,7 @@
             return;
         }
   
-        if (this.players.length === 0) {
+        if (this.participants.length === 0) {
             alert("No players have joined yet.");
             return;
         }
@@ -94,7 +96,7 @@
         let gameData = {
             gamePin: this.gamePin,
             selectedGames: this.selectedGames,
-            players: this.players,
+            participants: this.participants,
             selectedMinutes: this.selectedMinutes
             //add gamesettings
         }

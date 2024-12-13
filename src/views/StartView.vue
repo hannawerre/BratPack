@@ -68,9 +68,11 @@ export default {
   },
   methods: {
 
+    // method currently not used.
   createGame: function(){
       console.log("Requesting to create game...");
-      socket.emit("createGame", this.lang);
+
+      //socket.emit("createGame", this.lang);
       /*
       socket.on("gameCreated", (data) => {
       console.log("Game created with PIN:", data.pin);

@@ -15,19 +15,27 @@ function sockets(io, socket, data) {
   });
 
   socket.on('createGame', function(lang) {
-    data.createCustomGame(lang); 
+    let pin = data.createCustomGame(lang); 
+    socket.emit('gameCreated', pin);
     // Implement error handling if game could not be created
   });
+
+  /* Currently not used
   socket.on('readyForPin', function() {
     const pin = data.getPin();
     socket.emit('gameCreated', pin);
-  });
+  }); */
   
   socket.on('startGame', function(gameData) {
     data.storeGameData(gameData)
     //socket emit
   });
 
+  socket.on('joinCustomGame', function(gamePin) {
+    socket.join(gamePin);
+    // lägga till en emit
+  });
+  
   socket.on('addQuestion', function(d) {
     data.addQuestion(d.pollId, {q: d.q, a: d.a});
     socket.emit('questionUpdate', data.getQuestion(d.pollId));
