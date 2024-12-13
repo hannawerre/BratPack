@@ -1,8 +1,8 @@
 function sockets(io, socket, data) {
 
   // Check if poll exists
-  socket.on('pollExists', function(poll) {
-    socket.emit('pollExists', data.pollExists(poll))
+  socket.on('gameExists', function(game) {
+    socket.emit('gameExists', data.gameExists(game))
   });
 
   socket.on('getUILabels', function(lang) {
@@ -15,7 +15,7 @@ function sockets(io, socket, data) {
   });
 
   socket.on('createGame', function(lang) {
-    let pin = data.createCustomGame(lang); 
+    const pin = data.createCustomGame(lang); 
     socket.emit('gameCreated', pin);
     // Implement error handling if game could not be created
   });
