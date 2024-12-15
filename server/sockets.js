@@ -4,7 +4,9 @@ function sockets(io, socket, data) {
   socket.on('pollExists', function(poll) {
     socket.emit('pollExists', data.pollExists(poll))
   });
-
+  socket.on('customGameExists', function(gamePin) {
+    socket.emit('gameExists', data.customGameExists(gamePin))
+  });
   socket.on('getUILabels', function(lang) {
     socket.emit('uiLabels', data.getUILabels(lang));
   });
@@ -19,21 +21,10 @@ function sockets(io, socket, data) {
     socket.emit('gameCreated', pin);
     // Implement error handling if game could not be created
   });
-
-  /* Currently not used
-  socket.on('readyForPin', function() {
-    const pin = data.getPin();
-    socket.emit('gameCreated', pin);
-  }); */
   
   socket.on('startGame', function(gameData) {
     data.storeGameData(gameData)
     //socket emit
-  });
-
-  socket.on('joinCustomGame', function(gamePin) {
-    socket.join(gamePin);
-    // lägga till en emit
   });
   
   socket.on('addQuestion', function(d) {
@@ -45,6 +36,15 @@ function sockets(io, socket, data) {
     socket.join(pollId);
     socket.emit('questionUpdate', data.getQuestion(pollId))
     socket.emit('submittedAnswersUpdate', data.getSubmittedAnswers(pollId));
+  });
+
+  socket.on('joinCustomGame', function(gamePin) { //joins the socket room 'gamePin'
+    socket.join(gamePin);
+    // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
+  });
+  socket.on('participateInCustomGame', function(d){
+    data.participateInCustomGame(d.gamePin, d.name);
+    io.to(d.gamePin).emit('participantsUpdate', data.getCustomGameParticipants(d.gamePin));
   });
 
   socket.on('participateInPoll', function(d) {

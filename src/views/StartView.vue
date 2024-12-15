@@ -26,10 +26,10 @@
   <div class="items">
     <button v-if="!isPlay" @click="togglePlay">Join Game</button>
     <div v-if="isPlay" class="modal" ref="modal">
-      <input type="text" @input="checkPollExists(newPollId)" v-model="newPollId" :placeholder="'Lobby ID'">
+      <input type="text" @input="checkGameExists(newPollId)" v-model="newPollId" :placeholder="'Lobby ID'">
 
       <! -- The router link only appears if the input poll actually exists -->
-      <router-link v-if="this.pollExists" v-bind:to="'/lobby/' + newPollId">
+      <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + newPollId">
         <button>Join</button>
       </router-link>
     </div>
@@ -56,7 +56,7 @@ export default {
       lang: localStorage.getItem( "lang") || "en",
       hideNav: true,
       isPlay: false,
-      pollExists: false,
+      gameExists: false,
       gamePin: null //is this really needed in StartView.vue? 
     }
   },
@@ -64,7 +64,7 @@ export default {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.emit( "getUILabels", this.lang );
     // Listening for "pollExists" from socket.js
-    socket.on("pollExists", exists => this.pollExists = exists);
+    socket.on("gameExists", exists => this.gameExists = exists);
   },
   methods: {
 
@@ -95,10 +95,10 @@ export default {
       this.hideNav = ! this.hideNav;
     },
     // Checking if poll exists. StartView.vue -> socket.js -> Data.js -> socket.js -> StartView.vue
-    checkPollExists: function(pollId) {
-      console.log("Checking if poll with id:", pollId, "exists");
-      socket.emit("pollExists", pollId);
-      console.log("Poll exists: ", this.pollExists)
+    checkGameExists: function(gamePin) {
+      console.log("Checking if game with gamePin:", gamePin, "exists");
+      socket.emit("customGameExists", gamePin);
+      console.log("Game exists: ", this.gameExists)
     },
     togglePlay: function () {
       console.log("togglePlay")

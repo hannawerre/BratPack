@@ -17,7 +17,7 @@
       <p>{{ this.uiLabels.waitingForHost }}</p>
       <div>
         <h3>{{ this.uiLabels.players }}</h3>
-        <p v-for="participant in participants">{{ participant.name }}</p>
+        <p v-for="participant in participants">{{ participant }}</p>
       </div>
   </div>
   </div>
@@ -34,13 +34,12 @@ export default {
   data: function () {
     return {
       userName: "",
-      pollId: "inactive poll",
+      pollId: "inactive game",
       uiLabels: {},
       joined: false,
       lang: localStorage.getItem("lang") || "en",
       participants: [],
-      uiLabels: {},
-      lang: localStorage.getItem("lang") || "en",
+      uiLabels: {}
     }
   },
   created: function () {
@@ -48,19 +47,19 @@ export default {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.on( "participantsUpdate", p => this.participants = p );
     socket.on( "startPoll", () => this.$router.push("/poll/" + this.pollId) );
-    socket.emit( "joinPoll", this.pollId );
+    socket.emit( "joinCustomGame", this.pollId );
     socket.emit( "getUILabels", this.lang );
   },
   methods: {
     participateInPoll: function () {
-      socket.emit( "participateInPoll", {pollId: this.pollId, name: this.userName} )
+      socket.emit( "participateInCustomGame", {gamePin: this.pollId, name: this.userName} )
       this.joined = true;
     },
     handleLanguageChange(newLang) {
       this.lang = newLang;
       localStorage.setItem("lang", newLang);
       socket.emit("getUILabels", this.lang);
-  }
+    }
   }
 }
 </script>

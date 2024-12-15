@@ -42,7 +42,7 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/customgames/',
+      path: '/customgames/:gamePin?',
       name: 'CustomGamesView',
       component: () => import ('../views/CustomGamesView.vue')
     }

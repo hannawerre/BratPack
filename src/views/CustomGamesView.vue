@@ -37,7 +37,7 @@
   </template>
   
   <script>
-  import io from 'socket.io-client';  // These are needed for the socket communication
+  import io from 'socket.io-client';   // These are needed for the socket communication
   const socket = io("localhost:3000"); // ------
   export default {
     name: 'CustomGames',
@@ -56,18 +56,44 @@
             { id: 'game4', name: 'Quiz 4'}
           ],
           selectedGames: [],
-          participants: ['Player 1'],
+          participants: [],
           gamePin: ''
         };
     },
     
   created: function () {
-    socket.emit("createGame", this.lang);
-    // First setup listener for 'gameCreated', then emit 'readyForPin' back to socket.js. 
-    // This ensures the message comes AFTER the listener is up.
-    socket.on('gameCreated', pin => this.gamePin = pin);
-    console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
-    //socket.emit('readyForPin');
+    // If there is no gamePin in the url, it means that this is the first time the created hook is initiated.
+    // This if-statement ensures new games aren't created when the user just refreshes the site.
+    if (!this.$route.params.gamePin) { 
+      socket.emit("createGame", this.lang);
+      socket.on('gameCreated', pin => {
+        this.gamePin = pin
+        socket.emit('joinCustomGame', pin); //joins the socket room 'gamePin'
+        this.$router.replace({ path: `/customgames/${pin}` });
+      });
+      console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
+    }
+    // This else-statement gets triggered if the site is refreshed.
+    else { 
+      // TODO: när sidan laddas om så tror jag att all sparad data raderas. Därför borde allt som har med spelet och göra att sparas i localStorage eller sessionStorage
+      this.gamePin = this.$route.params.gamePin; // just nu kommer gamePin finnas kvar vid refresh, men jag tror att all game data raderas
+      // alltså ska vi här lägga till att vi hämtar den sparade datan relaterad till gamePin från localStorage eller sessionStorage
+    };
+    
+    
+    socket.on('participantAdded', ({ lobbyID, participant }) => {
+      console.log("participantAdded! checking if it is this lobby")
+      if (lobbyID === this.lobbyID) {
+        this.participants.push(participant);
+        // TODO lägg till error handling så att flera participants inte kan joina..
+        console.log('New participant added:', participant);
+        console.log('All participants: ', this.participants)
+      }
+    });
+    socket.on('participantsUpdate', participants => {
+      this.participants = participants;
+      console.log("Active participants: ", this.participants);
+    });
   },
   methods: {
   

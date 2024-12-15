@@ -3,7 +3,7 @@ import {readFileSync} from "fs";
 
 // Store data in an object to keep the global namespace clean. In an actual implementation this would be interfacing a database...
 function Data() {
-  
+
   // Custom Game
   this.customGames = {};
   this.customGames['test'] = {
@@ -38,43 +38,38 @@ prototype of the Data object/class
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
 ***********************************************/
 
-Data.prototype.pollExists = function (pollId) {
-  return typeof this.polls[pollId] !== "undefined"
-}
 
 // - Custom Game -
+
+Data.prototype.customGameExists = function (gamePin) {
+  return typeof this.customGames[gamePin !== "undefined"]
+}
 
 Data.prototype.generateGamePin = function () {
   let pin;
   do {
     pin = Math.floor(100000 + Math.random() * 900000).toString();
-  } while (this.pollExists(pin)); // Säkerställ att PIN är unik... behövs detta? /sebbe
+  } while (!this.customGameExists(pin)); // Säkerställ att PIN är unik... behövs detta? /sebbe
   return pin;
 };
 
 Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   const pin = this.generateGamePin(); 
-  this.createPoll(pin, lang); 
   this.gamePin = pin;
+  // TODO: If there currently is a game with the same pin. The older game will be overwritten. This issue should probably be solved in CustomGamesView.vue /sebbe
+  let customGame = {};
+  customGame.lang = lang;  
+  customGame.participants = [];
+  customGame.selectedGames = [];
+  customGame.selectedMinutes = 60;
+  this.customGames[pin] = customGame;
 
-  if (!this.pollExists(pin)) { //behövs denna if-sats? /sebbe
-    let customGame = {};
-    customGame.lang = lang;  
-    customGame.participants = [];
-    customGame.selectedGames = [];
-    customGame.selectedMinutes = 60;
-    this.customGames[pin] = customGame;
-    console.log("Custom Game created", pin, customGame);
-  };
+  console.log("Custom Game created", pin, customGame);
+  console.log("Custom Game created", pin, this.customGames);
   return pin;
 };
 
-Data.prototype.getPin = function(){
-  return 10; //fix this
-};
-
 Data.prototype.storeGameData = function (gameData){
-
   // Update the gameData
   let customGame = {};
   // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
@@ -83,21 +78,22 @@ Data.prototype.storeGameData = function (gameData){
   customGame.selectedMinutes = gameData.selectedMinutes;
   this.customGames[gameData.gamePin] = customGame;
 
-  console.log("Reached to data.storeGameData");
+  console.log("Reached to data.storeGameData with current customGames: ", this.customGames);
 }
+
 Data.prototype.getCustomGameParticipants = function(gamePin) {
-  const game = this.customGames[gamePin];
-  console.log("participants requested for custom game: ", gamePin);
-  if (this.pollExists(gamePin)) { 
-    return game.participants;
+  if (this.customGameExists(gamePin)) { 
+    console.log("participants requested for custom game: ", gamePin);
+    return this.customGames[gamePin].participants;
   }
   return [];
 }
 
 Data.prototype.participateInCustomGame = function(gamePin, name) {
   console.log("Participant will be added to custom game:", gamePin, name);
-  if (this.pollExists(gamePin)) {
-    this.customGames[gamePin].participants.push({name: name})
+  if (this.customGameExists(gamePin)) {
+    this.customGames[gamePin].participants.push(name) // TODO: senare när vi lägger till mer funktionalitet ska inte bara namnet pushas här, utan även tex hur det går i varje mini game
+    console.log("Participant added");
   }
 }
 
@@ -111,6 +107,10 @@ Data.prototype.getUILabels = function (lang) {
 
 
 // - Poll -
+
+Data.prototype.pollExists = function (pollId) {
+  return typeof this.polls[pollId] !== "undefined"
+}
 Data.prototype.createPoll = function(pollId, lang="en") {
   if (!this.pollExists(pollId)) {
     let poll = {};
@@ -124,21 +124,18 @@ Data.prototype.createPoll = function(pollId, lang="en") {
   }
   return this.polls[pollId];
 }
-
 Data.prototype.getPoll = function(pollId) {
   if (this.pollExists(pollId)) {
     return this.polls[pollId];
   }
   return {};
 }
-
 Data.prototype.participateInPoll = function(pollId, name) {
   console.log("participant will be added to", pollId, name);
   if (this.pollExists(pollId)) {
     this.polls[pollId].participants.push({name: name, answers: []})
   }
 }
-
 Data.prototype.getParticipants = function(pollId) {
   const poll = this.polls[pollId];
   console.log("participants requested for", pollId);
@@ -147,7 +144,6 @@ Data.prototype.getParticipants = function(pollId) {
   }
   return [];
 }
-
 Data.prototype.addQuestion = function(pollId, q) {
   if (this.pollExists(pollId)) {
     this.polls[pollId].questions.push(q);
