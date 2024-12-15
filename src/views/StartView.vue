@@ -26,10 +26,10 @@
   <div class="items">
     <button v-if="!isPlay" @click="togglePlay">Join Game</button>
     <div v-if="isPlay" class="modal" ref="modal">
-      <input type="text" @input="checkGameExists(newPollId)" v-model="newPollId" :placeholder="'Lobby ID'">
+      <input type="text" @input="checkGameExists(newGamePin)" v-model="newGamePin" :placeholder="'Game PIN'">
 
       <! -- The router link only appears if the input poll actually exists -->
-      <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + newPollId">
+      <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + newGamePin">
         <button>Join</button>
       </router-link>
     </div>
@@ -52,12 +52,11 @@ export default {
   data: function () {
     return {
       uiLabels: {},
-      newPollId: "",
+      newGamePin: "",
       lang: localStorage.getItem( "lang") || "en",
       hideNav: true,
       isPlay: false,
       gameExists: false,
-      gamePin: null //is this really needed in StartView.vue? 
     }
   },
   created: function () {

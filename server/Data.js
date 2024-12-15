@@ -112,7 +112,7 @@ Data.prototype.pollExists = function (pollId) {
   return typeof this.polls[pollId] !== "undefined"
 }
 Data.prototype.createPoll = function(pollId, lang="en") {
-  if (!this.pollExists(pollId)) {
+  if (!this.gameExists(pollId)) {
     let poll = {};
     poll.lang = lang;  
     poll.questions = [];
@@ -125,14 +125,14 @@ Data.prototype.createPoll = function(pollId, lang="en") {
   return this.polls[pollId];
 }
 Data.prototype.getPoll = function(pollId) {
-  if (this.pollExists(pollId)) {
+  if (this.gameExists(pollId)) {
     return this.polls[pollId];
   }
   return {};
 }
 Data.prototype.participateInPoll = function(pollId, name) {
   console.log("participant will be added to", pollId, name);
-  if (this.pollExists(pollId)) {
+  if (this.gameExists(pollId)) {
     this.polls[pollId].participants.push({name: name, answers: []})
   }
 }
@@ -145,13 +145,13 @@ Data.prototype.getParticipants = function(pollId) {
   return [];
 }
 Data.prototype.addQuestion = function(pollId, q) {
-  if (this.pollExists(pollId)) {
+  if (this.gameExists(pollId)) {
     this.polls[pollId].questions.push(q);
   }
 }
 
 Data.prototype.getQuestion = function(pollId, qId = null) {
-  if (this.pollExists(pollId)) {
+  if (this.gameExists(pollId)) {
     const poll = this.polls[pollId];
     if (qId !== null) {
       poll.currentQuestion = qId;
@@ -162,7 +162,7 @@ Data.prototype.getQuestion = function(pollId, qId = null) {
 }
 
 Data.prototype.getSubmittedAnswers = function(pollId) {
-  if (this.pollExists(pollId)) {
+  if (this.gameExists(pollId)) {
     const poll = this.polls[pollId];
     const answers = poll.answers[poll.currentQuestion];
     if (typeof poll.questions[poll.currentQuestion] !== 'undefined') {
@@ -173,7 +173,7 @@ Data.prototype.getSubmittedAnswers = function(pollId) {
 }
 
 Data.prototype.submitAnswer = function(pollId, answer) {
-  if (this.pollExists(pollId)) {
+  if (this.gameExists(pollId)) {
     const poll = this.polls[pollId];
     let answers = poll.answers[poll.currentQuestion];
     // create answers object if no answers have yet been submitted
