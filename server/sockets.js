@@ -1,9 +1,7 @@
 function sockets(io, socket, data) {
 
-  // Check if poll exists
-  socket.on('gameExists', function(game) {
-    socket.emit('gameExists', data.gameExists(game))
-  });
+  // Check if game exists
+  
   socket.on('customGameExists', function(gamePin) {
     socket.emit('gameExists', data.customGameExists(gamePin))
   });
@@ -43,8 +41,13 @@ function sockets(io, socket, data) {
     // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
   });
   socket.on('participateInCustomGame', function(d){
+    console.log("Adding participant: ", d.name, " in game: ", d.gamePin)
     data.participateInCustomGame(d.gamePin, d.name);
-    io.to(d.gamePin).emit('participantsUpdate', data.getCustomGameParticipants(d.gamePin));
+    io.to(d.gamePin).emit('participantsUpdate', data.getCustomGameParticipants(d.gamePin)); //change to getGameData
+  });
+  socket.on("requestGameData", function(gamePin) {
+    let gameData = data.getGameData(gamePin);
+    socket.emit("updateGameData", gameData)
   });
 
   socket.on('participateInPoll', function(d) {

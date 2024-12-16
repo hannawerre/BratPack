@@ -62,6 +62,12 @@
     },
     
   created: function () {
+    socket.on("updateGameData", function(gameData) {
+      this.selectedGames = gameData.selectedGames;
+      this.participants = gameData.participants;
+      this.selectedMinutes = gameData.selectedMinutes;
+      console.log("Updated gameData to: ", this.participants)
+    })
     // If there is no gamePin in the url, it means that this is the first time the created hook is initiated.
     // This if-statement ensures new games aren't created when the user just refreshes the site.
     if (!this.$route.params.gamePin) { 
@@ -76,20 +82,26 @@
     // This else-statement gets triggered if the site is refreshed.
     else { 
       // TODO: när sidan laddas om så tror jag att all sparad data raderas. Därför borde allt som har med spelet och göra att sparas i localStorage eller sessionStorage
+      console.log("Insde else-statement with participants: ", this.participants)
       this.gamePin = this.$route.params.gamePin; // just nu kommer gamePin finnas kvar vid refresh, men jag tror att all game data raderas
+      console.log("GamePin: ", this.gamePin);
+      socket.emit("joinCustomGame",this.gamePin);
+
+      socket.emit("requestGameData", this.gamePin);
       // alltså ska vi här lägga till att vi hämtar den sparade datan relaterad till gamePin från localStorage eller sessionStorage
     };
     
     
-    socket.on('participantAdded', ({ lobbyID, participant }) => {
-      console.log("participantAdded! checking if it is this lobby")
-      if (lobbyID === this.lobbyID) {
-        this.participants.push(participant);
-        // TODO lägg till error handling så att flera participants inte kan joina..
-        console.log('New participant added:', participant);
-        console.log('All participants: ', this.participants)
-      }
-    });
+    // socket.on('participantAdded', ({ lobbyID, participant }) => {
+    //   console.log("participantAdded! checking if it is this lobby")
+    //   if (lobbyID === this.lobbyID) {
+    //     this.participants.push(participant);
+    //     // TODO lägg till error handling så att flera participants inte kan joina..
+    //     console.log('New participant added:', participant);
+    //     console.log('All participants: ', this.participants)
+    //   }
+    // });
+
     socket.on('participantsUpdate', participants => {
       this.participants = participants;
       console.log("Active participants: ", this.participants);

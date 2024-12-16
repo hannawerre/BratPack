@@ -28,7 +28,7 @@
     <div v-if="isPlay" class="modal" ref="modal">
       <input type="text" @input="checkGameExists(newGamePin)" v-model="newGamePin" :placeholder="'Game PIN'">
 
-      <! -- The router link only appears if the input poll actually exists -->
+      <!-- The router link only appears if the input poll actually exists -->
       <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + newGamePin">
         <button>Join</button>
       </router-link>
@@ -78,7 +78,6 @@ export default {
       this.$router.push({ name: 'CustomGamesView', query: { gamePin: data.pin } });
   });*/
 }, //genererar gamepin, lyssnar på backend
-
 
     switchLanguage: function() {
       if (this.lang === "en") {

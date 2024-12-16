@@ -8,6 +8,9 @@
   <script>
   export default {
     props: ['gameId'], 
+    created: function(){
+      console.log()
+    }
   };
   </script>
   

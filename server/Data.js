@@ -43,7 +43,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
 
 Data.prototype.customGameExists = function (gamePin) {
   return typeof this.customGames[gamePin !== "undefined"]
-}
+};
 
 Data.prototype.generateGamePin = function () {
   let pin;
@@ -55,7 +55,6 @@ Data.prototype.generateGamePin = function () {
 
 Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   const pin = this.generateGamePin(); 
-  this.gamePin = pin;
   // TODO: If there currently is a game with the same pin. The older game will be overwritten. This issue should probably be solved in CustomGamesView.vue /sebbe
   let customGame = {};
   customGame.lang = lang;  
@@ -64,7 +63,6 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   customGame.selectedMinutes = 60;
   this.customGames[pin] = customGame;
 
-  console.log("Custom Game created", pin, customGame);
   console.log("Custom Game created", pin, this.customGames);
   return pin;
 };
@@ -79,15 +77,22 @@ Data.prototype.storeGameData = function (gameData){
   this.customGames[gameData.gamePin] = customGame;
 
   console.log("Reached to data.storeGameData with current customGames: ", this.customGames);
+};
+Data.prototype.getGameData = function(gamePin) {
+  if (this.customGameExists(gamePin)) { 
+    console.log("gameData requested for custom game: ", gamePin);
+    return this.customGames[gamePin];
+  }
+  console.log("Requested gameData for non existing game... returning []")
+  return []; //maybe returning an array is not the most convenient way... 
 }
-
 Data.prototype.getCustomGameParticipants = function(gamePin) {
   if (this.customGameExists(gamePin)) { 
     console.log("participants requested for custom game: ", gamePin);
     return this.customGames[gamePin].participants;
   }
-  return [];
-}
+  return [];  //maybe returning an array is not the most convenient way... 
+};
 
 Data.prototype.participateInCustomGame = function(gamePin, name) {
   console.log("Participant will be added to custom game:", gamePin, name);
