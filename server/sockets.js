@@ -56,6 +56,19 @@ function sockets(io, socket, data) {
     data.submitAnswer(d.pollId, d.answer);
     io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
   }); 
+
+  socket.on('update-timer', function(timerDisplay, pollId) {
+    console.log("Mottagit timerDisplay på servern:", timerDisplay, "Poll ID:", pollId);
+    if (pollId) {
+    console.log("Skickar timerDisplay till pollId:", pollId);
+    socket.join(pollId);
+    io.to(pollId).emit('update-timer', timerDisplay);
+    } else {
+    console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
+    io.emit('update-timer', timerDisplay);
+    }
+    });
+    
 }
 
 export { sockets };

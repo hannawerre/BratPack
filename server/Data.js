@@ -22,7 +22,8 @@ function Data() {
     selectedGames: [],
     gamePin: '',
     players: [],
-    selectedMinutes: 60
+    selectedMinutes: 60,
+    timerDisplay: ''
   }
 }
 
@@ -157,5 +158,11 @@ Data.prototype.submitAnswer = function(pollId, answer) {
     console.log("answers looks like ", answers, typeof answers);
   }
 }
+
+Data.prototype.updateTimer = function(pollId, timerDisplay) {
+    if (this.pollExists(pollId)) {
+    this.polls[pollId].timerDisplay = timerDisplay;
+    }
+}    
 
 export { Data };
