@@ -11,7 +11,8 @@ function Data() {
     participants: [],
     selectedGames: [],
     gamePin: '', //game pin sparas som namnet på objektet, behövs den då här? /sebbe
-    selectedMinutes: 60// Var ska tiden sparas? Vi vill kunna hämta tiden som är kvar för att veta när nästa spel ska köras igång! /sebbe
+    selectedMinutes: 60, // Var ska tiden sparas? Vi vill kunna hämta tiden som är kvar för att veta när nästa spel ska köras igång! /sebbe
+    timerDisplay: ''
   };
 
   // Poll
@@ -62,6 +63,7 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   customGame.participants = [];
   customGame.selectedGames = [];
   customGame.selectedMinutes = 60;
+  customGame.timerDisplay = '';
   this.customGames[pin] = customGame;
 
   console.log("Custom Game created", pin, this.customGames);
@@ -198,5 +200,12 @@ Data.prototype.submitAnswer = function(pollId, answer) {
     console.log("answers looks like ", answers, typeof answers);
   }
 }
+
+//Ändrat från pollId till gamePin
+Data.prototype.updateTimer = function(gamePin, timerDisplay) {
+    if (this.customGameExists(gamePin)) {
+    this.customGames[gamePin].timerDisplay = timerDisplay;
+    }
+}    
 
 export { Data };

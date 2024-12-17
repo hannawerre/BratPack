@@ -68,6 +68,20 @@ function sockets(io, socket, data) {
     data.submitAnswer(d.pollId, d.answer);
     io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
   }); 
+
+  //Ändrat från pollId till gamePin
+  socket.on('update-timer', function(timerDisplay, gamePin) {
+    console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin);
+    if (gamePin) {
+    console.log("Skickar timerDisplay till gamePin:", gamePin);
+    socket.join(gamePin);
+    io.to(gamePin).emit('update-timer', timerDisplay);
+    } else {
+    console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
+    io.emit('update-timer', timerDisplay);
+    }
+    });
+    
 }
 
 export { sockets };
