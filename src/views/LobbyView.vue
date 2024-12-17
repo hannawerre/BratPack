@@ -17,7 +17,7 @@
       <p>{{ this.uiLabels.waitingForHost }}</p>
       <div>
         <h3>{{ this.uiLabels.players }}</h3>
-        <p v-for="participant in participants">{{ participant }}</p>
+        <p v-for="participant in participants">{{ participant}}</p>
       </div>
   </div>
   </div>
@@ -45,7 +45,11 @@ export default {
   created: function () {
     this.pollId = this.$route.params.id;
     socket.on( "uiLabels", labels => this.uiLabels = labels );
-    socket.on( "participantsUpdate", p => this.participants = p );
+    socket.on( "participantsUpdate", p => {
+      this.participants = p;
+      console.log("Socket ID: ", socket.id) // kanske spara ner socketID i dataobjektet ovan...? 
+                                            // Eller spara userName: socketID som key value pairs i Data.js /sebbe
+    });
     socket.on( "startPoll", () => this.$router.push("/poll/" + this.pollId) );
     socket.emit( "joinCustomGame", this.pollId );
     socket.emit( "getUILabels", this.lang );

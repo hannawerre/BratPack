@@ -43,6 +43,7 @@ function sockets(io, socket, data) {
   socket.on('participateInCustomGame', function(d){
     console.log("Adding participant: ", d.name, " in game: ", d.gamePin)
     data.participateInCustomGame(d.gamePin, d.name);
+    console.log("User has joined. SocketID: ", socket.id)
     io.to(d.gamePin).emit('participantsUpdate', data.getCustomGameParticipants(d.gamePin)); //change to getGameData
   });
   socket.on("requestGameData", function(gamePin) {

@@ -42,14 +42,15 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
 // - Custom Game -
 
 Data.prototype.customGameExists = function (gamePin) {
-  return typeof this.customGames[gamePin !== "undefined"]
+  //console.log("Checking if '", gamePin, "' is a customGame. Customgames: ", this.customGames)
+  return typeof this.customGames[gamePin] !== "undefined";
 };
 
 Data.prototype.generateGamePin = function () {
   let pin;
   do {
     pin = Math.floor(100000 + Math.random() * 900000).toString();
-  } while (!this.customGameExists(pin)); // Säkerställ att PIN är unik... behövs detta? /sebbe
+  } while (this.customGameExists(pin)); // Säkerställ att PIN är unik... behövs detta? Och är den inte bakåtvänd? /sebbe
   return pin;
 };
 

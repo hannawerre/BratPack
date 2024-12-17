@@ -71,13 +71,14 @@
     // If there is no gamePin in the url, it means that this is the first time the created hook is initiated.
     // This if-statement ensures new games aren't created when the user just refreshes the site.
     if (!this.$route.params.gamePin) { 
-      socket.emit("createGame", this.lang);
       socket.on('gameCreated', pin => {
         this.gamePin = pin
         socket.emit('joinCustomGame', pin); //joins the socket room 'gamePin'
         this.$router.replace({ path: `/customgames/${pin}` });
       });
       console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
+      socket.emit("createGame", this.lang);
+      console.log("Emitted createGame from CustomGamesView.vue")
     }
     // This else-statement gets triggered if the site is refreshed.
     else { 
