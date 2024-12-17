@@ -201,9 +201,10 @@ Data.prototype.submitAnswer = function(pollId, answer) {
   }
 }
 
-Data.prototype.updateTimer = function(pollId, timerDisplay) {
-    if (this.pollExists(pollId)) {
-    this.polls[pollId].timerDisplay = timerDisplay;
+//Ändrat från pollId till gamePin
+Data.prototype.updateTimer = function(gamePin, timerDisplay) {
+    if (this.customGameExists(gamePin)) {
+    this.customGames[gamePin].timerDisplay = timerDisplay;
     }
 }    
 

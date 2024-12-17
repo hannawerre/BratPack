@@ -69,12 +69,13 @@ function sockets(io, socket, data) {
     io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
   }); 
 
-  socket.on('update-timer', function(timerDisplay, pollId) {
-    console.log("Mottagit timerDisplay på servern:", timerDisplay, "Poll ID:", pollId);
-    if (pollId) {
-    console.log("Skickar timerDisplay till pollId:", pollId);
-    socket.join(pollId);
-    io.to(pollId).emit('update-timer', timerDisplay);
+  //Ändrat från pollId till gamePin
+  socket.on('update-timer', function(timerDisplay, gamePin) {
+    console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin);
+    if (gamePin) {
+    console.log("Skickar timerDisplay till gamePin:", gamePin);
+    socket.join(gamePin);
+    io.to(gamePin).emit('update-timer', timerDisplay);
     } else {
     console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
     io.emit('update-timer', timerDisplay);
