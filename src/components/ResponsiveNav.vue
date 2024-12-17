@@ -5,6 +5,9 @@
         <img src="/img/logo_pwr_hour2.0.png" alt="Logo" />
       </router-link>
     </div>
+    <div>
+      <span> {{ miniClock }} </span>
+    </div>
     <div id="Language">
           <LanguageSwitcher 
       :lang="lang" 
@@ -17,6 +20,9 @@
 
 <script>
 import LanguageSwitcher from './LanguageSwitcher.vue'
+import io from 'socket.io-client';
+const socket = io("localhost:3000");
+
 
 export default {
   name: 'ResponsiveNav',
@@ -37,11 +43,32 @@ export default {
       default: 'en'
     }
   },
+  data() {
+    return {
+    miniClock: "",
+    };
+  },
+
   methods: {
     emitLanguageChangeToParent(newLang) {
       this.$emit('language-changed', newLang);
-    }
+    },
+    updateMiniClock(timerDisplay) {
+      console.log("TimerDispaly from responsiveNav= ", this.miniClock);
+      this.miniClock = timerDisplay;
   }
+  },
+  
+  created: function() {
+    socket.on('update-timer', (timerDisplay) => {
+    console.log("Mottar timerDisplay:", timerDisplay);
+    this.miniClock = timerDisplay;
+  })},
+  beforeDestroy() {
+    socket.off('update-timer'); // Avregistrerar händelsen
+  }
+
+
 };
 </script>
 

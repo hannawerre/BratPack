@@ -20,6 +20,10 @@
  
  
  <script>
+
+import io from 'socket.io-client';
+const socket = io("localhost:3000");
+
  export default {
   name: "Timer",
   data() {
@@ -60,6 +64,11 @@
       this.lastMinute = null;
       this.timerInterval = setInterval(this.updateTimer, 1000);
     },
+    sendUpdateTimer () {
+      console.log("TimerDispaly from timercomponant= ", this.timerDisplay);
+      socket.emit('update-timer', this.timerDisplay);
+    },
+
 
     updateTimer() {
       const now = new Date().getTime();
@@ -103,7 +112,7 @@
         this.playAlarm();
         
       }
-     
+      this.sendUpdateTimer();
     },
 
     playSilence() {
