@@ -1,4 +1,6 @@
 <template>
+  <div class="container">
+    <div class="main-content">
     <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
     <h1 v-else>Loading Game PIN...</h1>
   
@@ -23,39 +25,41 @@
         />
         <label :for="game.id">{{ game.name }}</label>
         
-        <!-- <router-link v-bind:to="{ name: 'EditView', params: { gameId: game.id } }" class="edit-button">
+        <router-link v-bind:to="{ name: 'EditView', params: { gameId: game.id } }" class="edit-button">
             <img src="/img/Gear-icon.png" alt="Edit" class="edit-icon" />
-        </router-link> -->
-
-        <div @click="openModal(game)" class="edit-button">
-          <img src="/img/Gear-icon.png" alt="Edit" class="edit-icon" />
-        </div>
-        
+        </router-link>
+  
     </div>
-    <Modal 
-          ref="modalRef" 
-          :GameName='currentGame ? currentGame.name : ""'
-          @modal-closed="onModalClosed"/>
   
     <div class="startbutton-container">
         <button class="startbutton" @click="startGame">Start Game</button>
     </div>
+  </div>
+  <div class="participants">
+    <h2>Participants</h2>
+    <ul>
+      <li v-for="(participant, index) in participants" :key="index"> 
+        {{ participant}}
+      </li>
+
+    </ul>
+
+  </div>
+  </div>
   
   
   </template>
   
   <script>
   import io from 'socket.io-client';   // These are needed for the socket communication
-  import Modal from '../components/EditComponent.vue';
-
-  const socket = io("localhost:3000");
-
+  const socket = io("localhost:3000"); // ------
   export default {
     name: 'CustomGames',
     components: {
-      Modal
+  
     },
-    data: function() {
+  
+  data: function() {
       return{
           lang:'en',
           selectedMinutes: 60,
@@ -67,11 +71,9 @@
           ],
           selectedGames: [],
           participants: [],
-          gamePin: '',
-          currentGame: null,
+          gamePin: ''
         };
     },
-
     
   created: function () {
     socket.on("updateGameData", function(gameData) {
@@ -105,7 +107,6 @@
     };
     
     
-    
     // socket.on('participantAdded', ({ lobbyID, participant }) => {
     //   console.log("participantAdded! checking if it is this lobby")
     //   if (lobbyID === this.lobbyID) {
@@ -122,6 +123,7 @@
     });
   },
   methods: {
+    
   
       incrementMinutes: function() {
           this.selectedMinutes += 10;
@@ -158,20 +160,26 @@
         this.$router.push({
           name: 'GameView',
         });   
-      },
-      openModal(game) {
-        this.currentGame = game;
-        this.$refs.modalRef.openModal();
-      },
-      onModalClosed() {
-        console.log('Modalen är stängd');
-        this.currentGame = null;
       }
     }
   }
   </script>
   
   <style>
+  .container {
+    align-items: flex-start;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    padding: 20px;
+    
+  }
+
+  .main-content {
+    flex: 1;
+    text-align: center;
+}
+
   
   .decrement-button{
     background-color: rgb(213, 8, 8);
@@ -243,7 +251,7 @@
   color: white;
   border: none;
   border-radius: 40px;
-  padding: 6px 6px;
+  padding: 6px 8px;
   text-align: center;
   text-decoration: none;
   font-size: 14px;
@@ -265,6 +273,35 @@
   width: 30px; 
   height: 30px; 
   vertical-align: middle; 
+  }
+
+  .participants {
+    flex: 0 0 auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: lightblue;
+    position: absolute;
+    right: 0;
+    margin-right: 40px;
+    margin-top: 40px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+
+}
+
+  .participants h2{
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .participants ul{
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .participants li{
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
   }
   
   
