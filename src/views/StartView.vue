@@ -60,6 +60,9 @@ export default {
     }
   },
   created: function () {
+    // Removes userName from the current sessionStorage if the user clicks home button
+    // sessionStorage.removeItem('userName'); //används inte just nu. Kan bli relevant om användaren inte ska raderas vid refresh /sebbe
+
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.emit( "getUILabels", this.lang );
     // Listening for "pollExists" from socket.js
