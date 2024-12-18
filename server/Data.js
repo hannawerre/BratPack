@@ -202,9 +202,10 @@ Data.prototype.submitAnswer = function(pollId, answer) {
 }
 
 //Ändrat från pollId till gamePin
-Data.prototype.updateTimer = function(gamePin, timerDisplay) {
+Data.prototype.updateTimer = function(gamePin, timerDisplay, soundType = null) {
     if (this.customGameExists(gamePin)) {
     this.customGames[gamePin].timerDisplay = timerDisplay;
+    this.customGames[gamePin].soundType = soundType;
     }
 }    
 

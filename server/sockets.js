@@ -70,15 +70,16 @@ function sockets(io, socket, data) {
   }); 
 
   //Ändrat från pollId till gamePin
-  socket.on('update-timer', function(timerDisplay, gamePin) {
-    console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin);
+  socket.on('update-timer', function(data) {
+    const { timerDisplay, gamePin, soundType } = data || {};
+    console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin, "Sound Type:", soundType);
     if (gamePin) {
     console.log("Skickar timerDisplay till gamePin:", gamePin);
     socket.join(gamePin);
-    io.to(gamePin).emit('update-timer', timerDisplay);
+    io.to(gamePin).emit('update-timer', { timerDisplay, soundType });
     } else {
     console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
-    io.emit('update-timer', timerDisplay);
+    io.emit('update-timer', { timerDisplay, soundType });
     }
     });
     

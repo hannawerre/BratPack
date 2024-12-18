@@ -64,9 +64,9 @@ const socket = io("localhost:3000");
       this.lastMinute = null;
       this.timerInterval = setInterval(this.updateTimer, 1000);
     },
-    sendUpdateTimer () {
-      console.log("TimerDispaly from timercomponant= ", this.timerDisplay);
-      socket.emit('update-timer', this.timerDisplay);
+    sendUpdateTimer (soundType) {
+      console.log("TimerDispaly from timercomponant= ", this.timerDisplay, soundType);
+      socket.emit('update-timer', { timerDisplay: this.timerDisplay, soundType });
     },
 
 
@@ -80,6 +80,7 @@ const socket = io("localhost:3000");
         clearInterval(this.timerInterval);
         this.timerDisplay = "Tiden är slut!";
         this.playAlarm(); 
+        this.sendUpdateTimer('alarm');
         return;
       }
  
@@ -106,13 +107,14 @@ const socket = io("localhost:3000");
 
         this.lastMinute = minutes;
         this.playSilence();
-      } if (totalSeconds % 60 === 0) {
+        this.sendUpdateTimer('silence');
+        } else if (totalSeconds % 60 === 0) {
         this.lastMinute = minutes;
-
         this.playAlarm();
-        
+        this.sendUpdateTimer('alarm'); // Skicka signal för alarm
+        } else {
+        this.sendUpdateTimer(); // Skicka bara timerDisplay
       }
-      this.sendUpdateTimer();
     },
 
     playSilence() {

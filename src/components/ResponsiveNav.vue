@@ -56,13 +56,64 @@ export default {
     updateMiniClock(timerDisplay) {
       console.log("TimerDispaly from responsiveNav= ", this.miniClock);
       this.miniClock = timerDisplay;
+  },
+
+  playAlarm() {
+    console.log("Spelar alarm...");
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const alarmSound = new Audio('public/audio/silence.mp3');
+    const track = audioContext.createMediaElementSource(alarmSound);
+
+    // Koppla till destinationen (högtalare)
+    track.connect(audioContext.destination);
+
+    // Säkerställ att AudioContext är i "resumed"-läge innan uppspelning
+    audioContext.resume().then(() => {
+        alarmSound.play().then(() => {
+            console.log("Alarm spelas upp via AudioContext.");
+        }).catch(error => {
+            console.error("Kunde inte spela upp alarmet:", error);
+        });
+    }).catch(error => {
+        console.error("Kunde inte återuppta AudioContext:", error);
+    });
+  },
+  playSilence() {
+    console.log("Spelar tystnad...");
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const silenceSound = new Audio('public/audio/silence.mp3');
+    const track = audioContext.createMediaElementSource(silenceSound);
+
+    // Koppla till destinationen (högtalare)
+    track.connect(audioContext.destination);
+
+    // Säkerställ att AudioContext är i "resumed"-läge innan uppspelning
+    audioContext.resume().then(() => {
+        silenceSound.play().then(() => {
+            console.log("Silence spelas upp via AudioContext.");
+        }).catch(error => {
+            console.error("Kunde inte spela upp Silence:", error);
+        });
+    }).catch(error => {
+        console.error("Kunde inte återuppta AudioContext:", error);
+    });
   }
   },
   
   created: function() {
-    socket.on('update-timer', (timerDisplay) => {
-    console.log("Mottar timerDisplay:", timerDisplay);
+    socket.on('update-timer', ({ timerDisplay, soundType }) => {
+    console.log("Mottar timerDisplay och soundtype:", timerDisplay, soundType);
     this.miniClock = timerDisplay;
+
+    if (soundType === 'alarm') {
+        this.playAlarm();
+    } else if (soundType === 'silence') {
+        this.playSilence();
+    } else if (soundType === null) {
+        console.log("Inget ljudspel ska spelas.");
+    } else {
+        console.warn("Okänd ljudtyp:", soundType);
+    }
   })},
   beforeDestroy() {
     socket.off('update-timer'); // Avregistrerar händelsen
