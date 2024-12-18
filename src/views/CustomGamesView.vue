@@ -23,11 +23,19 @@
         />
         <label :for="game.id">{{ game.name }}</label>
         
-        <router-link v-bind:to="{ name: 'EditView', params: { gameId: game.id } }" class="edit-button">
+        <!-- <router-link v-bind:to="{ name: 'EditView', params: { gameId: game.id } }" class="edit-button">
             <img src="/img/Gear-icon.png" alt="Edit" class="edit-icon" />
-        </router-link>
-  
+        </router-link> -->
+
+        <div @click="openModal(game)" class="edit-button">
+          <img src="/img/Gear-icon.png" alt="Edit" class="edit-icon" />
+        </div>
+        
     </div>
+    <Modal 
+          ref="modalRef" 
+          :GameName='currentGame ? currentGame.name : ""'
+          @modal-closed="onModalClosed"/>
   
     <div class="startbutton-container">
         <button class="startbutton" @click="startGame">Start Game</button>
@@ -38,14 +46,16 @@
   
   <script>
   import io from 'socket.io-client';   // These are needed for the socket communication
-  const socket = io("localhost:3000"); // ------
+  import Modal from '../components/EditComponent.vue';
+
+  const socket = io("localhost:3000");
+
   export default {
     name: 'CustomGames',
     components: {
-  
+      Modal
     },
-  
-  data: function() {
+    data: function() {
       return{
           lang:'en',
           selectedMinutes: 60,
@@ -57,9 +67,11 @@
           ],
           selectedGames: [],
           participants: [],
-          gamePin: ''
+          gamePin: '',
+          currentGame: null,
         };
     },
+
     
   created: function () {
     socket.on("updateGameData", function(gameData) {
@@ -91,6 +103,7 @@
       socket.emit("requestGameData", this.gamePin);
       // alltså ska vi här lägga till att vi hämtar den sparade datan relaterad till gamePin från localStorage eller sessionStorage
     };
+    
     
     
     // socket.on('participantAdded', ({ lobbyID, participant }) => {
@@ -145,6 +158,14 @@
         this.$router.push({
           name: 'GameView',
         });   
+      },
+      openModal(game) {
+        this.currentGame = game;
+        this.$refs.modalRef.openModal();
+      },
+      onModalClosed() {
+        console.log('Modalen är stängd');
+        this.currentGame = null;
       }
     }
   }
@@ -222,7 +243,7 @@
   color: white;
   border: none;
   border-radius: 40px;
-  padding: 6px 8px;
+  padding: 6px 6px;
   text-align: center;
   text-decoration: none;
   font-size: 14px;
