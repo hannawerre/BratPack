@@ -227,426 +227,163 @@ created: function () {
         console.log("Game already exists, gamepin: ", gamepin);
         this.showGameExistsPopup = true;
 
-      })
-      socket.emit("adminStartedWithExisitingPin", this.gamePin, this.lang) //behöver listener?
-      socket.emit("joinSocketRoom",this.gamePin); // lägga denna tidigare?
       socket.emit("requestGameData", this.gamePin);
-  
-};
+      // alltså ska vi här lägga till att vi hämtar den sparade datan relaterad till gamePin från localStorage eller sessionStorage
+    };
     
-socket.on('participantsUpdate', participants => {
-    this.participants = participants;
-    console.log("Participants updatet, active participants: ", this.participants);
-});
-
-
-/*
-
-  //Används ej
-  socket.emit("adminRejoined", (this.gamePin))
-  console.log("adminRejoined",this.gamePin, this.userName)
-
-  */
-},
-methods: {
-
-  mainMenu: function() {
-    window.removeEventListener("beforeunload", this.handleBeforeUnload);
-    this.$router.push("/");
-  },
-
-
-  handleLanguageChange(newLang) {
-      this.lang = newLang;
-      sessionStorage.setItem("lang", newLang);
-      socket.emit("getUILabels", this.lang);
-  }, 
-  
-  incrementMinutes: function() {
-    this.selectedMinutes += 10;
-    console.log(this.participants);
-  },
-
-  decrementMinutes: function () {
-    if(this.selectedMinutes > 10){
-      this.selectedMinutes -= 10;
-    }
-  },
-
-  isNameTaken: function(userName) {
-        this.nameTaken = this.participants.some(participant => participant.name === userName);
-        console.log("Name taken: ", this.nameTaken);
-        console.log("All participants: ", this.participants);
-    return this.nameTaken;
-  },
-
-  startGame: function () {
-    console.log("playerRole: ", this.playerRole);
-
-    if(this.isNameTaken(this.userName)){
-      alert("Name is taken, please choose another one");
-      return;
-    }
-
-    if (this.selectedGames.length === 0) {
-      alert("Please select at least one game.");
-      return;
-    }
-
-    if (this.participants.length === 0 && this.userRole === 'play') {
-      alert("No players have joined yet.");
-      return;
-    }
-    if(this.participants.length < 2 && this.userRole === 'host'){
-      alert("Only one player has joined. At least two players are required to start the game.");
-      return;
-    }
-
-    if (this.userRole === 'play') {
-      if (!this.userName) {
-        alert("Please enter your username.");
-        return;
-      }
-      console.log("hej",   this.userName);
-      const adminName={      
-        name: this.userName,
-        scoreGame1: 0,
-        scoreGame2: 0,
-        scoreGame3: 0,
-        scoreGame4: 0
-      }
-      console.log("adminName: ", adminName);
-      // socket.emit( "participateInCustomGame", this.gamePin,  adminName);
-      this.gameStarted = true;
-      this.participants.unshift(adminName);
-      sessionStorage.setItem('userName', this.userName); 
-    }
-    else {
-      // Ensure there is no name left in session storage. This is what determines if admin is playing in later views.
-      if (sessionStorage.getItem('userName')) {
-          sessionStorage.removeItem('userName');
-      }
-    }
-    sessionStorage.setItem('isAdmin', true);
     
-    let gameData = {  // borde den inte vara const? /theo
-      gamePin: this.gamePin,
-      selectedGames: this.selectedGames,
-      participants: this.participants,
-      selectedMinutes: this.selectedMinutes
-      //lang: this.lang språk sparas i gameData eller localStorage?
-    }
-    console.log("Davids och sebbes test: ", gameData);
-
-    window.removeEventListener("beforeunload", this.handleBeforeUnload);
-
-    socket.emit('startGame', gameData)
-    this.$router.push("/game/" + this.gamePin).then(() => {
-    // Add or maintain the beforeunload listener
-    
-    console.log("--> Listener carried over to /game/");
-  });
-
-    // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
-    // this.$router.push({
-    //   name: 'GameView',
-    //   params: { gamePin }
+    // socket.on('participantAdded', ({ lobbyID, participant }) => {
+    //   console.log("participantAdded! checking if it is this lobby")
+    //   if (lobbyID === this.lobbyID) {
+    //     this.participants.push(participant);
+    //     // TODO lägg till error handling så att flera participants inte kan joina..
+    //     console.log('New participant added:', participant);
+    //     console.log('All participants: ', this.participants)
+    //   }
     // });
-    console.log("--> After startGame!")
+
+    socket.on('participantsUpdate', participants => {
+      this.participants = participants;
+      console.log("Active participants: ", this.participants);
+    });
   },
-
-  openModal(game) {
-  this.currentGame = game;
-
-  if (game.id === 'generalQuiz') {
-    this.$refs.modalGeneralQuiz.openModal(); // Kontrollera denna rad
-  } else if (game.id === 'whosMostLikelyTo') {
-    this.$refs.modalWhosMostLikelyTo.openModal();
-  } else if (game.id === 'thisOrThat') {
-    this.$refs.modalThisOrThat.openModal();
-  }
-},
-
-  onModalClosed() {
-    console.log('Modalen är stängd');
-    this.currentGame = null;
-  },
-
-  onQuestionsSaved(savedQuestions, useCustomQuestions) { // kanske kan skriva ihop denna med onModalClosed? //david
-    console.log(this.currentGame.id);
-
-    console.log("Här ska customGames vara tom", this.customQuestions);
-
-    if (!this.customQuestions[this.currentGame.id]) {
-    this.customQuestions[this.currentGame.id] = {};
-  }
-
-  this.customQuestions[this.currentGame.id].customQuestions = savedQuestions;
-  this.customQuestions[this.currentGame.id].useCustomQuestions = useCustomQuestions;
-  // this.useCustomQuestions = useCustomQuestions;
-  // this.customQuestions = savedQuestions;
-
-
-  // console.log("Dessa ska vara lika dana:", this.customQuestions, "och", thiscustomQuestions[this.currentGame.id].customQuestions )
-
-  socket.emit(
-    "savedQuestionsToServer", 
-    this.gamePin, 
-    this.customQuestions[this.currentGame.id].customQuestions,
-    this.customQuestions[this.currentGame.id].useCustomQuestions,
-    this.currentGame.id
-  );
-},
-
-  // handleWindowClose(event) {
-  //     console.log("Admin window closed! unactivating lobby")
-  //     //socket.emit("adminLeftGame", this.gamePin, this.userName);
-  //   },
-
-  handleBeforeUnload(event) {
-      const dataToSave = {
-        selectedGames: this.selectedGames,
-        participants: this.participants,
-        customQuestions: this.customQuestions,
-        userName: this.userName,
-        userRole: this.userRole,
-        selectedMinutes: this.selectedMinutes
-      };
-
-      console.log("Saving data before unload:", dataToSave);
-
-      sessionStorage.setItem('shouldRestoreState', true);
-      sessionStorage.setItem('savedData', JSON.stringify(dataToSave));
-      // Visa standardvarning om det behövs
-    },
-
-  checkIfRefreshPage() {
-    // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
-      let storagePin = sessionStorage.getItem('gamePin');
-      if (storagePin) {
+  methods: {
+  
+      incrementMinutes: function() {
+          this.selectedMinutes += 10;
+        },
+  
+      decrementMinutes: function () {
+        if(this.selectedMinutes > 10){
+            this.selectedMinutes -= 10;
+        }
+      },
+  
+      startGame: function () {
+        if (this.selectedGames.length === 0) {
+            alert("Please select at least one game.");
+            return;
+        }
+  
+        if (this.participants.length === 0) {
+            alert("No players have joined yet.");
+            return;
+        }
         
-        this.gamePin = storagePin;
-        socket.emit("requestParticipants", this.gamePin);
-        
+        // This is what we send to Data.js
+        let gameData = {
+            gamePin: this.gamePin,
+            selectedGames: this.selectedGames,
+            participants: this.participants,
+            selectedMinutes: this.selectedMinutes
+            //add gamesettings
+        }
+  
+        socket.emit('startGame', gameData),
+
+        this.$router.push({
+          name: 'GameView',
+        });   
       }
-    console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
-    },
-    handleLanguageChange(newLang) {
-      this.lang = newLang;
-      localStorage.setItem("lang", newLang);
-      socket.emit("getUILabels", this.lang);
-    },
-    // dismantleSocket(){ //TODO kanske ta bort
-    //   console.log("-->before if-statement in dismantleSocket in CustomGamesView")
-    //   if(socket) {
-    //   console.log("-->inside if-statement in dismantleSocket in CustomGamesView")
-    //     socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
-    //     // socket.disconnect(); // Disconnect the socket
-    // }else console.log("this.socket does not exist in CustomGamesView")
-    // }
-  },
-
-mounted() {
-
-  window.addEventListener("beforeunload", this.handleBeforeUnload);
-
-  },
-  beforeUnmount() {
-    // this.dismantleSocket();
-    console.log("Admin left game, removed event listener");
-    
-    //socket.emit("adminLeftGame", this.gamePin);
-    window.removeEventListener("beforeunload", this.handleBeforeUnload);
-
-    sessionStorage.removeItem('shouldRestoreState');
-    sessionStorage.removeItem('savedData');
-
+    }
   }
-
+  </script>
+  
+  <style>
+  
+  .decrement-button{
+    background-color: rgb(213, 8, 8);
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
   }
-</script>
-
-
-<style>
-  .container {
-    align-items: flex-start;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: space-between;
-    padding: 20px;
-    
+  
+  .decrement-button:hover{
+    background-color: rgb(247, 44, 44);
+    box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
+    transform: scale(1.05);
   }
-
-  .main-content {
-    flex: 1;
-    text-align: center;
-}
-
-.admin-player {
-  padding: 10px;
-  margin: 20px 0;
-  text-align: center;
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.admin-player h2 {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.radio-group {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  color: #555;
-}
-
-.radio-option input[type="radio"] {
-  transform: scale(1.2);
-  accent-color: #4caf50;
-  cursor: pointer;
-  margin-right: 6px;
-}
-
-.form-group {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-
-
-.game-item {
-display: flex;
-justify-content: center; 
-align-items: center; 
-margin-bottom: 20px; 
-}
-
-.game-item label {
-margin-left: 10px; 
-margin-right: 20px; 
-font-weight: bold;
-}
-
-.edit-button {
-display: inline-block;
-background-color: rgb(183, 183, 183);
-color: white;
-border: none;
-border-radius: 40px;
-padding: 6px 8px;
-text-align: center;
-text-decoration: none;
-font-size: 14px;
-cursor: pointer;
-transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.edit-button:hover {
-background-color: rgb(170, 168, 168);
-transform: scale(1.02);
-box-shadow: 0 0 5px 2px  rgba(0, 0, 0, 0.5);
-}
-
-.edit-button:active {
-transform: scale(1);
-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.5);
-}
-.edit-icon {
-width: 30px; 
-height: 30px; 
-vertical-align: middle; 
-}
-
-input[type="checkbox"] {  
-      width: 20px;
-      height: 20px;
+  .increment-button{
+    background-color: green;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
   }
-
-  .participants {
-    flex: 0 0 auto;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+  
+  .increment-button:hover{
+    background-color: rgb(8, 179, 8);
+    box-shadow: 0 0 5px 2px rgba(8, 179, 8, 0.5);
+    transform: scale(1.05);
+  }
+  
+  .startbutton{
+    background-color: green;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;  
+    display: inline-block;
+    font-size: 16px;
+    margin: 30px 4px;
     padding: 15px;
-    background-color: lightblue;
-    position: absolute;
-    right: 0;
-    margin-right: 50px;
-    margin-top: 20px;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
-}
- .participants h2{
     text-align: center;
-    margin-bottom: 10px;
+    text-decoration: none;  
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
-
-  .participants ul{
-    list-style-type: none;
-    padding: 0;
+  
+  .startbutton:hover{
+    background-color: rgb(8, 179, 8);
+    box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5); 
+    transform: scale(1.05);
   }
-
-  .participants li{
-    padding: 5px 0;
-    border-bottom: 1px solid #ddd;
-  }
-
-
-
-  .popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  
+  .game-item {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.popup-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  width: 300px;
-}
-
-.popup-content h2 {
-  margin-bottom: 10px;
-}
-
-.popup-content p {
-  margin-bottom: 20px;
-}
-
-.popup-content button {
-  background-color: #4caf50;
+  justify-content: center; 
+  align-items: center; 
+  margin-bottom: 20px; 
+  }
+  
+  .game-item label {
+  margin-left: 10px; 
+  margin-right: 20px; 
+  }
+  
+  .edit-button {
+  display: inline-block;
+  background-color: rgb(183, 183, 183);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 40px;
+  padding: 6px 8px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.popup-content button:hover {
-  background-color: #45a049;
-}
-</style>
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .edit-button:hover {
+  background-color: rgb(170, 168, 168);
+  transform: scale(1.02);
+  box-shadow: 0 0 5px 2px  rgba(0, 0, 0, 0.5);
+  }
+  
+  .edit-button:active {
+  transform: scale(1);
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.5);
+  }
+  .edit-icon {
+  width: 30px; 
+  height: 30px; 
+  vertical-align: middle; 
+  }
+  
+  
+  </style>
