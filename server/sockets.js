@@ -38,6 +38,7 @@ function sockets(io, socket, data) {
 
   socket.on('joinCustomGame', function(gamePin) { //joins the socket room 'gamePin'
     socket.join(gamePin);
+    socket.emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
     // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
   });
   socket.on('participateInCustomGame', function(d){
@@ -49,6 +50,14 @@ function sockets(io, socket, data) {
   socket.on("requestGameData", function(gamePin) {
     let gameData = data.getGameData(gamePin);
     socket.emit("updateGameData", gameData)
+  });
+  socket.on("requestParticipants", function(gamePin) {
+    socket.emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
+  });
+  
+  socket.on("deleteUser", function(gamePin, userName) {
+    data.deleteUser(gamePin, userName);
+    io.to(gamePin).emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
   });
 
   socket.on('participateInPoll', function(d) {

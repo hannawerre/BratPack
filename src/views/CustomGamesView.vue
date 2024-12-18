@@ -1,4 +1,6 @@
 <template>
+<div class="container">
+  <div class="main-content">
   <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
   <h1 v-else>Loading Game PIN...</h1>
 
@@ -51,6 +53,18 @@
 
   <div class="startbutton-container">
       <button class="startbutton" @click="startGame">Start Game</button>
+  </div>
+</div>
+  <div class="participants">
+    <h2>Participants</h2>
+    <ul>
+      <li v-for="(participant, index) in participants" :key="index"> 
+        {{ participant}}
+      </li>
+
+    </ul>
+
+  </div>
   </div>
 </template>
 
@@ -177,7 +191,21 @@ methods: {
 </script>
 
 <style>
-  
+  .container {
+    align-items: flex-start;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    padding: 20px;
+    
+  }
+
+  .main-content {
+    flex: 1;
+    text-align: center;
+}
+
+
 .decrement-button{
   background-color: rgb(213, 8, 8);
   border: none;
@@ -249,7 +277,7 @@ background-color: rgb(183, 183, 183);
 color: white;
 border: none;
 border-radius: 40px;
-padding: 6px 6px;
+padding: 6px 8px;
 text-align: center;
 text-decoration: none;
 font-size: 14px;
@@ -276,5 +304,34 @@ vertical-align: middle;
 input[type="checkbox"] {  
       width: 20px;
       height: 20px;
+  }
+
+  .participants {
+    flex: 0 0 auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: lightblue;
+    position: absolute;
+    right: 0;
+    margin-right: 40px;
+    margin-top: 40px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+
+}
+
+  .participants h2{
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .participants ul{
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .participants li{
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
   }
 </style>

@@ -103,7 +103,17 @@ Data.prototype.participateInCustomGame = function(gamePin, name) {
     this.customGames[gamePin].participants.push(name) // TODO: senare när vi lägger till mer funktionalitet ska inte bara namnet pushas här, utan även tex hur det går i varje mini game
     console.log("Participant added");
   }
-}
+};
+Data.prototype.deleteUser = function (gamePin, userName) {
+  if (this.customGameExists(gamePin)) {
+    const participants = this.customGames[gamePin].participants;
+    this.customGames[gamePin].participants = participants.filter(
+      (name) => name !== userName
+    );
+    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", this.participants)
+  }
+  else console.log("ERROR, could not delete user because gamePin does not exist!");
+};
 
 Data.prototype.getUILabels = function (lang) {
   //check if lang is valid before trying to load the dictionary file
