@@ -21,7 +21,8 @@ function sockets(io, socket, data) {
   });
   
   socket.on('startGame', function(gameData) {
-    data.storeGameData(gameData)
+    data.storeGameDataAndStart(gameData);
+    io.to(gameData.gamePin).emit('startGame');
     //socket emit
   });
   
@@ -35,10 +36,15 @@ function sockets(io, socket, data) {
     socket.emit('questionUpdate', data.getQuestion(pollId))
     socket.emit('submittedAnswersUpdate', data.getSubmittedAnswers(pollId));
   });
-
+  socket.on('updateAllGameData', function(gamePin){
+    io.to(gamePin).emit('updateGameData', data.getGameData(gamePin))
+  });
+  socket.on('joinSocketRoom', function(gamePin){
+    socket.join(gamePin);
+  });
   socket.on('joinCustomGame', function(gamePin) { //joins the socket room 'gamePin'
     socket.join(gamePin);
-    socket.emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
+    socket.emit('updateGameData', data.getGameData(gamePin));
     // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
   });
   socket.on('participateInCustomGame', function(d){
@@ -54,7 +60,7 @@ function sockets(io, socket, data) {
   socket.on("requestParticipants", function(gamePin) {
     socket.emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
   });
-  
+
   socket.on("deleteUser", function(gamePin, userName) {
     data.deleteUser(gamePin, userName);
     io.to(gamePin).emit('participantsUpdate', data.getCustomGameParticipants(gamePin));

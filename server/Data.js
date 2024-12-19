@@ -12,7 +12,8 @@ function Data() {
     selectedGames: [],
     gamePin: '', //game pin sparas som namnet på objektet, behövs den då här? /sebbe
     selectedMinutes: 60, // Var ska tiden sparas? Vi vill kunna hämta tiden som är kvar för att veta när nästa spel ska köras igång! /sebbe
-    timerDisplay: ''
+    timerDisplay: '',
+    gameStarted: false
   };
 
   // Poll
@@ -64,23 +65,26 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   customGame.selectedGames = [];
   customGame.selectedMinutes = 60;
   customGame.timerDisplay = '';
+  customGame.gameStarted = false;
   this.customGames[pin] = customGame;
 
   console.log("Custom Game created", pin, this.customGames);
   return pin;
 };
 
-Data.prototype.storeGameData = function (gameData){
-  // Update the gameData
+Data.prototype.storeGameDataAndStart = function (gameData){
+  // Update the gameData and set gameStarted = true
   let customGame = {};
   // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
   customGame.participants = gameData.participants;
   customGame.selectedGames = gameData.selectedGames;
   customGame.selectedMinutes = gameData.selectedMinutes;
+  customGame.gameStarted = true;
   this.customGames[gameData.gamePin] = customGame;
 
   console.log("Reached to data.storeGameData with current customGames: ", this.customGames);
 };
+
 Data.prototype.getGameData = function(gamePin) {
   if (this.customGameExists(gamePin)) { 
     console.log("gameData requested for custom game: ", gamePin);
@@ -88,7 +92,7 @@ Data.prototype.getGameData = function(gamePin) {
   }
   console.log("Requested gameData for non existing game... returning []")
   return []; //maybe returning an array is not the most convenient way... 
-}
+};
 Data.prototype.getCustomGameParticipants = function(gamePin) {
   if (this.customGameExists(gamePin)) { 
     console.log("participants requested for custom game: ", gamePin);

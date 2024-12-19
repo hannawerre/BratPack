@@ -36,7 +36,7 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/game/',
+      path: '/game/:gamePin',
       name: 'GameView',
       component: () => import('../views/GameView.vue'),
       props: true,

@@ -163,9 +163,12 @@ methods: {
     }
 
     socket.emit('startGame', gameData),
-    this.$router.push({
-      name: 'GameView',
-    });   
+    // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
+    // this.$router.push({
+    //   name: 'GameView',
+    //   params: { gamePin }
+    // });
+    console.log("--> After startGame!")
   },
 
   openModal(game) {
