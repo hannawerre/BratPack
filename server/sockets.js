@@ -9,6 +9,11 @@ function sockets(io, socket, data) {
     socket.emit('uiLabels', data.getUILabels(lang));
   });
 
+  socket.on('getQuestions', function(lang) {
+    console.log("hämtar quiz frågor")
+    socket.emit('generalQuestions', data.getQuestions(lang))
+  });
+
   socket.on('createPoll', function(d) {
     data.createPoll(d.pollId, d.lang)
     socket.emit('pollData', data.getPoll(d.pollId));
@@ -23,6 +28,7 @@ function sockets(io, socket, data) {
   socket.on('startGame', function(gameData) {
     data.storeGameDataAndStart(gameData);
     io.to(gameData.gamePin).emit('startGame');
+    console.log("hej")
     //socket emit
   });
   

@@ -90,10 +90,10 @@ data: function() {
     lang:'en',
     selectedMinutes: 60,
     games: [
-      { id: 'game1', name: 'Quiz 1'} ,
-      { id: 'game2', name: 'Quiz 2'},
-      { id: 'game3', name: 'Quiz 3'},
-      { id: 'game4', name: 'Quiz 4'}
+      { id: 'General Quiz', name: 'Quiz 1'} ,
+      { id: 'Who´s most likely', name: 'Quiz 2'},
+      { id: 'Music quiz', name: 'Quiz 3'},
+      { id: 'This or that', name: 'Quiz 4'}
     ],
     selectedGames: [],
     participants: [],
@@ -155,14 +155,16 @@ methods: {
       return;
     }
     
-    let gameData = {
+    let gameData = {  // borde den inte vara const? /theo
       gamePin: this.gamePin,
       selectedGames: this.selectedGames,
       participants: this.participants,
       selectedMinutes: this.selectedMinutes
+      //lang: this.lang    språk sparas i gameData eller localStorage?
     }
 
-    socket.emit('startGame', gameData),
+    socket.emit('startGame', gameData)
+    this.$router.push("/game/" + this.gamePin)
     // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
     // this.$router.push({
     //   name: 'GameView',

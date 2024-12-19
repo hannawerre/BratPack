@@ -13,8 +13,11 @@ function Data() {
     gamePin: '', //game pin sparas som namnet på objektet, behövs den då här? /sebbe
     selectedMinutes: 60, // Var ska tiden sparas? Vi vill kunna hämta tiden som är kvar för att veta när nästa spel ska köras igång! /sebbe
     timerDisplay: '',
-    gameStarted: false
+    gameStarted: false,
+    playerAnswers: {}
   };
+
+  
 
   // Poll
   this.polls = {};
@@ -107,7 +110,15 @@ Data.prototype.participateInCustomGame = function(gamePin, name) {
     this.customGames[gamePin].participants.push(name) // TODO: senare när vi lägger till mer funktionalitet ska inte bara namnet pushas här, utan även tex hur det går i varje mini game
     console.log("Participant added");
   }
+  /*if (!game.playerAnswers[name]) {
+    game.playerAnswers[name] = {};
+    // Här kan du lägga till fler attribut om du vill, ex:
+    // game.playerAnswers[name].score = 0;
+    // game.playerAnswers[name].answers = {};
+  }
+  console.log(`Participant '${name}' added to game '${gamePin}' with a private answer store`); */
 };
+
 Data.prototype.deleteUser = function (gamePin, userName) {
   if (this.customGameExists(gamePin)) {
     const participants = this.customGames[gamePin].participants;
@@ -126,6 +137,35 @@ Data.prototype.getUILabels = function (lang) {
   const labels = readFileSync("./server/data/labels-" + lang + ".json");
   return JSON.parse(labels);
 }
+
+Data.prototype.getQuestions = function (lang) {
+  //check if lang is valid before trying to load the dictionary file
+  if (!["en", "sv"].some( el => el === lang))
+    lang = "en";
+  const questions = readFileSync("./server/data/questions-" + lang + ".json");
+  return JSON.parse(questions);
+}
+
+/* Data.prototype.storePlayerAnswer = function(gamePin, userName, miniGameId, questionId, answer) {
+  if (!this.customGameExists(gamePin)) return console.log("Game not found");
+  
+  let game = this.customGames[gamePin];
+
+  // Säkerställ att playerAnswers[name] finns (borde finnas efter participateInCustomGame)
+  if (!game.playerAnswers[userName]) {
+    game.playerAnswers[userName] = {};
+  }
+
+  // Skapa ett objekt för det specifika minispelet om det inte finns
+  if (!game.playerAnswers[userName][miniGameId]) {
+    game.playerAnswers[userName][miniGameId] = {};
+  }
+
+  // Spara svaret
+  game.playerAnswers[userName][miniGameId][questionId] = answer;
+
+  console.log(`Stored answer for ${userName} in ${miniGameId}, question ${questionId}: ${answer}`);
+}; */
 
 
 // - Poll -
