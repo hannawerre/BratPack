@@ -5,4 +5,9 @@
 body {
   margin: 0;
   padding: 0;
+  background: linear-gradient(to top left, #ff8c42, 
+    #b2c8ce, #829fa8 , #de9263, #5B7C99);
+    background-size: cover; /* Gör att bakgrunden täcker hela ytan */
+    background-attachment: fixed; /* Fixerar bakgrunden så att den inte rör sig vid scroll */
+    height: 100vh; /* Säkerställer att body täcker hela viewporten */
 }
