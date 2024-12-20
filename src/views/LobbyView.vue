@@ -103,9 +103,9 @@ button:hover {
 }
 
 .waitingRoom div{
-  background-color: rgba(224, 185, 10, 0.6);
+  background-color: #ff8c42;
   border-radius: 15px;
-  border: 2px solid rgb(234, 217, 144);
+  border: 4px solid #da6822;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
   width: 20%;
   margin: 5% 0% 0% 40%

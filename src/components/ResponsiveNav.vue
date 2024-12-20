@@ -106,26 +106,38 @@ export default {
 
 <style scoped>
 nav {
-  position: fixed;
-  top: 0;
+  position: sticky;
+  top: 10px;
   left: 0;
   z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 3rem;
-  background-color: rgba(0,0,0,0);
+  height: auto;
+  background-color: rgba(190, 52, 52, 0);
   color: #000;
   padding: 0 1rem;
   box-sizing: border-box;
+  
+  
+}
+
+nav > div:nth-child(2) {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  border: double 9px #5b7C99;
+  padding: 2px;
 }
 
 #Logo img {
-  padding-top: 30px;
+  
   margin-top: 5px;
   height: 90px;
   cursor: pointer;
+  
 }
 
 #Links {
