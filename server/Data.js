@@ -318,10 +318,12 @@ Data.prototype.startTimer = function (gamePin, selectedMinutes, io) {
       // Send  Timer-update without sound
       io.to(gamePin).emit("update-timer", {
           timerDisplay: game.timerDisplay,
-          soundType: soundType // No soundsingla for other seconds
+          soundType: "soundType" // No soundsingla for other seconds
           
       });
-      console.log("Sending update-timer to gamePin:", gamePin, "TimerDisplay:", game.timerDisplay, "SoundType:", soundType);
+
+      // denna rad orsakar problem för soundType finns inte /sebbe
+      //console.log("Sending update-timer to gamePin:", gamePin, "TimerDisplay:", game.timerDisplay, "SoundType:", soundType);
   }, 1000); // Update every second
 };
 

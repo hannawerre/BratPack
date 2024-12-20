@@ -29,16 +29,12 @@
 <script>
     const socket = io("localhost:3000");
     import io from 'socket.io-client';  // kanske behövs /sebbe 
-    import TimerComponent from '../components/TimerComponent.vue';
 import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
 
     export default{
         name: 'GameView',
         components: {
-            TimerComponent,
             GeneralQuizComponent
-            
-            
         },
         data: function(){
             return {
