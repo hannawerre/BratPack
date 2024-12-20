@@ -6,14 +6,14 @@
       </router-link>
     </div>
     <div>
-      <span> {{ miniClock }} </span>
+      <span> {{ miniClock }} </span> 
     </div>
     <div id="Language">
-          <LanguageSwitcher 
-      :lang="lang" 
-      :uiLabels="uiLabels"
-      @language-changed="emitLanguageChangeToParent"
-    />
+      <LanguageSwitcher 
+        :lang="lang" 
+        :uiLabels="uiLabels"
+        @language-changed="emitLanguageChangeToParent"
+      />
     </div>
   </nav>
 </template>
@@ -22,7 +22,6 @@
 import LanguageSwitcher from './LanguageSwitcher.vue'
 import io from 'socket.io-client';
 const socket = io("localhost:3000");
-
 
 export default {
   name: 'ResponsiveNav',
@@ -45,81 +44,63 @@ export default {
   },
   data() {
     return {
-    miniClock: "",
+      miniClock: "", 
     };
   },
-
   methods: {
     emitLanguageChangeToParent(newLang) {
       this.$emit('language-changed', newLang);
     },
-    updateMiniClock(timerDisplay) {
-      console.log("TimerDispaly from responsiveNav= ", this.miniClock);
-      this.miniClock = timerDisplay;
-  },
 
-  playAlarm() {
-    console.log("Spelar alarm...");
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const alarmSound = new Audio('public/audio/silence.mp3');
-    const track = audioContext.createMediaElementSource(alarmSound);
+    playAlarm() {
+      console.log("Spelar alarm...");
+      const alarmSound = new Audio('/audio/alarm.mp3');
+      alarmSound.play().then(() => {
+        console.log("Alarm spelas.");
+      }).catch((error) => {
+        console.error("Kunde inte spela upp alarmet:", error);
+      });
+    },
 
-    // Koppla till destinationen (högtalare)
-    track.connect(audioContext.destination);
-
-    // Säkerställ att AudioContext är i "resumed"-läge innan uppspelning
-    audioContext.resume().then(() => {
-        alarmSound.play().then(() => {
-            console.log("Alarm spelas upp via AudioContext.");
-        }).catch(error => {
-            console.error("Kunde inte spela upp alarmet:", error);
-        });
-    }).catch(error => {
-        console.error("Kunde inte återuppta AudioContext:", error);
-    });
-  },
-  playSilence() {
-    console.log("Spelar tystnad...");
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const silenceSound = new Audio('public/audio/silence.mp3');
-    const track = audioContext.createMediaElementSource(silenceSound);
-
-    // Koppla till destinationen (högtalare)
-    track.connect(audioContext.destination);
-
-    // Säkerställ att AudioContext är i "resumed"-läge innan uppspelning
-    audioContext.resume().then(() => {
-        silenceSound.play().then(() => {
-            console.log("Silence spelas upp via AudioContext.");
-        }).catch(error => {
-            console.error("Kunde inte spela upp Silence:", error);
-        });
-    }).catch(error => {
-        console.error("Kunde inte återuppta AudioContext:", error);
-    });
-  }
-  },
-  
-  created: function() {
-    socket.on('update-timer', ({ timerDisplay, soundType }) => {
-    console.log("Mottar timerDisplay och soundtype:", timerDisplay, soundType);
-    this.miniClock = timerDisplay;
-
-    if (soundType === 'alarm') {
-        this.playAlarm();
-    } else if (soundType === 'silence') {
-        this.playSilence();
-    } else if (soundType === null) {
-        console.log("Inget ljudspel ska spelas.");
-    } else {
-        console.warn("Okänd ljudtyp:", soundType);
+    playSilence() {
+      console.log("Spelar tystnad...");
+      const silenceSound = new Audio('/audio/silence.mp3');
+      silenceSound.play().then(() => {
+        console.log("Silence spelas.");
+      }).catch((error) => {
+        console.error("Kunde inte spela upp Silence:", error);
+      });
     }
-  })},
+  }, 
+  created() {
+    console.log("Testing sound playback...");
+
+    const silenceSound = new Audio('/audio/silence.mp3');
+    silenceSound.play().then(() => {
+        console.log("Silence sound played successfully.");
+    }).catch(error => {
+        console.error("Failed to play silence:", error);
+    });
+
+    
+
+    
+    socket.on('update-timer', ({ timerDisplay, soundType }) => {
+        console.log("TimerDisplay received in ResponsiveNav:", timerDisplay, "SoundType:", soundType);
+
+        this.miniClock = timerDisplay;
+
+        if (soundType === 'alarm') {
+            this.playAlarm();
+        } else if (soundType === 'silence') {
+            this.playSilence();
+        }
+    });
+},
   beforeDestroy() {
-    socket.off('update-timer'); // Avregistrerar händelsen
+   // Clean up the socket listener when the component is destroyed
+    socket.off('update-timer');
   }
-
-
 };
 </script>
 
@@ -160,13 +141,7 @@ nav {
   cursor: pointer;
 }
 
-
 .hide {
   display: none;
 }
 </style>
-
-
-
-
-

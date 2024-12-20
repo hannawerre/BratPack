@@ -202,11 +202,76 @@ Data.prototype.submitAnswer = function(pollId, answer) {
 }
 
 //Ändrat från pollId till gamePin
-Data.prototype.updateTimer = function(gamePin, timerDisplay, soundType = null) {
-    if (this.customGameExists(gamePin)) {
-    this.customGames[gamePin].timerDisplay = timerDisplay;
-    this.customGames[gamePin].soundType = soundType;
-    }
-}    
+// Lägg denna funktion längst ned i prototypsektionen:
+Data.prototype.startTimer = function (gamePin, selectedMinutes, io) {
+  if (!this.customGameExists(gamePin)) {
+      console.log("Game does not exist:", gamePin);
+      return;
+  }
+
+  const game = this.customGames[gamePin];
+  game.selectedMinutes = selectedMinutes;
+  const countDownDate = Date.now() + selectedMinutes * 60 * 1000;
+
+  let lastMinute = null; // Inledningsvis null
+
+  console.log("Starting timer for gamePin:", gamePin, "with", selectedMinutes, "minutes.");
+
+  const interval = setInterval(() => {
+      const now = Date.now();
+      const distance = countDownDate - now;
+
+      if (distance <= 0) {
+          clearInterval(interval);
+          game.timerDisplay = "Tiden är slut!";
+          io.to(gamePin).emit("update-timer", {
+              timerDisplay: game.timerDisplay,
+              soundType: "alarm" // When there is no time left, play alarm
+          });
+          console.log("Timer ended for gamePin:", gamePin);
+          return;
+      }
+      const totalSeconds = Math.floor(distance / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+ 
+ 
+      game.timerDisplay = `${minutes}m ${seconds}s`;
+
+
+      // Play silence when starting the timer (lastMinute is null)
+      if (lastMinute === null) {
+          lastMinute = minutes; // Uppdate lastMinute
+          io.to(gamePin).emit("update-timer", {
+              timerDisplay: game.timerDisplay,
+              soundType: "silence" // Play silence when start
+          });
+          console.log("Playing silence for gamePin:", gamePin);
+          return;
+      }
+
+      
+      if (totalSeconds % 60 === 0) {
+          lastMinute = minutes; //  updating lastMinute 
+          io.to(gamePin).emit("update-timer", {
+              timerDisplay: game.timerDisplay,
+              soundType: "alarm" // play alarm
+          });
+          console.log("Playing alarm for gamePin:", gamePin);
+          return;
+      }
+
+      // Send  Timer-update without sound
+      io.to(gamePin).emit("update-timer", {
+          timerDisplay: game.timerDisplay,
+          soundType: soundType // No soundsingla for other seconds
+          
+      });
+      console.log("Sending update-timer to gamePin:", gamePin, "TimerDisplay:", game.timerDisplay, "SoundType:", soundType);
+  }, 1000); // Update every second
+};
+
+
+
 
 export { Data };

@@ -20,10 +20,25 @@ function sockets(io, socket, data) {
     // Implement error handling if game could not be created
   });
   
-  socket.on('startGame', function(gameData) {
-    data.storeGameData(gameData)
-    //socket emit
-  });
+  socket.on('startGame', function (gameData) {
+    console.log("Game started for gamePin:", gameData.gamePin);
+
+
+    
+    data.startTimer(gameData.gamePin, gameData.selectedMinutes, io);
+
+ 
+    io.to(gameData.gamePin).emit("startGame", {
+        message: "Game has started!",
+        gamePin: gameData.gamePin
+    });
+});
+
+
+  socket.on('readyToStartTimer',function(){
+    let gameData = data.getGameData();
+    socket.emit('startTimer', gameData.selectedMinutes, gameData.gamePin);
+  })
   
   socket.on('addQuestion', function(d) {
     data.addQuestion(d.pollId, {q: d.q, a: d.a});
@@ -38,6 +53,7 @@ function sockets(io, socket, data) {
 
   socket.on('joinCustomGame', function(gamePin) { //joins the socket room 'gamePin'
     socket.join(gamePin);
+    console.log(`Client ${socket.id} joined gamePin: ${gamePin}`);
     // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
   });
   socket.on('participateInCustomGame', function(d){
@@ -46,7 +62,7 @@ function sockets(io, socket, data) {
     console.log("User has joined. SocketID: ", socket.id)
     io.to(d.gamePin).emit('participantsUpdate', data.getCustomGameParticipants(d.gamePin)); //change to getGameData
   });
-  socket.on("requestGameData", function(gamePin) {
+  socket.on("requestGameData", function(gamePin) { 
     let gameData = data.getGameData(gamePin);
     socket.emit("updateGameData", gameData)
   });
@@ -69,7 +85,7 @@ function sockets(io, socket, data) {
     io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
   }); 
 
-  //Ändrat från pollId till gamePin
+  
   socket.on('update-timer', function(data) {
     const { timerDisplay, gamePin, soundType } = data || {};
     console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin, "Sound Type:", soundType);
@@ -82,6 +98,20 @@ function sockets(io, socket, data) {
     io.emit('update-timer', { timerDisplay, soundType });
     }
     });
+
+    socket.on("requestGameData", function (gamePin) {
+      const gameData = data.getGameData(gamePin);
+      if (gameData) {
+          console.log(`Sending current game data to client ${socket.id}`);
+          socket.emit("update-timer", {
+              timerDisplay: gameData.timerDisplay,
+              soundType: null 
+          });
+      }
+  });
+  
+
+
     
 }
 

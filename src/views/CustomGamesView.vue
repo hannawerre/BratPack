@@ -121,31 +121,64 @@
       },
   
       startGame: function () {
-        if (this.selectedGames.length === 0) {
-            alert("Please select at least one game.");
-            return;
-        }
-  
-        if (this.participants.length === 0) {
-            alert("No players have joined yet.");
-            return;
-        }
-        
-        // This is what we send to Data.js
-        let gameData = {
-            gamePin: this.gamePin,
-            selectedGames: this.selectedGames,
-            participants: this.participants,
-            selectedMinutes: this.selectedMinutes
-            //add gamesettings
-        }
-  
-        socket.emit('startGame', gameData),
+    if (this.selectedGames.length === 0) {
+        alert("Please select at least one game.");
+        return;
+    }
 
-        this.$router.push({
-          name: 'GameView',
-        });   
-      }
+    if (this.participants.length === 0) {
+        alert("No players have joined yet.");
+        return;
+    }
+
+    // Simulera timerstart lokalt för teständamål
+    let countDownDate = Date.now() + this.selectedMinutes * 60 * 1000;
+
+    const interval = setInterval(() => {
+        const now = Date.now();
+        const distance = countDownDate - now;
+
+        if (distance <= 0) {
+            clearInterval(interval);
+            socket.emit('update-timer', {
+                timerDisplay: "Tiden är slut!",
+                soundType: "alarm"
+            });
+            return;
+        }
+
+        const totalSeconds = Math.floor(distance / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        socket.emit('update-timer', {
+            timerDisplay: `${minutes}m ${seconds}s`,
+            soundType: totalSeconds % 60 === 0 ? "alarm" : null
+        });
+    }, 1000);
+
+    console.log("Timer startad i CustomGameView för test.");
+
+    // Behåll framtida kod för att starta spel och navigera
+    /*
+    let gameData = {
+        gamePin: this.gamePin,
+        selectedGames: this.selectedGames,
+        participants: this.participants,
+        selectedMinutes: this.selectedMinutes
+    };
+
+    socket.emit('startGame', gameData);
+
+    this.$router.push({
+        name: 'GameView',
+        params: { gamePin: this.gamePin }
+    });
+    */
+}
+
+        
+    
     }
   }
   </script>
