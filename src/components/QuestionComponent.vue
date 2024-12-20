@@ -1,23 +1,35 @@
 <template>
-<p>{{question.q}}</p>
-<button v-for="a in question.a" v-on:click="answer(a)" v-bind:key="a">
-  {{ a }}
-</button>
+  <div>
+    <h3>{{ question.question }} (ID: {{ question.id }})</h3>
+    <ul>
+      <li v-for="answerObj in question.answers" :key="answerObj.id">
+        <!-- Här visar vi alla variabler: id, answer, isCorrect -->
+        <button @click="answer(answerObj)">
+          {{ answerObj.id }}: {{ answerObj.answer }} - Correct: {{ answerObj.isCorrect }}
+        </button>
+      </li>
+    </ul>
+  </div>
 </template>
+
 <script>
 export default {
   name: 'QuestionComponent',
   props: {
-    question: Object
+    question: {
+      type: Object,
+      required: true
+    }
   },
   emits: ["answer"],
   methods: {
-    answer: function (answer) {
-      this.$emit("answer", answer);
+    answer: function (answerObj) {
+      this.$emit("answer", answerObj);
     } 
   }
 }
 </script>
+
 
 <style scoped>
 button{

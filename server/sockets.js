@@ -9,6 +9,11 @@ function sockets(io, socket, data) {
     socket.emit('uiLabels', data.getUILabels(lang));
   });
 
+  socket.on('getQuestions', function(lang) {
+    console.log("hämtar quiz frågor")
+    socket.emit('generalQuestions', data.getQuestions(lang))
+  });
+
   socket.on('createPoll', function(d) {
     data.createPoll(d.pollId, d.lang)
     socket.emit('pollData', data.getPoll(d.pollId));
@@ -21,24 +26,24 @@ function sockets(io, socket, data) {
   });
   
   socket.on('startGame', function (gameData) {
+
+    data.storeGameDataAndStart(gameData);
+    io.to(gameData.gamePin).emit('startGame');
+
     console.log("Game started for gamePin:", gameData.gamePin);
 
-
-    
     data.startTimer(gameData.gamePin, gameData.selectedMinutes, io);
 
- 
-    io.to(gameData.gamePin).emit("startGame", {
+    io.to(gameData.gamePin).emit("startGame", { // Hmmm... Detta känns överflödigt eller? /sebbe
         message: "Game has started!",
         gamePin: gameData.gamePin
     });
-});
-
+  });
 
   socket.on('readyToStartTimer',function(){
     let gameData = data.getGameData();
     socket.emit('startTimer', gameData.selectedMinutes, gameData.gamePin);
-  })
+  });
   
   socket.on('addQuestion', function(d) {
     data.addQuestion(d.pollId, {q: d.q, a: d.a});
@@ -50,10 +55,15 @@ function sockets(io, socket, data) {
     socket.emit('questionUpdate', data.getQuestion(pollId))
     socket.emit('submittedAnswersUpdate', data.getSubmittedAnswers(pollId));
   });
-
+  socket.on('updateAllGameData', function(gamePin){
+    io.to(gamePin).emit('updateGameData', data.getGameData(gamePin))
+  });
+  socket.on('joinSocketRoom', function(gamePin){
+    socket.join(gamePin);
+  });
   socket.on('joinCustomGame', function(gamePin) { //joins the socket room 'gamePin'
     socket.join(gamePin);
-    console.log(`Client ${socket.id} joined gamePin: ${gamePin}`);
+    socket.emit('updateGameData', data.getGameData(gamePin));
     // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
   });
   socket.on('participateInCustomGame', function(d){
@@ -65,6 +75,14 @@ function sockets(io, socket, data) {
   socket.on("requestGameData", function(gamePin) { 
     let gameData = data.getGameData(gamePin);
     socket.emit("updateGameData", gameData)
+  });
+  socket.on("requestParticipants", function(gamePin) {
+    socket.emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
+  });
+
+  socket.on("deleteUser", function(gamePin, userName) {
+    data.deleteUser(gamePin, userName);
+    io.to(gamePin).emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
   });
 
   socket.on('participateInPoll', function(d) {
