@@ -1,0 +1,365 @@
+{
+    "statements": [
+      {
+        "id": 1,
+        "statement": "Who is the most flirtatious?"
+      },
+      {
+        "id": 2,
+        "statement": "Who has had the most attractive partner?"
+      },
+      {
+        "id": 3,
+        "statement": "Who flirts the most in everyday life?"
+      },
+      {
+        "id": 4,
+        "statement": "Who enjoys mingling with the most people?"
+      },
+      {
+        "id": 5,
+        "statement": "Who is the most self-confident?"
+      },
+      {
+        "id": 6,
+        "statement": "Who will be the coolest parent?"
+      },
+      {
+        "id": 7,
+        "statement": "Who is the most popular?"
+      },
+      {
+        "id": 8,
+        "statement": "Who gets the most attention?"
+      },
+      {
+        "id": 9,
+        "statement": "Who says no the most often?"
+      },
+      {
+        "id": 10,
+        "statement": "Who likes younger people?"
+      },
+      {
+        "id": 11,
+        "statement": "Who is the most self-confident?"
+      },
+      {
+        "id": 12,
+        "statement": "Who can drink the fastest?"
+      },
+      {
+        "id": 13,
+        "statement": "Who is the best at hiding things from their parents?"
+      },
+      {
+        "id": 14,
+        "statement": "Who likes to try new things?"
+      },
+      {
+        "id": 15,
+        "statement": "Who is the most social tonight?"
+      },
+      {
+        "id": 16,
+        "statement": "Who will laugh the most at this tomorrow?"
+      },
+      {
+        "id": 17,
+        "statement": "Who is the nicest in the group?"
+      },
+      {
+        "id": 18,
+        "statement": "Who is always the most prepared?"
+      },
+      {
+        "id": 19,
+        "statement": "Who uses the most snus?"
+      },
+      {
+        "id": 20,
+        "statement": "Who is the most creative?"
+      },
+      {
+        "id": 21,
+        "statement": "Who is the best at giving compliments?"
+      },
+      {
+        "id": 22,
+        "statement": "Who likes a luxurious lifestyle the most?"
+      },
+      {
+        "id": 23,
+        "statement": "Who is the most restless?"
+      },
+      {
+        "id": 24,
+        "statement": "Who will find a partner this year?"
+      },
+      {
+        "id": 25,
+        "statement": "Who trains the most?"
+      },
+      {
+        "id": 26,
+        "statement": "Who is the best at handling friendships?"
+      },
+      {
+        "id": 27,
+        "statement": "Who drinks the most alcohol?"
+      },
+      {
+        "id": 28,
+        "statement": "Who is the most satisfied with themselves?"
+      },
+      {
+        "id": 29,
+        "statement": "Who has the best smile?"
+      },
+      {
+        "id": 30,
+        "statement": "Who has the best fashion sense?"
+      },
+      {
+        "id": 31,
+        "statement": "Who will become famous?"
+      },
+      {
+        "id": 32,
+        "statement": "Who cares most about their appearance?"
+      },
+      {
+        "id": 33,
+        "statement": "Who is the most spontaneous?"
+      },
+      {
+        "id": 34,
+        "statement": "Who is the best at entertaining others?"
+      },
+      {
+        "id": 35,
+        "statement": "Who is the most innocent?"
+      },
+      {
+        "id": 36,
+        "statement": "Who makes the funniest sounds when they are happy?"
+      },
+      {
+        "id": 37,
+        "statement": "Who is the life of the party?"
+      },
+      {
+        "id": 38,
+        "statement": "Who is the most generous?"
+      },
+      {
+        "id": 39,
+        "statement": "Who have you been eyeing tonight?"
+      },
+      {
+        "id": 40,
+        "statement": "Who has the most in common with you?"
+      },
+      {
+        "id": 41,
+        "statement": "Who dances the best?"
+      },
+      {
+        "id": 42,
+        "statement": "Who has the best music taste?"
+      },
+      {
+        "id": 43,
+        "statement": "Who has the most international friends?"
+      },
+      {
+        "id": 44,
+        "statement": "Who is the best at resolving conflicts?"
+      },
+      {
+        "id": 45,
+        "statement": "Who is the best at finding interesting things about others?"
+      },
+      {
+        "id": 46,
+        "statement": "Who drinks the most cups of coffee?"
+      },
+      {
+        "id": 47,
+        "statement": "Who is the most adventurous?"
+      },
+      {
+        "id": 48,
+        "statement": "Who likes to be spontaneous?"
+      },
+      {
+        "id": 49,
+        "statement": "Who is the best at finding unusual places to visit?"
+      },
+      {
+        "id": 50,
+        "statement": "Who is the best at keeping in touch with old friends?"
+      },
+      {
+        "id": 51,
+        "statement": "Who likes to try new things?"
+      },
+      {
+        "id": 52,
+        "statement": "Who likes older people?"
+      },
+      {
+        "id": 53,
+        "statement": "Who has the most international contacts?"
+      },
+      {
+        "id": 54,
+        "statement": "Who is the most sensitive?"
+      },
+      {
+        "id": 55,
+        "statement": "Who has the shortest patience?"
+      },
+      {
+        "id": 56,
+        "statement": "Who has the most interesting goals for the future?"
+      },
+      {
+        "id": 57,
+        "statement": "Who likes to travel the most?"
+      },
+      {
+        "id": 58,
+        "statement": "Who spends the most time at home?"
+      },
+      {
+        "id": 59,
+        "statement": "Who has the most unusual interests?"
+      },
+      {
+        "id": 60,
+        "statement": "Who has been the most creative lately?"
+      },
+      {
+        "id": 61,
+        "statement": "Who gets angry the easiest?"
+      },
+      {
+        "id": 62,
+        "statement": "Who was last on a fun trip?"
+      },
+      {
+        "id": 63,
+        "statement": "Who knows the most famous people?"
+      },
+      {
+        "id": 64,
+        "statement": "Who will live the longest?"
+      },
+      {
+        "id": 65,
+        "statement": "Who is the most adventurous?"
+      },
+      {
+        "id": 66,
+        "statement": "Who will have the most stories to tell?"
+      },
+      {
+        "id": 67,
+        "statement": "Who is your favorite in the group?"
+      },
+      {
+        "id": 68,
+        "statement": "Who is the most relaxed?"
+      },
+      {
+        "id": 69,
+        "statement": "Who is the most self-confident tonight?"
+      },
+      {
+        "id": 70,
+        "statement": "Who is the most elegant?"
+      },
+      {
+        "id": 71,
+        "statement": "Who is the best at problem-solving?"
+      },
+      {
+        "id": 72,
+        "statement": "Who learns new things the fastest?"
+      },
+      {
+        "id": 73,
+        "statement": "Who will become a successful entrepreneur?"
+      },
+      {
+        "id": 74,
+        "statement": "Who knows the most programming languages?"
+      },
+      {
+        "id": 75,
+        "statement": "Who is the best at writing clean code?"
+      },
+      {
+        "id": 76,
+        "statement": "Who is the most creative in their work?"
+      },
+      {
+        "id": 77,
+        "statement": "Who would be the best at giving a TED Talk?"
+      },
+      {
+        "id": 78,
+        "statement": "Who has the most potential to become a manager?"
+      },
+      {
+        "id": 79,
+        "statement": "Who makes the best PowerPoint presentations?"
+      },
+      {
+        "id": 80,
+        "statement": "Who works the hardest?"
+      },
+      {
+        "id": 91,
+        "statement": "Who is the best at networking?"
+      },
+      {
+        "id": 92,
+        "statement": "Who has the most exciting CV?"
+      },
+      {
+        "id": 93,
+        "statement": "Who is the best at multitasking?"
+      },
+      {
+        "id": 94,
+        "statement": "Who would be the best mentor?"
+      },
+      {
+        "id": 95,
+        "statement": "Who has the biggest chance to work abroad?"
+      },
+      {
+        "id": 96,
+        "statement": "Who is the best at thinking outside the box?"
+      },
+      {
+        "id": 97,
+        "statement": "Who would be the most successful in the tech industry?"
+      },
+      {
+        "id": 98,
+        "statement": "Who is the best at meeting deadlines?"
+      },
+      {
+        "id": 99,
+        "statement": "Who would start a startup?"
+      },
+      {
+        "id": 100,
+        "statement": "Who has the most LinkedIn connections?"
+      }
+    ]
+  }
+  

@@ -38,6 +38,7 @@ export default {
     return {
       userName: "",
       nameTaken: false,
+      gameStarted: false,
       gamePin: "inactive game",
       uiLabels: {},
       joined: false,
@@ -54,7 +55,11 @@ export default {
       console.log("Socket ID: ", socket.id) // kanske spara ner socketID i dataobjektet ovan...? 
                                             // Eller spara userName: socketID som key value pairs i Data.js /sebbe
     });
-    socket.on( "startPoll", () => this.$router.push("/poll/" + this.gamePin) );
+    socket.on("updateGameData", data => {
+      this.gameStarted = data.gameStarted;
+      this.participants = data.participants;
+    });
+    socket.on( "startGame", () => this.$router.push("/game/" + this.gamePin) );
     socket.emit( "joinCustomGame", this.gamePin );
     socket.emit( "getUILabels", this.lang );
   },
@@ -64,8 +69,15 @@ export default {
       this.joined = true;
       
       // Detta kan vara användbart senare om vi ska lösa så att användare inte raderas vid refresh! /sebbe
-      // sessionStorage.setItem('userName', this.userName); 
-      // console.log("Updated sessionStorage with item ('userName',", this.userName, ")");
+      // Används också i skrivande stund så att varje persons userName skickas över till GameView rätt.
+      sessionStorage.setItem('userName', this.userName); 
+      console.log("Updated sessionStorage with item ('userName',", this.userName, ")");
+      
+      // This if statement checks if the game is already running. In that case, the user will immediately get pushed to GameView!
+      if(this.gameStarted) {
+        console.log("In if statement data.gamestarted: ", this.gameStarted)
+        this.$router.push("/game/" + this.gamePin);
+      };
     },
     handleLanguageChange(newLang) {
       this.lang = newLang;
@@ -82,8 +94,6 @@ export default {
       console.log("Window closed!!! Deleting user")
       socket.emit('deleteUser', this.gamePin, this.userName);
     },
-
-
     // Denna används inte för tillfället. Kan komma att användas om vi ska fixa så att användare inte raderas vid refresh! /sebbe
     checkIfRefreshPage() {
     // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
@@ -150,9 +160,9 @@ button:hover {
 }
 
 .waitingRoom div{
-  background-color: rgba(224, 185, 10, 0.6);
+  background-color: #ff8c42;
   border-radius: 15px;
-  border: 2px solid rgb(234, 217, 144);
+  border: 4px solid #da6822;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
   width: 20%;
   margin: 5% 0% 0% 40%

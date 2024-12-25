@@ -90,10 +90,10 @@ data: function() {
     lang:'en',
     selectedMinutes: 60,
     games: [
-      { id: 'game1', name: 'Quiz 1'} ,
-      { id: 'game2', name: 'Quiz 2'},
-      { id: 'game3', name: 'Quiz 3'},
-      { id: 'game4', name: 'Quiz 4'}
+      { id: 'General Quiz', name: 'Quiz 1'} ,
+      { id: 'Who´s most likely', name: 'Quiz 2'},
+      { id: 'Music quiz', name: 'Quiz 3'},
+      { id: 'This or that', name: 'Quiz 4'}
     ],
     selectedGames: [],
     participants: [],
@@ -154,18 +154,51 @@ methods: {
       alert("No players have joined yet.");
       return;
     }
+
+    // Simulera timerstart lokalt för teständamål
+    let countDownDate = Date.now() + this.selectedMinutes * 60 * 1000;
+
+    const interval = setInterval(() => {
+        const now = Date.now();
+        const distance = countDownDate - now;
+
+        if (distance <= 0) {
+            clearInterval(interval);
+            socket.emit('update-timer', {
+                timerDisplay: "Tiden är slut!",
+                soundType: "alarm"
+            });
+            return;
+        }
+
+        const totalSeconds = Math.floor(distance / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        socket.emit('update-timer', {
+            timerDisplay: `${minutes}m ${seconds}s`,
+            soundType: totalSeconds % 60 === 0 ? "alarm" : null
+        });
+    }, 1000);
+
+    console.log("Timer startad i CustomGameView för test.");
     
-    let gameData = {
+    let gameData = {  // borde den inte vara const? /theo
       gamePin: this.gamePin,
       selectedGames: this.selectedGames,
       participants: this.participants,
       selectedMinutes: this.selectedMinutes
+      //lang: this.lang    språk sparas i gameData eller localStorage?
     }
 
-    socket.emit('startGame', gameData),
-    this.$router.push({
-      name: 'GameView',
-    });   
+    socket.emit('startGame', gameData)
+    this.$router.push("/game/" + this.gamePin)
+    // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
+    // this.$router.push({
+    //   name: 'GameView',
+    //   params: { gamePin }
+    // });
+    console.log("--> After startGame!")
   },
 
   openModal(game) {

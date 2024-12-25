@@ -5,7 +5,18 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  background: linear-gradient(to bottom right, #CFE8EF, #9eb5bc, #98c4d1);
+  border: double 10px #ff8c42;
+  border-radius: 10px;
+  margin: 25px;
+  padding: 15px;
+  padding-bottom: 20px;
 }
+/* linear-gradient(to bottom right, #ff8c42, 
+    #cfe8ef,  
+     
+    #8abfce , #ff8c42, #5B7C99
+    );*/
 /* EDIT MODAL FOR EDIT QUIZ */
 .edit-modal-background {
   position: fixed;
@@ -62,3 +73,7 @@
   box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5);
   transform: scale(1.05);
 }
+
+
+
+

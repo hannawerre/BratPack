@@ -1,4 +1,5 @@
 <template>
+ 
   <header>
     <div v-bind:class="['hamburger', {'close': !hideNav}]" 
          v-on:click="toggleNav">
@@ -123,13 +124,17 @@ export default {
 }
 </script>
 <style scoped>
-  
+
+
   header {
-    background-color: rgb(71, 71, 255);
-    width: 100%;
-    display: grid;
-    grid-template-columns: 2em auto;
+    position: relative;
+    background-color: #cfe8ef;
+    width: 90%;
+    display: flex;
     justify-content: center;
+    border: #ff8c42 10px double;
+    border-radius: 10px;
+    margin: 3% 5% 0% 5%;  
   }
   #header {
     width: 500px;
@@ -139,7 +144,7 @@ export default {
     text-transform: uppercase;
     letter-spacing: 0.25em;
     font-size: 2.5rem;
-    color: white;
+    color: #cfe8ef;
     padding-top:0.2em;
   }
   .logo img {
@@ -148,7 +153,7 @@ export default {
     margin-right: 0.5rem; 
   }
   .hamburger {
-    color:white;
+    color:#CFE8eF;
     width:1em;
     display: flex;
     align-items: center;
