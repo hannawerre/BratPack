@@ -28,7 +28,25 @@ const router = createRouter({
       path: '/result/:id',
       name: 'ResultView',
       component: () => import('../views/ResultView.vue')
+    },
+    {
+      path: '/edit/:gameId',
+      name: 'EditView',
+      component: () => import('../views/EditView.vue'),
+      props: true,
+    },
+    {
+      path: '/game/:gamePin',
+      name: 'GameView',
+      component: () => import('../views/GameView.vue'),
+      
+    },
+    {
+      path: '/customgames/:gamePin?',
+      name: 'CustomGamesView',
+      component: () => import ('../views/CustomGamesView.vue')
     }
+
   ]
 })
 

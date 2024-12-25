@@ -1,19 +1,21 @@
 <template>
+ 
   <header>
     <div v-bind:class="['hamburger', {'close': !hideNav}]" 
          v-on:click="toggleNav">
     </div>
     <div class="logo">
-      <img src="/img/logo.png">
-      Power Hour
-      <img src="../assets/logo.svg">
+      <!--<img src="/img/powerhour_logo.png">-->
+      <img id="header" src="/img/Header_pwrHour.png">
+      
+      <!--<img src="../assets/logo.svg">-->
     </div>
   </header>
   <ResponsiveNav v-bind:hideNav="hideNav">
     <button v-on:click="switchLanguage">
       {{ uiLabels.changeLanguage }}
     </button>
-    <router-link to="/create/">
+    <router-link to="//">
       {{ uiLabels.createPoll }}
     </router-link>
     <a href="">
@@ -25,15 +27,15 @@
   <div class="items">
     <button v-if="!isPlay" @click="togglePlay">Join Game</button>
     <div v-if="isPlay" class="modal" ref="modal">
-      <input type="text" @input="checkPollExists(newPollId)" v-model="newPollId" :placeholder="'Lobby ID'">
+      <input type="text" @input="checkGameExists(newGamePin)" v-model="newGamePin" :placeholder="'Game PIN'">
 
-      <! -- The router link only appears if the input poll actually exists -->
-      <router-link v-if="this.pollExists" v-bind:to="'/lobby/' + newPollId">
+      <!-- The router link only appears if the input poll actually exists -->
+      <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + newGamePin">
         <button>Join</button>
       </router-link>
     </div>
-      <router-link to="/create/">
-        <button v-if="!isPlay" id="create">Create Game</button>
+      <router-link to="/customgames/">
+        <button v-if="!isPlay" @click="createGame" id="create">Create Game</button>
       </router-link>
   </div>
 </template>
@@ -51,20 +53,36 @@ export default {
   data: function () {
     return {
       uiLabels: {},
-      newPollId: "",
+      newGamePin: "",
       lang: localStorage.getItem( "lang") || "en",
       hideNav: true,
       isPlay: false,
-      pollExists: false
+      gameExists: false,
     }
   },
   created: function () {
+    // Removes userName from the current sessionStorage if the user clicks home button
+    // sessionStorage.removeItem('userName'); //används inte just nu. Kan bli relevant om användaren inte ska raderas vid refresh /sebbe
+
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.emit( "getUILabels", this.lang );
     // Listening for "pollExists" from socket.js
-    socket.on("pollExists", exists => this.pollExists = exists)
+    socket.on("gameExists", exists => this.gameExists = exists);
   },
   methods: {
+
+    // method currently not used.
+  createGame: function(){
+      console.log("Requesting to create game...");
+
+      //socket.emit("createGame", this.lang);
+      /*
+      socket.on("gameCreated", (data) => {
+      console.log("Game created with PIN:", data.pin);
+      this.$router.push({ name: 'CustomGamesView', query: { gamePin: data.pin } });
+  });*/
+}, //genererar gamepin, lyssnar på backend
+
     switchLanguage: function() {
       if (this.lang === "en") {
         this.lang = "sv"
@@ -79,10 +97,10 @@ export default {
       this.hideNav = ! this.hideNav;
     },
     // Checking if poll exists. StartView.vue -> socket.js -> Data.js -> socket.js -> StartView.vue
-    checkPollExists: function(pollId) {
-      console.log("Checking if poll with id:", pollId, "exists");
-      socket.emit("pollExists", pollId);
-      console.log("Poll exists: ", this.pollExists)
+    checkGameExists: function(gamePin) {
+      console.log("Checking if game with gamePin:", gamePin, "exists");
+      socket.emit("customGameExists", gamePin);
+      console.log("Game exists: ", this.gameExists)
     },
     togglePlay: function () {
       console.log("togglePlay")
@@ -106,18 +124,27 @@ export default {
 }
 </script>
 <style scoped>
-  
+
+
   header {
-    background-color: gray;
-    width: 100%;
-    display: grid;
-    grid-template-columns: 2em auto;
+    position: relative;
+    background-color: #cfe8ef;
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    border: #ff8c42 10px double;
+    border-radius: 10px;
+    margin: 3% 5% 0% 5%;  
+  }
+  #header {
+    width: 500px;
+    height: fit-content;
   }
   .logo {
     text-transform: uppercase;
     letter-spacing: 0.25em;
     font-size: 2.5rem;
-    color: white;
+    color: #cfe8ef;
     padding-top:0.2em;
   }
   .logo img {
@@ -126,7 +153,7 @@ export default {
     margin-right: 0.5rem; 
   }
   .hamburger {
-    color:white;
+    color:#CFE8eF;
     width:1em;
     display: flex;
     align-items: center;
