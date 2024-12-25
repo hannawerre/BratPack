@@ -1,6 +1,6 @@
 <template>
-    <div v-if="isModalOpen" class="modal-background" @click.self="closeModal">
-        <div class="modal-content">
+    <div v-if="isModalOpen" class="edit-modal-background" @click.self="closeModal">
+        <div class="edit-modal-content">
             <h1>Edit {{ GameName }}</h1>
             <p>Here you can add questions to the game</p>
             <br>
@@ -20,10 +20,9 @@
             </div>
             
                 <button @click="addAlternative" id="alternatative-button">Add alternative</button>
-
-            
-            <button @click="closeModal" id="close-button">Close</button>
-        </div>
+                <button @click="submitQuestion" id="submit-button">Submit</button>
+                <button @click="closeModal" id="close-button">Close</button>
+            </div>
     </div>
 </template>
   
@@ -47,6 +46,10 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
         alternatives.value.push({ text: "", isCorrect: false }); 
     };
 
+    const submitQuestion = () => {
+        
+    }
+
     const openModal = () => {
         isModalOpen.value = true;
         emit('modal-opened');
@@ -66,33 +69,10 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
   </script>
 
 <style scoped>
-    .modal-background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 8px;
-        text-align: center;
-        max-width: 500px;
-        width: 90%;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
     .question {
-    margin: 10px 0; 
-    box-sizing: border-box;
-}
+        margin: 10px 0; 
+        box-sizing: border-box;
+        }
 
     input[type="text"],
     input[placeholder] {
@@ -129,38 +109,6 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
 
     }
 
-    button {
-        border: none;
-        border-radius: 6px;
-        color: white;
-        cursor: pointer;
-        display: inline-block;
-        font-size: 16px;
-        margin: 20px 4px;
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    #alternatative-button{
-        background-color: green;
-    }
-    #close-button {
-        background-color: rgb(213, 8, 8);
-    }
-
-    #close-button:hover{
-        background-color: rgb(247, 44, 44);
-        box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
-        transform: scale(1.05);
-    }
-
-    #alternatative-button:hover {
-        background-color: rgb(8, 179, 8);
-        box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5);
-        transform: scale(1.05);
-    }
-    
     .alternative-row {
         display: flex;
         align-items: center; 

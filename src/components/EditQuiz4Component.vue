@@ -1,3 +1,6 @@
+<!-- ÄNDRA CSS OCH CLASSES SÅ ATT DET ÄR SAMMA SOM FÖR QUIZ 1 -->
+
+
 <template>
     <div v-if="isModalOpen" class="modal-background" @click.self="closeModal">
         <div class="modal-content">
