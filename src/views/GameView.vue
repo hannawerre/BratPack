@@ -4,21 +4,28 @@
         <p>{{ this.gamePin }}</p>
         <p>{{ this.userName }}</p>
         <p>{{ this.gameData }}</p>
+        <p>kalas</p>
+
+        <ThisOrThatComponent v-if="gameData.selectedGames.includes('This or that')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
 
         <div class="button-container">
                 <!-- Här skapas play-knappar för de valda spelen /theo -->
-            <button v-for="game in this.gameData.selectedGames" v-on:click="playMiniGame(game)" v-bind:key="game" class="game-button">
+            <!-- <button v-for="game in this.gameData.selectedGames" v-on:click="playMiniGame(game)" v-bind:key="game" class="game-button">
                 {{game}}    
-            </button> 
+            </button>  -->
         </div>
     </div>
 
-    <div v-else>
+    <!-- <div v-else>
         <GeneralQuizComponent
             v-if="activeGame === 'General Quiz'"
             :gameData="gameData"
             :gamePin="gamePin"
         />
+    </div> -->
+    <div>
+        <p>adiaibabdbaiwdiaidadabdbaj</p>
+        
     </div>
 
 
@@ -29,12 +36,14 @@
 <script>
     const socket = io("localhost:3000");
     import io from 'socket.io-client';  // kanske behövs /sebbe 
-import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
+    import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
+    import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
 
     export default{
         name: 'GameView',
         components: {
-            GeneralQuizComponent
+            GeneralQuizComponent,
+            ThisOrThatComponent
         },
         data: function(){
             return {

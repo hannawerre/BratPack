@@ -107,7 +107,7 @@ created: function () {
     this.selectedGames = gameData.selectedGames;
     this.participants = gameData.participants;
     this.selectedMinutes = gameData.selectedMinutes;
-    console.log("Updated gameData to: ", this.participants)
+    console.log("Updated gameData.participants to: ", this.participants)
   })
 
   if (!this.$route.params.gamePin) { 

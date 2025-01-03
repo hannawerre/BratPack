@@ -9,10 +9,51 @@ function sockets(io, socket, data) {
     socket.emit('uiLabels', data.getUILabels(lang));
   });
 
+  // Games getQuestions
   socket.on('getQuestions', function(lang) {
     console.log("hämtar quiz frågor")
     socket.emit('generalQuestions', data.getQuestions(lang))
   });
+
+  // ThisOrThat -------------------------------------------------------------------
+  socket.on('setup_ThisOrThat', function(gamePin, lang) {
+    console.log("Setting up ThisOrThat game, and returning questions");
+    socket.emit('setup_ThisOrThat', data.setup_ThisOrThat(gamePin));
+    socket.emit("getQuestions_ThisOrThat", data.getQuestions_ThisOrThat(lang));
+  });
+  socket.on('newChosenParticipant', function(gamePin) {
+    io.to(gamePin).emit('newChosenParticipant', data.newChosenParticipant(gamePin));
+  });
+  socket.on('answer_ThisOrThat', function(gamePin, userName, answerId){
+    data.answer_ThisOrThat(gamePin, userName, answerId);
+  });
+  socket.on("chosenParticipantAnswer", function(answer, gamePin){
+    io.to(gamePin).emit('chosenParticipantAnswer', answer);
+  });
+  socket.on('correctQuestion_ThisOrThat', function(gamePin, questionId){
+    data.correctQuestion_ThisOrThat(gamePin, questionId);
+    //io.to(gamePin).emit('updateGameData', data.getGameData(gamePin))
+  })
+  socket.on('startRound', function(gamePin) {
+    if(!data.roundInProgress(gamePin)){
+
+      console.log("--> startRound inside if statement! gamePin: ", gamePin)
+      data.roundInProgress(gamePin, true); // Set to true
+
+      setTimeout(() => {
+        data.correctQuestion_ThisOrThat(gamePin); // Correct the answers and add points
+        data.newChosenParticipant(gamePin);       // Get new chosenParticipant
+        data.nextQuestion_ThisOrThat(gamePin);    // Get next questionId
+        io.to(gamePin).emit("roundUpdate", data.getGameData(gamePin).ThisOrThat);
+      }, 20000) // 20 seconds is exactly when question time ends.
+
+      setTimeout(() => {
+        io.to(gamePin).emit("nextRound");
+        data.roundInProgress(gamePin, false); // Set to false
+      }, 30000) // 10 seconds later
+  }
+  })
+// ---------------------------------------------------------------------------------
 
   socket.on('createPoll', function(d) {
     data.createPoll(d.pollId, d.lang)
@@ -106,18 +147,18 @@ function sockets(io, socket, data) {
   
   socket.on('update-timer', function(data) {
     const { timerDisplay, gamePin, soundType } = data || {};
-    console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin, "Sound Type:", soundType);
+    // console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin, "Sound Type:", soundType);
     if (gamePin) {
-    console.log("Skickar timerDisplay till gamePin:", gamePin);
+    // console.log("Skickar timerDisplay till gamePin:", gamePin);
     socket.join(gamePin);
     io.to(gamePin).emit('update-timer', { timerDisplay, soundType });
     } else {
-    console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
+    // console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
     io.emit('update-timer', { timerDisplay, soundType });
     }
     });
 
-    socket.on("requestGameData", function (gamePin) {
+    socket.on("requestGameData", function (gamePin) { // vad används denna metod till? Den uppdaterar bara timern? /sebbe
       const gameData = data.getGameData(gamePin);
       if (gameData) {
           console.log(`Sending current game data to client ${socket.id}`);

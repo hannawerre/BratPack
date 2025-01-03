@@ -1,0 +1,164 @@
+{
+    "questions": [
+        {
+            "id": 1,
+            "question": "Hamburgare eller Pizza?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Hamburgare",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Pizza",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "question": "Kaffe eller Te?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Kaffe",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Te",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "question": "Katter eller Hundar?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Katter",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Hundar",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "question": "Strand eller Berg?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Strand",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Berg",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "question": "Sommar eller Vinter?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Sommar",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Vinter",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "question": "Böcker eller Filmer?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Böcker",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Filmer",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "question": "Android eller iOS?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Android",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "iOS",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "question": "Choklad eller Vanilj?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Choklad",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Vanilj",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "question": "Morgon eller Kväll?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Morgon",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Kväll",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "question": "Stad eller Landsbygd?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Stad",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Landsbygd",
+                    "isCorrect": false
+                }
+            ]
+        }
+    ]
+}

@@ -86,7 +86,7 @@ export default {
 
     
     socket.on('update-timer', ({ timerDisplay, soundType }) => {
-        console.log("TimerDisplay received in ResponsiveNav:", timerDisplay, "SoundType:", soundType);
+        // console.log("TimerDisplay received in ResponsiveNav:", timerDisplay, "SoundType:", soundType);
 
         this.miniClock = timerDisplay;
 

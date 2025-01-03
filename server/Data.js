@@ -3,14 +3,13 @@ import {readFileSync} from "fs";
 
 // Store data in an object to keep the global namespace clean. In an actual implementation this would be interfacing a database...
 function Data() {
-
+  // TODO: Uppdatera customgames['test'] så att den ser exakt ut som ett äkta spel
   // Custom Game
   this.customGames = {};
   this.customGames['test'] = {
     lang: "en",
     participants: [],
     selectedGames: [],
-    gamePin: '', //game pin sparas som namnet på objektet, behövs den då här? /sebbe
     selectedMinutes: 60, // Var ska tiden sparas? Vi vill kunna hämta tiden som är kvar för att veta när nästa spel ska köras igång! /sebbe
     timerDisplay: '',
     gameStarted: false,
@@ -45,7 +44,6 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
 
 
 // - Custom Game -
-
 Data.prototype.customGameExists = function (gamePin) {
   //console.log("Checking if '", gamePin, "' is a customGame. Customgames: ", this.customGames)
   return typeof this.customGames[gamePin] !== "undefined";
@@ -90,7 +88,7 @@ Data.prototype.storeGameDataAndStart = function (gameData){
 
 Data.prototype.getGameData = function(gamePin) {
   if (this.customGameExists(gamePin)) { 
-    console.log("gameData requested for custom game: ", gamePin);
+    console.log("gameData: ", this.customGames[gamePin]," requested for custom game: ", gamePin);
     return this.customGames[gamePin];
   }
   console.log("Requested gameData for non existing game... returning []")
@@ -136,7 +134,7 @@ Data.prototype.getUILabels = function (lang) {
     lang = "en";
   const labels = readFileSync("./server/data/labels-" + lang + ".json");
   return JSON.parse(labels);
-}
+};
 
 Data.prototype.getQuestions = function (lang) {
   //check if lang is valid before trying to load the dictionary file
@@ -144,32 +142,93 @@ Data.prototype.getQuestions = function (lang) {
     lang = "en";
   const questions = readFileSync("./server/data/questions-" + lang + ".json");
   return JSON.parse(questions);
+};
+
+// ThisOrThat -------------------------------------------------------------------------------------
+Data.prototype.setup_ThisOrThat = function(gamePin) {
+  if(this.customGames[gamePin].ThisOrThat) return this.customGames[gamePin].ThisOrThat; // If it already exists
+  let ThisOrThat = {};
+  let participants = {};
+  for(const participant of this.customGames[gamePin].participants){
+    console.log("--> Adding '", participant, "' to participants list");
+    participants[participant] = {answers: {}, points: 0}; 
+  };
+  ThisOrThat.participants = participants;
+  ThisOrThat.chosenParticipant = this.newChosenParticipant(gamePin, true);
+  ThisOrThat.correctAnswers = {};
+  ThisOrThat.currentQuestion = 0;
+  this.customGames[gamePin].ThisOrThat = ThisOrThat;
+  return ThisOrThat;
+};
+Data.prototype.getQuestions_ThisOrThat = function(lang) {
+  if (!["en", "sv"].some( el => el === lang)) 
+    lang = "en";
+  const questions = readFileSync("./server/data/questionsThisOrThat-" + lang + ".json");
+  return JSON.parse(questions);
+};
+Data.prototype.answer_ThisOrThat = function(gamePin, userName, answerId) {
+  // Add the answer to the given participant.
+  const currentQuestion = this.customGames[gamePin].ThisOrThat.currentQuestion
+  this.customGames[gamePin].ThisOrThat.participants[userName].answers[currentQuestion] = answerId;
+  // If user is the chosen one, add the answer to correctAnswers array.
+  if(userName === this.customGames[gamePin].ThisOrThat.chosenParticipant) {
+    this.customGames[gamePin].ThisOrThat.correctAnswers[currentQuestion] = answerId;
+  };
+};
+Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
+
+  const participantsArray = Object.values(this.customGames[gamePin].participants); //just nu är det totala antalet participants, även de som loggat in efter att spelet startat /sebbe
+  const randomNumber = Math.floor(Math.random() * participantsArray.length);
+  const newChosenParticipant = participantsArray[randomNumber];
+
+  // On setup we just want it returned. This is because the method is called before the object is initiated.
+  // All other times we just want it updated in Data.js
+  if(isSetup_flag) {
+    return newChosenParticipant;
+  }; 
+  this.customGames[gamePin].ThisOrThat.chosenParticipant = newChosenParticipant
+};
+Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
+  const participantsArray = Object.entries(this.customGames[gamePin].ThisOrThat.participants);
+  const correctAnswers = this.customGames[gamePin].ThisOrThat.correctAnswers;
+  const questionId = this.customGames[gamePin].ThisOrThat.currentQuestion;
+  // Add 10 points if answer is correct
+  for(let [name, data] of participantsArray){
+    if (data.answers[questionId] && data.answers[questionId] === correctAnswers[questionId]){
+      this.customGames[gamePin].ThisOrThat.participants[name].points += 10;
+    }
+  }
+};
+Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
+  return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
+};
+Data.prototype.roundInProgress = function(gamePin, isActive = null) {
+  if (isActive === null) {
+    return this.customGames[gamePin].ThisOrThat.roundInProgress;
+  }
+  this.customGames[gamePin].ThisOrThat.roundInProgress = isActive;
 }
+Data.prototype.startGame_ThisOrThat = function(gamePin) {
+  let elapsedSeconds = 0;
 
-/* Data.prototype.storePlayerAnswer = function(gamePin, userName, miniGameId, questionId, answer) {
-  if (!this.customGameExists(gamePin)) return console.log("Game not found");
-  
-  let game = this.customGames[gamePin];
+  const interval = setInterval(() => {
+    elapsedSeconds++;
+    if(elapsedSeconds === 20) { // Exactly when the question time runs out
+      
+      this.correctQuestion_ThisOrThat(gamePin, this.customGames[gamePin].ThisOrThat.currentQuestion);
+      this.newChosenParticipant(gamePin);
+      this.customGames[gamePin].ThisOrThat.currentQuestion++; //TODO: När den kört 15 eller 20 frågor borde spelet vara klart.
 
-  // Säkerställ att playerAnswers[name] finns (borde finnas efter participateInCustomGame)
-  if (!game.playerAnswers[userName]) {
-    game.playerAnswers[userName] = {};
-  }
+      io.to(gamePin).emit("roundUpdate", this.customGames[gamePin].ThisOrThat)
+    }
+    if(elapsedSeconds === 30) { // 30 seconds matches the combined duration of each phase in ThisOrThatComponent.vue. 
+      elapsedSeconds=0; 
+    }
+  }, 1000); 
+};
+// -------------------------------------------------------------------------------------------------
 
-  // Skapa ett objekt för det specifika minispelet om det inte finns
-  if (!game.playerAnswers[userName][miniGameId]) {
-    game.playerAnswers[userName][miniGameId] = {};
-  }
-
-  // Spara svaret
-  game.playerAnswers[userName][miniGameId][questionId] = answer;
-
-  console.log(`Stored answer for ${userName} in ${miniGameId}, question ${questionId}: ${answer}`);
-}; */
-
-
-// - Poll -
-
+// - Poll ------------------------------------------------------------------------------------------
 Data.prototype.pollExists = function (pollId) {
   return typeof this.polls[pollId] !== "undefined"
 }
@@ -211,7 +270,6 @@ Data.prototype.addQuestion = function(pollId, q) {
     this.polls[pollId].questions.push(q);
   }
 }
-
 Data.prototype.getQuestion = function(pollId, qId = null) {
   if (this.gameExists(pollId)) {
     const poll = this.polls[pollId];
@@ -222,7 +280,6 @@ Data.prototype.getQuestion = function(pollId, qId = null) {
   }
   return {}
 }
-
 Data.prototype.getSubmittedAnswers = function(pollId) {
   if (this.gameExists(pollId)) {
     const poll = this.polls[pollId];
@@ -233,7 +290,6 @@ Data.prototype.getSubmittedAnswers = function(pollId) {
   }
   return {}
 }
-
 Data.prototype.submitAnswer = function(pollId, answer) {
   if (this.gameExists(pollId)) {
     const poll = this.polls[pollId];
@@ -254,6 +310,7 @@ Data.prototype.submitAnswer = function(pollId, answer) {
     console.log("answers looks like ", answers, typeof answers);
   }
 }
+// -------------------------------------------------------------------------------------------
 
 //Ändrat från pollId till gamePin
 // Lägg denna funktion längst ned i prototypsektionen:
@@ -261,7 +318,7 @@ Data.prototype.startTimer = function (gamePin, selectedMinutes, io) {
   if (!this.customGameExists(gamePin)) {
       console.log("Game does not exist:", gamePin);
       return;
-  }
+  } 
 
   const game = this.customGames[gamePin];
   game.selectedMinutes = selectedMinutes;
