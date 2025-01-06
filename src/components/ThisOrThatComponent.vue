@@ -193,9 +193,9 @@ export default {
         updateGame: function(){ //test
             socket.emit('requestGameData', this.gamePin)
         },
-        onAnswer(questionId, answerId) { 
+        onAnswer(answerData) { 
             // TODO: Just nu används inte questionId! /sebbe
-            socket.emit('answer_ThisOrThat', this.gamePin, this.userName, answerId)
+            socket.emit('answer_ThisOrThat', this.gamePin, this.userName, answerData.answerId)
             console.log("User: ", this.userName, "just answered");
         },
         correctQuestion(){

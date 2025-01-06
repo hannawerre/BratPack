@@ -73,7 +73,9 @@
 </template>
 
 <script>
-import {socket} from '../socketClient.js';
+//import {socket} from '../socketClient.js';
+const socket = io("localhost:3000");
+import io from 'socket.io-client'; 
 import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';

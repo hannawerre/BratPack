@@ -7,13 +7,6 @@
 
         <ThisOrThatComponent v-if="gameData.selectedGames.includes('This or that')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
 
-<<<<<<< HEAD
-        <div class="button-container">
-                <!-- Här skapas play-knappar för de valda spelen /theo -->
-            <!-- <button v-for="game in this.gameData.selectedGames" v-on:click="playMiniGame(game)" v-bind:key="game" class="game-button">
-                {{game}}    
-            </button>  -->
-=======
         <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
             <div>
                 <span>{{ participant.name }}</span>
@@ -30,7 +23,6 @@
                         {{ gameName }}
                 </button>
             </div>
->>>>>>> 1d862de (Everything I did during the christmas break- Theo)
         </div>
 
         
@@ -38,11 +30,7 @@
         
     </div>
 
-<<<<<<< HEAD
-    <!-- <div v-else>
-=======
     <div v-else> <!--Visas bara så länge ett spel är aktiverat-->
->>>>>>> 1d862de (Everything I did during the christmas break- Theo)
         <GeneralQuizComponent
             v-if="activeGame === 'General Quiz'"
             :gameData="gameData"
@@ -50,10 +38,6 @@
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
         />
-    </div> -->
-    <div>
-        <p>adiaibabdbaiwdiaidadabdbaj</p>
-        
     </div>
 
 
@@ -62,29 +46,19 @@
 
 
 <script>
-<<<<<<< HEAD
+    //import {socket} from '../socketClient.js';  // kanske behövs /sebbe 
+    
+    
     const socket = io("localhost:3000");
     import io from 'socket.io-client';  // kanske behövs /sebbe 
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
-=======
-    import {socket} from '../socketClient.js';  // kanske behövs /sebbe 
-    import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
-    
->>>>>>> 1d862de (Everything I did during the christmas break- Theo)
 
     export default{
         name: 'GameView',
         components: {
-<<<<<<< HEAD
             GeneralQuizComponent,
-            ThisOrThatComponent
-=======
-        
-            GeneralQuizComponent
-            
-            
->>>>>>> 1d862de (Everything I did during the christmas break- Theo)
+            ThisOrThatComponent         
         },
         data: function(){
             return {

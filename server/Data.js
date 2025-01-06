@@ -158,7 +158,7 @@ Data.prototype.setup_ThisOrThat = function(gamePin) {
   let participants = {};
   for(const participant of this.customGames[gamePin].participants){
     console.log("--> Adding '", participant, "' to participants list");
-    participants[participant] = {answers: {}, points: 0}; 
+    participants[participant.name] = {answers: {}, points: 0}; 
   };
   ThisOrThat.participants = participants;
   ThisOrThat.chosenParticipant = this.newChosenParticipant(gamePin, true);
@@ -186,7 +186,7 @@ Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
 
   const participantsArray = Object.values(this.customGames[gamePin].participants); //just nu är det totala antalet participants, även de som loggat in efter att spelet startat /sebbe
   const randomNumber = Math.floor(Math.random() * participantsArray.length);
-  const newChosenParticipant = participantsArray[randomNumber];
+  const newChosenParticipant = participantsArray[randomNumber].name;
 
   // On setup we just want it returned. This is because the method is called before the object is initiated.
   // All other times we just want it updated in Data.js
@@ -196,9 +196,11 @@ Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
   this.customGames[gamePin].ThisOrThat.chosenParticipant = newChosenParticipant
 };
 Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
+  
   const participantsArray = Object.entries(this.customGames[gamePin].ThisOrThat.participants);
   const correctAnswers = this.customGames[gamePin].ThisOrThat.correctAnswers;
   const questionId = this.customGames[gamePin].ThisOrThat.currentQuestion;
+  console.log("-------> Inside correctQuestion_ThisOrThat", participantsArray, this.customGames[gamePin].ThisOrThat)
   // Add 10 points if answer is correct
   for(let [name, data] of participantsArray){
     if (data.answers[questionId] && data.answers[questionId] === correctAnswers[questionId]){

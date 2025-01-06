@@ -42,8 +42,9 @@
 
 <script>
 import ResponsiveNav from '@/components/ResponsiveNav.vue';
-import {socket} from '../socketClient.js';
-
+//import {socket} from '../socketClient.js';
+const socket = io("localhost:3000");
+import io from 'socket.io-client'; 
 
 export default {
   name: 'StartView',

@@ -148,46 +148,18 @@ function sockets(io, socket, data) {
     io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
   }); 
 
-<<<<<<< HEAD
-  
-  socket.on('update-timer', function(data) {
-    const { timerDisplay, gamePin, soundType } = data || {};
-    // console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin, "Sound Type:", soundType);
-=======
   //Ändrat från pollId till gamePin
   socket.on('update-timer', function(timerDisplay, gamePin) {
 
->>>>>>> 1d862de (Everything I did during the christmas break- Theo)
     if (gamePin) {
-    // console.log("Skickar timerDisplay till gamePin:", gamePin);
+    console.log("Skickar timerDisplay till gamePin:", gamePin);
     socket.join(gamePin);
     io.to(gamePin).emit('update-timer', timerDisplay);
     } else {
-<<<<<<< HEAD
-    // console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
-    io.emit('update-timer', { timerDisplay, soundType });
-    }
-    });
-
-    socket.on("requestGameData", function (gamePin) { // vad används denna metod till? Den uppdaterar bara timern? /sebbe
-      const gameData = data.getGameData(gamePin);
-      if (gameData) {
-          console.log(`Sending current game data to client ${socket.id}`);
-          socket.emit("update-timer", {
-              timerDisplay: gameData.timerDisplay,
-              soundType: null 
-          });
-      }
-  });
-  
-
-
-=======
     
     io.emit('update-timer', timerDisplay);
     }
     });
->>>>>>> 1d862de (Everything I did during the christmas break- Theo)
     
 }
 

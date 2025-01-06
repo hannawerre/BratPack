@@ -100,7 +100,8 @@
 
 import QuestionComponent from './QuestionComponent.vue';
 import Nav from './ResponsiveNav.vue';
-import {socket} from '../socketClient.js';
+const socket = io("localhost:3000");
+import io from 'socket.io-client'; 
 
 export default {
   name: 'GeneralQuizComponent',
@@ -141,14 +142,14 @@ export default {
       pointsTime: 0,
       timeIsUp: false,
       playerAnsweredRight: false,
-      localGameData: JSON.parse(JSON.stringify(this.gameData))
+      
     };
   },
   created() {
+
+      socket.emit("joinSocketRoom", this.gamePin);
   
-      socket.on("updateGameData", gameData => {
-        this.localGameData = gameData;
-      })
+      
     // När servern skickar frågorna, sätt dem i `questions`
       socket.on('generalQuestions', quizQuestions => {
           this.questions = quizQuestions.questions;
@@ -195,34 +196,37 @@ export default {
       
     },
 
-    handleAnswer(answer){
-      if(this.isAdmin){
-        return;
-      }
-      this.onAnswer(answer)
-    },
+    handleAnswer(answerData) {
+    if (this.isAdmin) return; // Admin ska inte hantera svar
+    this.onAnswer(answerData);
+  },
 
-    onAnswer(answer) {
-      this.currentAnswer = answer;
-      this.currentPhase = "answeredPhase"
-      
-      const participant = this.gameData.participants.find(p => p.name === this.userName) //för att se till att rätt deltagres poäng uppdateras
-      if(answer.isCorrect){
-          
-          const leftOverTime = this.timeLeftOnAnswer;
-          const fraction = leftOverTime / this.pointsTime;
-          const points = Math.floor(fraction *1000);
+  onAnswer(answerData) {
+    // Spara hela svarsdatan
+    this.currentAnswer = answerData;
+    this.currentPhase = "answeredPhase";
 
-          this.playerAnsweredRight = true;
-          participant.scoreGame1 += points;
-          console.log(participant.name, participant.scoreGame1)
+    console.log("Svar från användaren:", answerData);
 
-          
-      }
-      
-      this.updatePoints(participant);
+    // Hitta rätt deltagare
+    const participant = this.gameData.participants.find(p => p.name === this.userName);
+    
+    if (answerData.isCorrect) {
+      // Räkna poäng
+      const leftOverTime = this.timeLeftOnAnswer;
+      const fraction = leftOverTime / this.pointsTime;
+      const points = Math.floor(fraction * 1000);
 
-    },
+      this.playerAnsweredRight = true;
+      participant.scoreGame1 += points;
+
+      console.log("Poäng uppdaterad:", participant.name, participant.scoreGame1);
+    }
+
+    // Skicka poänguppdatering till servern
+    this.updatePoints(participant);
+  },
+
     startCountdown(duration) {
       const updateInterval = 100; 
       const startTime = Date.now();
@@ -293,7 +297,6 @@ export default {
           case "feedbackPhase":
             if(this.currentQuestionIndex < this.questions.length - 1) {
               this.playerAnsweredRight = false;
-              this.currentQuestionIndex++;
               this.currentPhase = "introPhase";
               this.startCountdown(3)
             } else{
