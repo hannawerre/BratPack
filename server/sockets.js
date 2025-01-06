@@ -1,7 +1,24 @@
 function sockets(io, socket, data) {
+  
+  
+  socket.on("startingQuizQuestion", function(data){
+    console.log(`startQuizForAll received for gamePin = ${data.gamePin}`)
+    io.to(data.gamePin).emit("startGeneralQuizQuestion", data.currentQuestionIndex)
+  })
 
   // Check if game exists
-  
+  socket.on("startMiniGame", function(data){
+    const {gamePin, gameName} = data;
+    io.to(gamePin).emit("onGameStart", gameName)
+    
+  })
+
+  socket.on("updatePlayerPoints", (d) => {
+    console.log("Uppdaterar poängen för klienten")
+    data.setScore(d.gamePin, d.userName, d.newScore);
+    io.to(d.gamePin).emit('updateGameData', data.getGameData(d.gamePin))
+    
+  })
   socket.on('customGameExists', function(gamePin) {
     socket.emit('gameExists', data.customGameExists(gamePin))
   });
@@ -66,24 +83,11 @@ function sockets(io, socket, data) {
     // Implement error handling if game could not be created
   });
   
-  socket.on('startGame', function (gameData) {
-
+  socket.on('startGame', function(gameData) {
     data.storeGameDataAndStart(gameData);
     io.to(gameData.gamePin).emit('startGame');
-
-    console.log("Game started for gamePin:", gameData.gamePin);
-
-    data.startTimer(gameData.gamePin, gameData.selectedMinutes, io);
-
-    io.to(gameData.gamePin).emit("startGame", { // Hmmm... Detta känns överflödigt eller? /sebbe
-        message: "Game has started!",
-        gamePin: gameData.gamePin
-    });
-  });
-
-  socket.on('readyToStartTimer',function(){
-    let gameData = data.getGameData();
-    socket.emit('startTimer', gameData.selectedMinutes, gameData.gamePin);
+    console.log("hej");
+    //socket emit
   });
   
   socket.on('addQuestion', function(d) {
@@ -107,13 +111,13 @@ function sockets(io, socket, data) {
     socket.emit('updateGameData', data.getGameData(gamePin));
     // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
   });
-  socket.on('participateInCustomGame', function(d){
-    console.log("Adding participant: ", d.name, " in game: ", d.gamePin)
-    data.participateInCustomGame(d.gamePin, d.name);
+  socket.on('participateInCustomGame', function(gamePin, playerObj){
+    console.log("Adding participant: ", playerObj.name, " in game: ", gamePin)
+    data.participateInCustomGame(gamePin, playerObj);
     console.log("User has joined. SocketID: ", socket.id)
-    io.to(d.gamePin).emit('participantsUpdate', data.getCustomGameParticipants(d.gamePin)); //change to getGameData
+    io.to(gamePin).emit('participantsUpdate', data.getCustomGameParticipants(gamePin)); //change to getGameData
   });
-  socket.on("requestGameData", function(gamePin) { 
+  socket.on("requestGameData", function(gamePin) {
     let gameData = data.getGameData(gamePin);
     socket.emit("updateGameData", gameData)
   });
@@ -144,15 +148,22 @@ function sockets(io, socket, data) {
     io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
   }); 
 
+<<<<<<< HEAD
   
   socket.on('update-timer', function(data) {
     const { timerDisplay, gamePin, soundType } = data || {};
     // console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin, "Sound Type:", soundType);
+=======
+  //Ändrat från pollId till gamePin
+  socket.on('update-timer', function(timerDisplay, gamePin) {
+
+>>>>>>> 1d862de (Everything I did during the christmas break- Theo)
     if (gamePin) {
     // console.log("Skickar timerDisplay till gamePin:", gamePin);
     socket.join(gamePin);
-    io.to(gamePin).emit('update-timer', { timerDisplay, soundType });
+    io.to(gamePin).emit('update-timer', timerDisplay);
     } else {
+<<<<<<< HEAD
     // console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
     io.emit('update-timer', { timerDisplay, soundType });
     }
@@ -171,6 +182,12 @@ function sockets(io, socket, data) {
   
 
 
+=======
+    
+    io.emit('update-timer', timerDisplay);
+    }
+    });
+>>>>>>> 1d862de (Everything I did during the christmas break- Theo)
     
 }
 

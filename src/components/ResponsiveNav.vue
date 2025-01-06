@@ -53,10 +53,9 @@ export default {
     },
 
     playAlarm() {
-      console.log("Spelar alarm...");
       const alarmSound = new Audio('/audio/alarm.mp3');
       alarmSound.play().then(() => {
-        console.log("Alarm spelas.");
+
       }).catch((error) => {
         console.error("Kunde inte spela upp alarmet:", error);
       });
@@ -66,7 +65,7 @@ export default {
       console.log("Spelar tystnad...");
       const silenceSound = new Audio('/audio/silence.mp3');
       silenceSound.play().then(() => {
-        console.log("Silence spelas.");
+  
       }).catch((error) => {
         console.error("Kunde inte spela upp Silence:", error);
       });

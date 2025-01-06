@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>{{ question.question }} (ID: {{ question.id }})</h3>
-    <ul>
+    <ul >
       <li v-for="answerObj in question.answers" :key="answerObj.id">
         <!-- Här visar vi alla variabler: id, answer, isCorrect -->
         <button @click="answer(question.id, answerObj.id)">
@@ -9,6 +9,7 @@
         </button>
       </li>
     </ul>
+    
   </div>
 </template>
 
@@ -19,6 +20,10 @@ export default {
     question: {
       type: Object,
       required: true
+    },
+    isAdmin: {
+      type: Boolean,
+      
     }
   },
   emits: ["answer"],

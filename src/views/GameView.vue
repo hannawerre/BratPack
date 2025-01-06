@@ -1,6 +1,5 @@
 <template>
-    <div v-if="!activeGame">
-        <TimerComponent/>
+    <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
         <p>{{ this.gamePin }}</p>
         <p>{{ this.userName }}</p>
         <p>{{ this.gameData }}</p>
@@ -8,19 +7,48 @@
 
         <ThisOrThatComponent v-if="gameData.selectedGames.includes('This or that')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
 
+<<<<<<< HEAD
         <div class="button-container">
                 <!-- Här skapas play-knappar för de valda spelen /theo -->
             <!-- <button v-for="game in this.gameData.selectedGames" v-on:click="playMiniGame(game)" v-bind:key="game" class="game-button">
                 {{game}}    
             </button>  -->
+=======
+        <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
+            <div>
+                <span>{{ participant.name }}</span>
+                <span v-if="participant.isAdmin">(Admin)</span>
+            </div>
+  <!-- Visa bara knapparna om detta är den inloggade användarens namn OCH om den är admin -->
+            <div v-if="participant.name === this.userName && participant.isAdmin">
+                <button
+                    v-for="gameName in gameData.selectedGames"
+                    :key="gameName"
+                    class="game-button"
+                    @click="playMiniGame(gameName)"
+                    >
+                        {{ gameName }}
+                </button>
+            </div>
+>>>>>>> 1d862de (Everything I did during the christmas break- Theo)
         </div>
+
+        
+
+        
     </div>
 
+<<<<<<< HEAD
     <!-- <div v-else>
+=======
+    <div v-else> <!--Visas bara så länge ett spel är aktiverat-->
+>>>>>>> 1d862de (Everything I did during the christmas break- Theo)
         <GeneralQuizComponent
             v-if="activeGame === 'General Quiz'"
             :gameData="gameData"
             :gamePin="gamePin"
+            :uiLabels="uiLabels"
+            :isAdmin="isAdmin"
         />
     </div> -->
     <div>
@@ -34,40 +62,61 @@
 
 
 <script>
+<<<<<<< HEAD
     const socket = io("localhost:3000");
     import io from 'socket.io-client';  // kanske behövs /sebbe 
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
+=======
+    import {socket} from '../socketClient.js';  // kanske behövs /sebbe 
+    import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
+    
+>>>>>>> 1d862de (Everything I did during the christmas break- Theo)
 
     export default{
         name: 'GameView',
         components: {
+<<<<<<< HEAD
             GeneralQuizComponent,
             ThisOrThatComponent
+=======
+        
+            GeneralQuizComponent
+            
+            
+>>>>>>> 1d862de (Everything I did during the christmas break- Theo)
         },
         data: function(){
             return {
                 gamePin: '',
                 userName: '',
                 gameData: {},
-                activeGame: null
+                activeGame: '',
+                uiLabels: {},
+                isAdmin: false
             }
         },
         created: function() {
-            
+            socket.on( "uiLabels", labels => this.uiLabels = labels );
             socket.on('updateGameData', gameData => {
                 this.gameData = gameData;
-                console.log("Updated gameData to: ", this.gameData)
+                this.determineAdminStatus();
             });
+            
             this.setup();
             // This will ensure the client will listen to messages emitted to the socket room. :)
+            console.log(this.gamePin)
             socket.emit('joinSocketRoom', this.gamePin);
+            socket.emit( "getUILabels", this.lang );
         },
         mounted: function() {
+            socket.on("onGameStart", gameName=> this.activeGame = gameName)
             socket.emit('updateAllGameData', this.gamePin);
             console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin)
 
         },
+        
+
         methods: {
             setup: function(){
                 this.gamePin = this.$route.params.gamePin;
@@ -75,8 +124,17 @@
                 socket.emit('requestGameData', this.gamePin);
             },
 
+            determineAdminStatus () {
+                const user = this.gameData.participants?.find(p=> p.name === this.userName)
+                this.isAdmin = user ? user.isAdmin : false;
+            },
+
             playMiniGame: function(game){
-                this.activeGame = game;
+                if(this.isAdmin){
+                    socket.emit("startMiniGame", {
+                        gameName: game, 
+                        gamePin: this.gamePin
+                })}
                 //socket.emit(miniGameStarted, gameid) ?? 
                 // på något sätt få varje spels komponent aktiverad
                 //theo
