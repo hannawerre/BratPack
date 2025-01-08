@@ -50,15 +50,19 @@
 import { ref, defineProps, defineExpose , defineEmits} from 'vue';
 
     const props = defineProps({
-        GameName: String
+        GameName: String,
         
     });
 
-    const emit = defineEmits(["modal-opened", "modal-closed", "questions-saved"]);
+    const emit = defineEmits([
+    "modal-opened",
+    "modal-closed",
+    "questions-saved-quiz1"
+]);
 
     const isModalOpen = ref(false);
 
-    const useStandardQuestions = ref(false);
+    const useStandardQuestions = ref(true);
     const useOwnQuestions = ref(false);
 
     const question = ref("");
@@ -78,6 +82,13 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
 
     const saveQuestion = () => {
         if (question.value.trim() !== "") {
+
+            const hasCorrectAnswer = alternatives.value.some(alt => alt.isCorrect);
+        if (!hasCorrectAnswer) {
+            console.error("At least one alternative must be marked as correct.");
+            alert("Please mark at least one alternative as correct.");
+            return;
+        }
             const newQuestionId = savedQuestions.value.length + 1;
             
             const newQuestionObj = {
@@ -98,12 +109,20 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
      };
     };
     const closeModal = () => {
+
+        if(!useStandardQuestions.value && !useOwnQuestions.value){
+            alert("Please select at least one option: 'Use standard questions' or 'Use own questions'.");
+            return;
+        }
+
         isModalOpen.value = false;
         emit(
-            "questions-saved",
+            "questions-saved-quiz1",
             savedQuestions.value,
             useStandardQuestions.value,
-            useOwnQuestions.value
+            useOwnQuestions.value,
+            "Quiz1"
+
         );
         
         emit('modal-closed');

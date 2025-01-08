@@ -1,7 +1,24 @@
 function sockets(io, socket, data) {
+  
+  
+  socket.on("startingQuizQuestion", function(data){
+    console.log(`startQuizForAll received for gamePin = ${data.gamePin}`)
+    io.to(data.gamePin).emit("startGeneralQuizQuestion", data.currentQuestionIndex)
+  })
 
   // Check if game exists
-  
+  socket.on("startMiniGame", function(data){
+    const {gamePin, gameName} = data;
+    io.to(gamePin).emit("onGameStart", gameName)
+    
+  })
+
+  socket.on("updatePlayerPoints", (d) => {
+    console.log("Uppdaterar poängen för klienten")
+    data.setScore(d.gamePin, d.userName, d.newScore);
+    io.to(d.gamePin).emit('updateGameData', data.getGameData(d.gamePin))
+    
+  })
   socket.on('customGameExists', function(gamePin) {
     socket.emit('gameExists', data.customGameExists(gamePin))
   });
@@ -66,24 +83,11 @@ function sockets(io, socket, data) {
     // Implement error handling if game could not be created
   });
   
-  socket.on('startGame', function (gameData) {
-
+  socket.on('startGame', function(gameData) {
     data.storeGameDataAndStart(gameData);
     io.to(gameData.gamePin).emit('startGame');
-
-    console.log("Game started for gamePin:", gameData.gamePin);
-
-    data.startTimer(gameData.gamePin, gameData.selectedMinutes, io);
-
-    io.to(gameData.gamePin).emit("startGame", { // Hmmm... Detta känns överflödigt eller? /sebbe
-        message: "Game has started!",
-        gamePin: gameData.gamePin
-    });
-  });
-
-  socket.on('readyToStartTimer',function(){
-    let gameData = data.getGameData();
-    socket.emit('startTimer', gameData.selectedMinutes, gameData.gamePin);
+    console.log("hej");
+    //socket emit
   });
   
   socket.on('addQuestion', function(d) {
@@ -107,13 +111,13 @@ function sockets(io, socket, data) {
     socket.emit('updateGameData', data.getGameData(gamePin));
     // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
   });
-  socket.on('participateInCustomGame', function(d){
-    console.log("Adding participant: ", d.name, " in game: ", d.gamePin)
-    data.participateInCustomGame(d.gamePin, d.name);
+  socket.on('participateInCustomGame', function(gamePin, playerObj){
+    console.log("Adding participant: ", playerObj.name, " in game: ", gamePin)
+    data.participateInCustomGame(gamePin, playerObj);
     console.log("User has joined. SocketID: ", socket.id)
-    io.to(d.gamePin).emit('participantsUpdate', data.getCustomGameParticipants(d.gamePin)); //change to getGameData
+    io.to(gamePin).emit('participantsUpdate', data.getCustomGameParticipants(gamePin)); //change to getGameData
   });
-  socket.on("requestGameData", function(gamePin) { 
+  socket.on("requestGameData", function(gamePin) {
     let gameData = data.getGameData(gamePin);
     socket.emit("updateGameData", gameData)
   });
@@ -144,34 +148,69 @@ function sockets(io, socket, data) {
     io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
   }); 
 
-  
-  socket.on('update-timer', function(data) {
-    const { timerDisplay, gamePin, soundType } = data || {};
-    // console.log("Mottagit timerDisplay på servern:", timerDisplay, "Game Pin:", gamePin, "Sound Type:", soundType);
+  //Ändrat från pollId till gamePin
+  socket.on('update-timer', function(timerDisplay, gamePin) {
+
     if (gamePin) {
-    // console.log("Skickar timerDisplay till gamePin:", gamePin);
+    console.log("Skickar timerDisplay till gamePin:", gamePin);
     socket.join(gamePin);
-    io.to(gamePin).emit('update-timer', { timerDisplay, soundType });
+    io.to(gamePin).emit('update-timer', timerDisplay);
     } else {
-    // console.log("Broadcastar timerDisplay till alla klienter:", timerDisplay);
-    io.emit('update-timer', { timerDisplay, soundType });
+    
+    io.emit('update-timer', timerDisplay);
     }
     });
-
-    socket.on("requestGameData", function (gamePin) { // vad används denna metod till? Den uppdaterar bara timern? /sebbe
-      const gameData = data.getGameData(gamePin);
-      if (gameData) {
-          console.log(`Sending current game data to client ${socket.id}`);
-          socket.emit("update-timer", {
-              timerDisplay: gameData.timerDisplay,
-              soundType: null 
-          });
-      }
-  });
   
-
-
     
+    socket.on("savedQuestionsToServer", function(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz) {
+    data.saveQuestions(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz);
+  });
+
+
+// socket.on("adminLeftGame", (gamepin, userName) => {
+
+//     console.log(`Admin left for gamepin: ${gamepin}`);
+
+//     let adminAssigned = false;
+//     // Start a listener for the 'newAdmin' event
+//     // Track if a new admin has been assigned
+
+//     socket.on("newAdmin", (newGamePin, newAdmin) => {
+//       if (newGamePin === gamepin) {
+//           adminAssigned = true;
+//           if (newAdmin === userName) {
+//               console.log("Admin returned for the same game.");
+//           } else {
+//               io.to(gamePin).emit("newAdmin", newAdmin);
+//               console.log(`New admin ${newAdmin} assigned for gamePin: ${gamePin}`);
+//           }
+//       }
+//   });
+//   setTimeout(() => {
+//     if (gamePin) { // Ensure gamePin is still valid
+//         io.to(gamePin).emit("adminLeft", { message: "Admin has left the game." });
+//         console.log(`Notified gamePin: ${gamePin} that admin has left.`);
+//     } else {
+//         console.error("gamePin is undefined when attempting to emit 'adminLeft'.");
+//     }
+// }, 5000);
+
+//     // Wait for one minute before checking if a new admin was assigned
+//     setTimeout(() => {
+//         if (!adminAssigned) {
+//           if (gamePin) {
+//             io.to(gamePin).emit("deletingGame");
+//             data.deleteGame(gamePin);
+//             console.log(`Game deleted for gamePin: ${gamePin}`);
+//         } else {
+//             console.error("gamePin is undefined when attempting to delete the game.");
+//         }
+//         } else {
+//             console.log(`Gamepin ${gamepin} continues with a new admin.`);
+//         }
+//     }, 60000); // 60000 ms = 1 minute
+    //  });
 }
+
 
 export { sockets };
