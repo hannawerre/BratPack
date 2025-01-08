@@ -1,15 +1,11 @@
 <template>
     <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
-        <p>{{ this.gamePin }}</p>
-        <p>{{ this.userName }}</p>
-        <p>{{ this.gameData }}</p>
-        <p>kalas</p>
 
         <ThisOrThatComponent v-if="gameData.selectedGames.includes('This or that')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
 
         <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
             <div>
-                <span>{{ participant.name }}</span>
+                <span>{{ participant.name }}</span> 
                 <span v-if="participant.isAdmin">(Admin)</span>
             </div>
   <!-- Visa bara knapparna om detta är den inloggade användarens namn OCH om den är admin -->
