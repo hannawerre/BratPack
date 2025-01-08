@@ -76,8 +76,8 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
 
 Data.prototype.storeGameDataAndStart = function (gameData){
   // Update the gameData and set gameStarted = true
-  console.log("gamedata:",gameData);
-
+  // console.log("gamedata:",gameData);
+  // console.log("this.customgames",this.customGames)
  
   // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
   this.customGames[gameData.gamePin].participants = gameData.participants;
@@ -88,6 +88,7 @@ Data.prototype.storeGameDataAndStart = function (gameData){
   
 
   console.log("Reached to data.storeGameData with current customGames: ", this.customGames[gameData.gamePin]);
+  
 };
 
 Data.prototype.getGameData = function(gamePin) {
@@ -111,8 +112,8 @@ Data.prototype.participateInCustomGame = function (gamePin, playerObj) {
     const game = this.customGames[gamePin];
     game.participants.push({
       name: playerObj.name || "Anonymous",
-      isPlaying: playerObj.isPlaying || true,
-      isAdmin: playerObj.isAdmin || false,
+      isPlaying: playerObj.isPlaying ?? null,
+      isAdmin: playerObj.isAdmin ?? false,
       scoreGame1: playerObj.scoreGame1 || 0,
       scoreGame2: playerObj.scoreGame2 || 0,
       scoreGame3: playerObj.scoreGame3 || 0,
@@ -406,6 +407,38 @@ Data.prototype.startTimer = function (gamePin, selectedMinutes, io) {
   }, 1000); // Update every second
 };
 
+
+Data.prototype.saveQuestions = function(gamePin, customQuestions, whichQuiz) {
+  console.log("Saving questions for pin: ", gamePin);
+  console.log("Saved questions: ", customQuestions);
+  console.log("Which quiz: ", whichQuiz);
+
+  if (!this.customGameExists(gamePin)) {
+    console.error(`Cannot save questions. Game with pin ${gamePin} does not exist.`);
+    return;
+  }
+  if (!this.customGames[gamePin].customQuestions) {
+    this.customGames[gamePin].customQuestions = {};
+  }
+  if (!this.customGames[gamePin].customQuestions[whichQuiz]) {
+    this.customGames[gamePin].customQuestions[whichQuiz] = {};
+  }
+  this.customGames[gamePin].customQuestions[whichQuiz] = customQuestions;
+
+  console.log("Saved questions for pin: ", gamePin, " are: ", this.customGames[gamePin].customQuestions[whichQuiz]);
+
+  // this.customGames[gamePin].selectedGames[whichQuiz].saveQuestions = savedQuestions;
+  // this.customGames[gamePin].selectedGames[whichQuiz].useStandardQuestions = useStandardQuestions;
+  // this.customGames[gamePin].selectedGames[whichQuiz].useOwnQuestions = useOwnQuestions;
+
+  // Save
+
+}
+
+Data.prototype.deleteGame = function(gamePin) {
+  console.log("Deleting game with pin: ", gamePin);
+
+}
 
 
 

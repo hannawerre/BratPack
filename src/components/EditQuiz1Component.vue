@@ -1,9 +1,28 @@
+//kod edit quizcomponent
 <template>
-    <div v-if="isModalOpen" class="edit-modal-background" @click.self="closeModal">
-        <div class="edit-modal-content">
+    <div v-if="isModalOpen" class="modal-background" @click.self="closeModal">
+        <div class="modal-content">
             <h1>Edit {{ GameName }}</h1>
             <p>Here you can add questions to the game</p>
             <br>
+            <div class="checkboxes-container">
+                <label>
+                <input 
+                    type="checkbox"
+                    v-model="useStandardQuestions"
+                />
+                Use standard questions
+                </label>
+                <label>
+                <input 
+                    type="checkbox"
+                    v-model="useOwnQuestions"
+                />
+                Use own questions
+                </label>
+            </div>
+            <br>
+
             <p>Add question</p>
             <input v-model="question" placeholder="Add question" class="question"> </input>
             <div v-for="(alt, index) in alternatives" :key="index" class="alternative-row">
@@ -20,9 +39,10 @@
             </div>
             
                 <button @click="addAlternative" id="alternatative-button">Add alternative</button>
-                <button @click="submitQuestion" id="submit-button">Submit</button>
+                <button @click="saveQuestion" id="save-button">Save question</button>
                 <button @click="closeModal" id="close-button">Close</button>
-            </div>
+
+        </div>
     </div>
 </template>
   
@@ -30,36 +50,85 @@
 import { ref, defineProps, defineExpose , defineEmits} from 'vue';
 
     const props = defineProps({
-        GameName: String
+        GameName: String,
         
     });
 
-    const emit = defineEmits(["modal-opened", "modal-closed"]);
+    const emit = defineEmits([
+    "modal-opened",
+    "modal-closed",
+    "questions-saved-quiz1"
+]);
 
     const isModalOpen = ref(false);
+
+    const useStandardQuestions = ref(true);
+    const useOwnQuestions = ref(false);
+
     const question = ref("");
     const alternatives = ref([{ text: "", isCorrect: false }]);
 
+    const savedQuestions = ref([]);
 
     const addAlternative = () => {
         console.log("Adding alternative");
         alternatives.value.push({ text: "", isCorrect: false }); 
     };
 
-    const submitQuestion = () => {
-        
-    }
-
     const openModal = () => {
         isModalOpen.value = true;
         emit('modal-opened');
     };
+
+    const saveQuestion = () => {
+        if (question.value.trim() !== "") {
+
+            const hasCorrectAnswer = alternatives.value.some(alt => alt.isCorrect);
+        if (!hasCorrectAnswer) {
+            console.error("At least one alternative must be marked as correct.");
+            alert("Please mark at least one alternative as correct.");
+            return;
+        }
+            const newQuestionId = savedQuestions.value.length + 1;
+            
+            const newQuestionObj = {
+                id: newQuestionId,
+                question: question.value, 
+                answers: alternatives.value.map((alt, index) => ({
+                    id: index + 1,
+                    answer: alt.text,
+                    isCorrect: alt.isCorrect
+                }))
+            };
+
+        savedQuestions.value.push(newQuestionObj);
+        console.log("Currently saved questions:", savedQuestions.value);
+
+        question.value = "";
+        alternatives.value = [{ text: "", isCorrect: false }];
+     };
+    };
     const closeModal = () => {
+
+        if(!useStandardQuestions.value && !useOwnQuestions.value){
+            alert("Please select at least one option: 'Use standard questions' or 'Use own questions'.");
+            return;
+        }
+
         isModalOpen.value = false;
+        emit(
+            "questions-saved-quiz1",
+            savedQuestions.value,
+            useStandardQuestions.value,
+            useOwnQuestions.value,
+            "Quiz1"
+
+        );
+        
         emit('modal-closed');
         alternatives.value = alternatives.value.filter((alt, index) => {
         return index === 0 || alt.text.trim() !== "";
-    });
+        });
     };
 
     defineExpose({
@@ -69,10 +138,47 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
   </script>
 
 <style scoped>
+    .modal-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .checkboxes-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+
+    .checkboxes-container label {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
     .question {
         margin: 10px 0; 
         box-sizing: border-box;
-        }
+    }
 
     input[type="text"],
     input[placeholder] {
@@ -101,14 +207,52 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
         border: solid white;
     }
     
-
     label {
         font-size: 1rem;
         color: #333;
         font-weight: bold;
-
     }
 
+    button {
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 16px;
+        margin: 20px 4px;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #alternatative-button{
+        background-color: green;
+    }
+    #save-button{
+        background-color: green;
+    }
+    #close-button {
+        background-color: rgb(213, 8, 8);
+    }
+
+    #close-button:hover{
+        background-color: rgb(247, 44, 44);
+        box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
+        transform: scale(1.05);
+    }
+
+    #alternatative-button:hover {
+        background-color: rgb(8, 179, 8);
+        box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5);
+        transform: scale(1.05);
+    }
+    #save-button:hover {
+        background-color: rgb(8, 179, 8);
+        box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5);
+        transform: scale(1.05);
+    }
+    
     .alternative-row {
         display: flex;
         align-items: center; 

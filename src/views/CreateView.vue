@@ -60,17 +60,18 @@ export default {
       userName: "",
       userRole: "play",
       gamePin: "",
-      joined: false
+      joined: false,
+      isPlaying: true
     }
     
   },
   created: function () {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.on("gameCreated", pin => {
+      socket.emit("joinSocketRoom", pin)
       this.gamePin = pin;
       this.addAdminToGame();
-      socket.emit("joinSocketRoom", pin)
-  
+
     })
     socket.emit( "getUILabels", this.lang );
     
@@ -87,12 +88,15 @@ export default {
     },
 
     addAdminToGame() {
-      console.log("startar spelet ars")
-      const isPlaying = this.userRole === "play";
+      console.log("startar spelet med rollen:", this.userRole)
+
+      this.isPlaying = this.userRole === "play";
+     
+      console.log("isPlaying är: ", this.isPlaying)
 
       socket.emit("participateInCustomGame", this.gamePin, {
         name: this.userName,
-        isPlaying: isPlaying,
+        isPlaying: this.isPlaying,
         isAdmin: true,
         scoreGame1: 0,
         scoreGame2: 0,
