@@ -57,25 +57,31 @@
 </div>
   <div class="participants">
     <h2>Participants</h2>
-    <ul>
-      <li v-for="(participant, index) in participants" :key="index"> 
-        {{ participant}}
-      </li>
+      <ul>
+        <li v-for="(participant, index) in participants" :key="index">
+          <strong>{{ participant.name }}</strong> 
+          <span v-if="participant.isAdmin && participant.isPlaying">: Admin & Playing</span>
+          <span v-else-if="participant.isAdmin">: Admin</span>
+          <span v-else-if="participant.isPlaying">- Playing</span>
+          <span v-else>- Spectator</span>
+        </li>
+      </ul>
 
-    </ul>
 
   </div>
   </div>
 </template>
 
 <script>
-import io from 'socket.io-client';   
+//import {socket} from '../socketClient.js';
+const socket = io("localhost:3000");
+import io from 'socket.io-client'; 
 import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';
 import EditQuiz4Component from '../components/EditQuiz4Component.vue';
 
-const socket = io("localhost:3000");
+
 
 export default {
 name: 'CustomGames',
@@ -110,27 +116,18 @@ created: function () {
     console.log("Updated gameData.participants to: ", this.participants)
   })
 
-  if (!this.$route.params.gamePin) { 
-    socket.on('gameCreated', pin => {
-      this.gamePin = pin
-      socket.emit('joinCustomGame', pin); 
-      this.$router.replace({ path: `/customgames/${pin}` });
-    });
-    console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
-    socket.emit("createGame", this.lang);
-    console.log("Emitted createGame from CustomGamesView.vue")
-  } else { 
+  
     console.log("Insde else-statement with participants: ", this.participants)
     this.gamePin = this.$route.params.gamePin;
     console.log("GamePin: ", this.gamePin);
     socket.emit("joinCustomGame",this.gamePin);
     socket.emit("requestGameData", this.gamePin);
-  };
 
   socket.on('participantsUpdate', participants => {
     this.participants = participants;
     console.log("Active participants: ", this.participants);
   });
+  socket.emit("requestParticipants", this.gamePin);
 },
 methods: {
 

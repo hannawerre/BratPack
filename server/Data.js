@@ -13,7 +13,7 @@ function Data() {
     selectedMinutes: 60, // Var ska tiden sparas? Vi vill kunna hämta tiden som är kvar för att veta när nästa spel ska köras igång! /sebbe
     timerDisplay: '',
     gameStarted: false,
-    playerAnswers: {}
+    playerAnswers: {},
   };
 
   
@@ -68,22 +68,26 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   customGame.timerDisplay = '';
   customGame.gameStarted = false;
   this.customGames[pin] = customGame;
+  
 
-  console.log("Custom Game created", pin, this.customGames);
+  console.log("Custom Game created", pin, customGame);
   return pin;
 };
 
 Data.prototype.storeGameDataAndStart = function (gameData){
   // Update the gameData and set gameStarted = true
-  let customGame = {};
-  // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
-  customGame.participants = gameData.participants;
-  customGame.selectedGames = gameData.selectedGames;
-  customGame.selectedMinutes = gameData.selectedMinutes;
-  customGame.gameStarted = true;
-  this.customGames[gameData.gamePin] = customGame;
+  console.log("gamedata:",gameData);
 
-  console.log("Reached to data.storeGameData with current customGames: ", this.customGames);
+ 
+  // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
+  this.customGames[gameData.gamePin].participants = gameData.participants;
+  this.customGames[gameData.gamePin].selectedGames = gameData.selectedGames;
+  this.customGames[gameData.gamePin].selectedMinutes = gameData.selectedMinutes;
+  this.customGames[gameData.gamePin].gameStarted = true;
+  
+  
+
+  console.log("Reached to data.storeGameData with current customGames: ", this.customGames[gameData.gamePin]);
 };
 
 Data.prototype.getGameData = function(gamePin) {
@@ -102,19 +106,22 @@ Data.prototype.getCustomGameParticipants = function(gamePin) {
   return [];  //maybe returning an array is not the most convenient way... 
 };
 
-Data.prototype.participateInCustomGame = function(gamePin, name) {
-  console.log("Participant will be added to custom game:", gamePin, name);
+Data.prototype.participateInCustomGame = function (gamePin, playerObj) {
   if (this.customGameExists(gamePin)) {
-    this.customGames[gamePin].participants.push(name) // TODO: senare när vi lägger till mer funktionalitet ska inte bara namnet pushas här, utan även tex hur det går i varje mini game
-    console.log("Participant added");
+    const game = this.customGames[gamePin];
+    game.participants.push({
+      name: playerObj.name || "Anonymous",
+      isPlaying: playerObj.isPlaying || true,
+      isAdmin: playerObj.isAdmin || false,
+      scoreGame1: playerObj.scoreGame1 || 0,
+      scoreGame2: playerObj.scoreGame2 || 0,
+      scoreGame3: playerObj.scoreGame3 || 0,
+      scoreGame4: playerObj.scoreGame4 || 0
+    });
+    console.log("Updated participants:", game.participants);
+  } else {
+    console.error(`Game with pin ${gamePin} does not exist.`);
   }
-  /*if (!game.playerAnswers[name]) {
-    game.playerAnswers[name] = {};
-    // Här kan du lägga till fler attribut om du vill, ex:
-    // game.playerAnswers[name].score = 0;
-    // game.playerAnswers[name].answers = {};
-  }
-  console.log(`Participant '${name}' added to game '${gamePin}' with a private answer store`); */
 };
 
 Data.prototype.deleteUser = function (gamePin, userName) {
@@ -151,7 +158,7 @@ Data.prototype.setup_ThisOrThat = function(gamePin) {
   let participants = {};
   for(const participant of this.customGames[gamePin].participants){
     console.log("--> Adding '", participant, "' to participants list");
-    participants[participant] = {answers: {}, points: 0}; 
+    participants[participant.name] = {answers: {}, points: 0}; 
   };
   ThisOrThat.participants = participants;
   ThisOrThat.chosenParticipant = this.newChosenParticipant(gamePin, true);
@@ -179,7 +186,7 @@ Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
 
   const participantsArray = Object.values(this.customGames[gamePin].participants); //just nu är det totala antalet participants, även de som loggat in efter att spelet startat /sebbe
   const randomNumber = Math.floor(Math.random() * participantsArray.length);
-  const newChosenParticipant = participantsArray[randomNumber];
+  const newChosenParticipant = participantsArray[randomNumber].name;
 
   // On setup we just want it returned. This is because the method is called before the object is initiated.
   // All other times we just want it updated in Data.js
@@ -189,9 +196,11 @@ Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
   this.customGames[gamePin].ThisOrThat.chosenParticipant = newChosenParticipant
 };
 Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
+  
   const participantsArray = Object.entries(this.customGames[gamePin].ThisOrThat.participants);
   const correctAnswers = this.customGames[gamePin].ThisOrThat.correctAnswers;
   const questionId = this.customGames[gamePin].ThisOrThat.currentQuestion;
+  console.log("-------> Inside correctQuestion_ThisOrThat", participantsArray, this.customGames[gamePin].ThisOrThat)
   // Add 10 points if answer is correct
   for(let [name, data] of participantsArray){
     if (data.answers[questionId] && data.answers[questionId] === correctAnswers[questionId]){
@@ -310,8 +319,19 @@ Data.prototype.submitAnswer = function(pollId, answer) {
     console.log("answers looks like ", answers, typeof answers);
   }
 }
-// -------------------------------------------------------------------------------------------
 
+Data.prototype.setScore = function(gamePin, userName, newScore){
+  console.log("går in i setscore")
+  let game = this.customGames[gamePin]
+  console.log("spelet är:", game );
+  
+ if (!game) {
+    return;
+  }
+  const participant = game.participants.find(p => p.name === userName);
+  participant.scoreGame1 = newScore;
+  console.log("spelet efter uppdaterad poäng:", this.customGames[gamePin])
+}
 //Ändrat från pollId till gamePin
 // Lägg denna funktion längst ned i prototypsektionen:
 Data.prototype.startTimer = function (gamePin, selectedMinutes, io) {

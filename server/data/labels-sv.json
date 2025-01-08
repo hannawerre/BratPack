@@ -2,7 +2,13 @@
 	"sales-pitch": "Svar. Helt. Enkelt.",
 	"subHeading": "Ett enkelt enkätverktyg",
 	"invite": "Bjud in deltagare med den här länken:",
-	"createPoll": "Skapa röstning",
+
+
+	"createGame": "Skapa spel",
+	"playAsAdmin": "Vill du spela eller bara vara spelledare?",
+	"play": "Spela",
+	"hostOnly": "Spelledare",
+    "enterDetails": "Ange ditt namn",
 	"participatePoll": "Delta i röstning",
 	"question": "Fråga",
 	"changeLanguage": "Change to English",
@@ -12,6 +18,7 @@
 	"players": "Spelare",
 	"waitingForHost": "Väntar på spelledaren...",
 	"Lang": "Svenska",
-	"Welcome": "Välkommen"
+	"Welcome": "Välkommen",
+	"generalTrivia": "Frågesportspelet"
 
 }
