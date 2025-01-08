@@ -1,16 +1,9 @@
 <template>
-<<<<<<< HEAD
-     <Nav :hideNav="false"
-  :uiLabels="uiLabels"
-  :lang="lang"
-  :gamePin="gamePin"
-  @language-changed="handleLanguageChange">
-  </Nav>
+    <Nav :hideNav="false"
+    :gamePin="gamePin"
+    @language-changed="handleLanguageChange">
+    </Nav>
     <div v-if="!activeGame">
-        <!--<TimerComponent/>-->
-=======
-    <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
->>>>>>> admin-view
         <p>{{ this.gamePin }}</p>
         <p>{{ this.userName }}</p>
         <p>{{ this.gameData }}</p>
@@ -57,13 +50,10 @@
 
 
 <script>
-<<<<<<< HEAD
 import Nav from '@/components/ResponsiveNav.vue'
-=======
     //import {socket} from '../socketClient.js';  // kanske behövs /sebbe 
     
     
->>>>>>> admin-view
     const socket = io("localhost:3000");
     import io from 'socket.io-client';  // kanske behövs /sebbe 
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
@@ -73,11 +63,8 @@ import Nav from '@/components/ResponsiveNav.vue'
         name: 'GameView',
         components: {
             GeneralQuizComponent,
-<<<<<<< HEAD
-            Nav
-=======
+            Nav,
             ThisOrThatComponent         
->>>>>>> admin-view
         },
         data: function(){
             return {

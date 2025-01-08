@@ -2,7 +2,6 @@
   <Nav :hideNav="false"
   :uiLabels="uiLabels"
   :lang="lang"
-  :gamePin="gamePin"
   @language-changed="handleLanguageChange">
   </Nav>
   
@@ -29,9 +28,8 @@
 
 <script>
 import Nav from '@/components/ResponsiveNav.vue'
-//import {socket} from '../socketClient.js';
+import io from 'socket.io-client';
 const socket = io("localhost:3000");
-import io from 'socket.io-client'; 
 
 export default {
   name: 'LobbyView',
@@ -67,15 +65,7 @@ export default {
   },
   methods: {
     participateInCustomGame: function () {
-      socket.emit( "participateInCustomGame", this.gamePin, {
-        name: this.userName,
-        isPlaying: true,
-        isAdmin: false,
-        scoreGame1: 0,
-        scoreGame2: 0,
-        scoreGame3: 0,
-        scoreGame4: 0
-      });
+      socket.emit( "participateInCustomGame", {gamePin: this.gamePin, name: this.userName});
       this.joined = true;
       
       // Detta kan vara användbart senare om vi ska lösa så att användare inte raderas vid refresh! /sebbe
@@ -95,11 +85,10 @@ export default {
       socket.emit("getUILabels", this.lang);
     },
     isNameTaken(userName) {
-        this.nameTaken = this.participants.some(participant => participant.name === userName);
-        console.log("Name taken: ", this.nameTaken);
-        console.log("All participants: ", this.participants);
-},
-
+      this.nameTaken = this.participants.includes(userName);
+      console.log("Name taken: ", this.nameTaken);
+      console.log("All participants: ", this.participants);
+    },
     // Delete user on window close / refresh
     handleWindowClose(event) {
       console.log("Window closed!!! Deleting user")
