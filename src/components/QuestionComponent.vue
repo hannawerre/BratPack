@@ -1,11 +1,10 @@
 <template>
   <div>
-    <h3>{{ question.question }} (ID: {{ question.id }})</h3>
+    <h3>{{ question.question }}</h3>
     <ul>
       <li v-for="answerObj in question.answers" :key="answerObj.id">
-        <!-- Här visar vi alla variabler: id, answer, isCorrect -->
-        <button @click="answer(answerObj)">
-          {{ answerObj.id }}: {{ answerObj.answer }} - Correct: {{ answerObj.isCorrect }}
+        <button @click="answer(question.id, answerObj)">
+          {{ answerObj.answer }}
         </button>
       </li>
     </ul>
@@ -23,12 +22,19 @@ export default {
   },
   emits: ["answer"],
   methods: {
-    answer: function (answerObj) {
-      this.$emit("answer", answerObj);
-    } 
+    answer(questionId, answerObj) {
+      // Skicka ett objekt med all nödvändig data
+      this.$emit("answer", {
+        questionId: questionId,
+        answerId: answerObj.id,
+        isCorrect: answerObj.isCorrect,
+        answerText: answerObj.answer
+      });
+    }
   }
-}
+};
 </script>
+
 
 
 <style scoped>

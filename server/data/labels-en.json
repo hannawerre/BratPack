@@ -2,7 +2,11 @@
 	"sales-pitch": "Simply. Great. Polling.",
 	"subHeading": "A simple polling tool",
 	"invite": "Invite participants with this link:",
-	"createPoll": "Create poll",
+	"enterDetails": "Enter your name",
+	"createGame": "Create Game",
+	"playAsAdmin":"Do you want to play or be the host?",
+	"play": "Play",
+	"hostOnly": "Host",
 	"participatePoll": "Participate in poll",
 	"question": "Question",
 	"changeLanguage": "Byt till svenska",
@@ -12,5 +16,7 @@
 	"players": "Players",
 	"waitingForHost": "Waiting for host to start...",
 	"Lang": "English",
-	"Welcome": "Welcome"
+	"Welcome": "Welcome",
+	"generalTrivia": "General Trivia Quiz" 
+
 }

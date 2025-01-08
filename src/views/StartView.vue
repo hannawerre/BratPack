@@ -1,5 +1,5 @@
 <template>
- 
+
   <header>
     <div v-bind:class="['hamburger', {'close': !hideNav}]" 
          v-on:click="toggleNav">
@@ -27,14 +27,14 @@
   <div class="items">
     <button v-if="!isPlay" @click="togglePlay">Join Game</button>
     <div v-if="isPlay" class="modal" ref="modal">
-      <input type="text" @input="checkGameExists(newGamePin)" v-model="newGamePin" :placeholder="'Game PIN'">
+      <input type="text" @input="checkGameExists(gamePin)" v-model="gamePin" :placeholder="'Game PIN'">
 
       <!-- The router link only appears if the input poll actually exists -->
-      <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + newGamePin">
+      <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + gamePin">
         <button>Join</button>
       </router-link>
     </div>
-      <router-link to="/customgames/">
+      <router-link to="/create/">
         <button v-if="!isPlay" @click="createGame" id="create">Create Game</button>
       </router-link>
   </div>
@@ -42,8 +42,9 @@
 
 <script>
 import ResponsiveNav from '@/components/ResponsiveNav.vue';
-import io from 'socket.io-client';
+//import {socket} from '../socketClient.js';
 const socket = io("localhost:3000");
+import io from 'socket.io-client'; 
 
 export default {
   name: 'StartView',
@@ -53,7 +54,7 @@ export default {
   data: function () {
     return {
       uiLabels: {},
-      newGamePin: "",
+      gamePin: "",
       lang: localStorage.getItem( "lang") || "en",
       hideNav: true,
       isPlay: false,
@@ -125,14 +126,14 @@ export default {
 </script>
 <style scoped>
 
-
+  
   header {
-    position: relative;
+position: relative;
     background-color: #cfe8ef;
     width: 90%;
     display: flex;
     justify-content: center;
-    border: #ff8c42 10px double;
+border: #ff8c42 10px double;
     border-radius: 10px;
     margin: 3% 5% 0% 5%;  
   }
