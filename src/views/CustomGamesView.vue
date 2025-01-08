@@ -164,6 +164,10 @@ created: function () {
   });
   socket.on('lobbyUnactive',(gamePin) => {
     console.log("Unactivating lobby", gamePin);
+
+    participants.forEach(participant => {
+    console.log(`Participant: ${participant.name}, isPlaying: ${participant.isPlaying}`);
+  });
   });
   socket.emit("requestParticipants", this.gamePin);
 },
@@ -171,6 +175,7 @@ methods: {
 
   incrementMinutes: function() {
     this.selectedMinutes += 10;
+    console.log(this.participants);
   },
 
   decrementMinutes: function () {

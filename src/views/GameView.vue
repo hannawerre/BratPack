@@ -37,6 +37,7 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
+            :isPlaying="isPlaying"
         />
     </div>
 
@@ -67,7 +68,8 @@
                 gameData: {},
                 activeGame: '',
                 uiLabels: {},
-                isAdmin: false
+                isAdmin: false,
+                isPlaying: false
             }
         },
         created: function() {
@@ -101,6 +103,7 @@
             determineAdminStatus () {
                 const user = this.gameData.participants?.find(p=> p.name === this.userName)
                 this.isAdmin = user ? user.isAdmin : false;
+                this.isPlaying = user ? user.isPlaying : false;
             },
 
             playMiniGame: function(game){

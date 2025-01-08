@@ -112,8 +112,8 @@ Data.prototype.participateInCustomGame = function (gamePin, playerObj) {
     const game = this.customGames[gamePin];
     game.participants.push({
       name: playerObj.name || "Anonymous",
-      isPlaying: playerObj.isPlaying || true,
-      isAdmin: playerObj.isAdmin || false,
+      isPlaying: playerObj.isPlaying ?? null,
+      isAdmin: playerObj.isAdmin ?? false,
       scoreGame1: playerObj.scoreGame1 || 0,
       scoreGame2: playerObj.scoreGame2 || 0,
       scoreGame3: playerObj.scoreGame3 || 0,
