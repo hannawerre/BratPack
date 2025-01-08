@@ -1,6 +1,12 @@
 <template>
+     <Nav :hideNav="false"
+  :uiLabels="uiLabels"
+  :lang="lang"
+  :gamePin="gamePin"
+  @language-changed="handleLanguageChange">
+  </Nav>
     <div v-if="!activeGame">
-        <TimerComponent/>
+        <!--<TimerComponent/>-->
         <p>{{ this.gamePin }}</p>
         <p>{{ this.userName }}</p>
         <p>{{ this.gameData }}</p>
@@ -27,6 +33,7 @@
 
 
 <script>
+import Nav from '@/components/ResponsiveNav.vue'
     const socket = io("localhost:3000");
     import io from 'socket.io-client';  // kanske behövs /sebbe 
 import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
@@ -34,7 +41,8 @@ import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     export default{
         name: 'GameView',
         components: {
-            GeneralQuizComponent
+            GeneralQuizComponent,
+            Nav
         },
         data: function(){
             return {

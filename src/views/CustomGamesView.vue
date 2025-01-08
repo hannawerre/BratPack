@@ -341,10 +341,10 @@ input[type="checkbox"] {
 
   .participants {
     flex: 0 0 auto;
-    border: 1px solid #ccc;
+    border: 4px solid var(--border-orange);
     border-radius: 8px;
     padding: 15px;
-    background-color: lightblue;
+    background-color: var(--our-orange);
     position: absolute;
     right: 0;
     margin-right: 40px;
@@ -365,6 +365,6 @@ input[type="checkbox"] {
 
   .participants li{
     padding: 5px 0;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-orange);
   }
 </style>
