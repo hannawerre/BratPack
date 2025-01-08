@@ -18,7 +18,8 @@
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
       </div>
     </div>
-    <!-- Phase 1: Display Chosen Participant -->
+
+    <!-- Game Phase 1: Display Chosen Participant -->
     <div v-if="showParticipant">
       <h2>Chosen participant: {{ chosenParticipant }}</h2>
       <div class="countdown-bar">
@@ -26,7 +27,7 @@
       </div>
     </div>
 
-    <!-- Phase 2: Display Question -->
+    <!-- Game Phase 2: Display Question -->
     <div v-if="showQuestion">
       <QuestionComponent
         v-if="questions?.questions?.[currentQuestion]"
@@ -38,7 +39,7 @@
       </div>
     </div>
 
-    <!-- Phase 3: Display Correct Answer -->
+    <!-- Game Phase 3: Display Correct Answer -->
     <div v-if="showAnswer">
       <h2>Correct Answer: {{ correctAnswer }}</h2>
       <p>{{ numCorrect }} participants got it correct!</p>
@@ -48,17 +49,6 @@
     </div>
     
   </div>
-
-    <!-- <div v-if="displayQuestion">
-        <QuestionComponent
-            v-if="questions?.questions?.[currentQuestion]"
-            :question="questions.questions[currentQuestion]"
-            @answer="onAnswer"
-        />
-    </div>
-    <div v-else>
-        hejsan
-    </div> -->
 </template>
 
 <script>
@@ -179,8 +169,8 @@ export default {
             }
         },
         revealCorrectAnswer() {
-            this.correctAnswer = "Pizza"; // Replace with actual logic
-            this.numCorrect = 69; // Replace with actual logic
+            this.correctAnswer = "Pizza"; 
+            this.numCorrect = 69; 
         },
         newChosenParticipant: function() {
             // Returns a random number between 0 and the amount of players-1. 
