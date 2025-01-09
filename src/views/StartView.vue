@@ -1,9 +1,7 @@
 <template>
 
   <header>
-    <div v-bind:class="['hamburger', {'close': !hideNav}]" 
-         v-on:click="toggleNav">
-    </div>
+  
     <div class="logo">
       <!--<img src="/img/powerhour_logo.png">-->
       <img id="header" src="/img/Header_pwrHour.png">
@@ -25,7 +23,7 @@
   </ResponsiveNav>
 
   <div class="items">
-    <button v-if="!isPlay" @click="togglePlay">Join Game</button>
+    <button class="button green" v-if="!isPlay" @click="togglePlay">Join Game</button>
     <div v-if="isPlay" class="modal" ref="modal">
       <input type="text" @input="checkGameExists(gamePin)" v-model="gamePin" :placeholder="'Game PIN'">
 
@@ -35,7 +33,7 @@
       </router-link>
     </div>
       <router-link to="/create/">
-        <button v-if="!isPlay" @click="createGame" id="create">Create Game</button>
+        <button v-if="!isPlay" @click="createGame" class="button">Create Game</button>
       </router-link>
   </div>
 </template>
@@ -142,10 +140,7 @@ border: #ff8c42 10px double;
     height: fit-content;
   }
   .logo {
-    text-transform: uppercase;
-    letter-spacing: 0.25em;
-    font-size: 2.5rem;
-    color: #cfe8ef;
+    display: flex;
     padding-top:0.2em;
   }
   .logo img {
@@ -153,44 +148,24 @@ border: #ff8c42 10px double;
     vertical-align: bottom;
     margin-right: 0.5rem; 
   }
-  .hamburger {
-    color:#CFE8eF;
-    width:1em;
-    display: flex;
-    align-items: center;
-    justify-content: left;
-    padding:0.5rem;
-    top:0;
-    left:0;
-    height: 2rem;
-    cursor: pointer;
-    font-size: 1.5rem;
-  }
-  /* Items */
+  
+
   .items {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin: 20% 0% 20% 0%;
+  margin: 20% 20% 20% 20%;
   position: relative; 
   }
-  .items button {
-    background-color: rgb(149, 235, 153);
-    font-size: 1.5rem;
-    cursor: pointer;
-    border-radius: 6px;
-    border: 2px solid rgb(177, 242, 164);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.7);
-    padding: 10px;
-    margin: 0% 20% 0% 20%
-  }
+  
   /* When "Join Game" is pressed, the modal appears */
+  /*Vill ändra färg på modal men vet inte till vad //HANNA */
   .modal {
     position: fixed;  
     top: 50%;         
     left: 50%;        
     transform: translate(-50%, -50%); 
-    background-color: rgb(199, 233, 199) !important; /*av nån anledning blir det inte rätt färg annars... */
+    background-color: rgb(149, 235, 153 ) !important; /*av nån anledning blir det inte rätt färg annars... */
     padding: 20px;
     border: 2px solid rgb(12, 66, 1);
     border-radius: 6px;
@@ -205,6 +180,7 @@ border: #ff8c42 10px double;
     border-radius: 6px;
     padding: 10px;
   }
+  
   .modal button {
     background-color: rgb(149, 235, 153);
     font-size: 1.5rem;
@@ -215,19 +191,13 @@ border: #ff8c42 10px double;
     padding: 10px;
     margin: 0;
   }
-  .modal, .items button:hover {
+  .modal button:hover {
     background-color: rgb(126, 201, 130);
   }
-  #create {
-    background-color: rgb(179, 179, 179);
-    border-color: rgb(197, 197, 197);
-    border-radius: 6px;
-  }
-  #create:hover {
-    background-color: rgb(153, 153, 153);
-  }
 
 
+
+/* Inte säker att nedan behövs
 @media screen and (max-width:50em) {
   .logo {
     font-size: 5vw;
@@ -235,9 +205,7 @@ border: #ff8c42 10px double;
     align-items: center;
     justify-content: center;
   }
-  .hamburger::before {
-    content: "☰";
-  }
+  
   .close::before {
     content: "✕";
   }
@@ -245,4 +213,5 @@ border: #ff8c42 10px double;
     left:-12em;
   }
 }
+  */
 </style>

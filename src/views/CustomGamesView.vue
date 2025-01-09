@@ -1,44 +1,39 @@
 <template>
-  <div class="container">
-   <div class="main-content">
-   <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
-   <h1 v-else>Loading Game PIN...</h1>
-  
-  
-   <div>
-       <p>Choose the time in minutes:</p>
-       <div class="button-container">
-           <button class="decrement-button" @click="decrementMinutes">-</button>
-           {{ selectedMinutes }}
-           <button class="increment-button" @click="incrementMinutes">+</button>
-       </div>
-   </div>
-  
-  
-   <h2>Choose your custom games below:</h2>
-  
-  
-   <div v-for="game in games" :key="game.id" class="game-item">
-       <input
-           type="checkbox"
-           :id="game.id"
-           :value="game.id"
-           v-model="selectedGames"
-       />
-       <label :for="game.id">{{ game.name }}</label>
-  
-  
-       <div class="edit-button" @click="openModal(game)">
-           <img src="/img/Gear-icon.png" alt="Edit" class="edit-icon" />
-       </div>
-   </div>
-  
-  
-   <!-- Modal-komponenter med unika ref -->
-   <EditQuiz1Component
-       ref="modalQuiz1"
-       :GameName="currentGame ? currentGame.name : ''"
-       @modal-closed="onModalClosed"
+<div class="container">
+  <div class="main-content">
+  <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
+  <h1 v-else>Loading Game PIN...</h1>
+
+  <div>
+      <p>Choose the time in minutes:</p>
+      <div class="button-container">
+          <button class="button decrement" @click="decrementMinutes">-</button>
+          {{ selectedMinutes }}
+          <button class="button increment" @click="incrementMinutes">+</button>
+      </div>
+  </div>
+
+  <h2>Choose your custom games below:</h2>
+
+  <div v-for="game in games" :key="game.id" class="game-item">
+      <input 
+          type="checkbox" 
+          :id="game.id" 
+          :value="game.id" 
+          v-model="selectedGames"
+      />
+      <label :for="game.id">{{ game.name }}</label>
+
+      <div class="edit-button" @click="openModal(game)">
+          <img src="/img/Gear-icon.png" alt="Edit" class="edit-icon" />
+      </div>
+  </div>
+
+  <!-- Modal-komponenter med unika ref -->
+  <EditQuiz1Component 
+      ref="modalQuiz1" 
+      :GameName="currentGame ? currentGame.name : ''"
+      @modal-closed="onModalClosed"
   />
    <EditQuiz2Component
        ref="modalQuiz2"
@@ -56,8 +51,8 @@
        @modal-closed="onModalClosed"
   />
 
-  <div class="startbutton-container">
-      <button class="startbutton" @click="startGame">Start Game</button>
+  <div>
+      <button class="button green" @click="startGame">Start Game</button>
   </div>
 </div>
   <div class="participants">
@@ -253,58 +248,6 @@ methods: {
 }
 
 
-.decrement-button{
-  background-color: rgb(213, 8, 8);
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  height: 30px;
-  width: 30px;
-}
-
-.decrement-button:hover{
-  background-color: rgb(247, 44, 44);
-  box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
-  transform: scale(1.05);
-}
-.increment-button{
-  background-color: green;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  height: 30px;
-  width: 30px;
-}
-
-.increment-button:hover{
-  background-color: rgb(8, 179, 8);
-  box-shadow: 0 0 5px 2px rgba(8, 179, 8, 0.5);
-  transform: scale(1.05);
-}
-
-.startbutton{
-  background-color: green;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;  
-  display: inline-block;
-  font-size: 16px;
-  margin: 30px 4px;
-  padding: 15px;
-  text-align: center;
-  text-decoration: none;  
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.startbutton:hover{
-  background-color: rgb(8, 179, 8);
-  box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5); 
-  transform: scale(1.05);
-}
-
 .game-item {
 display: flex;
 justify-content: center; 
@@ -353,32 +296,4 @@ input[type="checkbox"] {
       height: 20px;
   }
 
-  .participants {
-    flex: 0 0 auto;
-    border: 4px solid var(--border-orange);
-    border-radius: 8px;
-    padding: 15px;
-    background-color: var(--our-orange);
-    position: absolute;
-    right: 0;
-    margin-right: 40px;
-    margin-top: 40px;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
-
-}
-
-  .participants h2{
-    text-align: center;
-    margin-bottom: 10px;
-  }
-
-  .participants ul{
-    list-style-type: none;
-    padding: 0;
-  }
-
-  .participants li{
-    padding: 5px 0;
-    border-bottom: 1px solid var(--border-orange);
-  }
 </style>
