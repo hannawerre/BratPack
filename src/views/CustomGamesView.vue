@@ -122,14 +122,12 @@ data: function() {
 
   };
 },
-watch: {
-    selectedGames(newVal) {
-      sessionStorage.setItem("selectedGames", JSON.stringify(newVal));
-    }
-  },
 
 created: function () {
-  socket.on("updateGameData", (gameData) => {
+  this.gamePin = this.$route.params.gamePin;
+    console.log("GamePin: ", this.gamePin);
+    socket.emit("joinCustomGame",this.gamePin);
+    socket.on("updateGameData", (gameData) => {
       if (gameData.selectedGames && gameData.selectedGames.length > 0) {
         this.selectedGames = gameData.selectedGames;
     }
@@ -148,16 +146,15 @@ created: function () {
     console.log("Updated gameData, participants: ", this.participants);
     this.userName = this.participants[0]
     console.log("Username: ", this.userName);
+
+    
   });
 
   
     console.log("Insde else-statement with participants: ", this.participants)
-    this.gamePin = this.$route.params.gamePin;
-    console.log("GamePin: ", this.gamePin);
-    socket.emit("joinCustomGame",this.gamePin);
     socket.emit("requestGameData", this.gamePin);
 
-  socket.on('participantsUpdate', participants => {
+    socket.on('participantsUpdate', participants => {
     this.participants = participants;
     console.log("Active participants: ", this.participants);
     
@@ -166,6 +163,9 @@ created: function () {
     console.log("Unactivating lobby", gamePin);
   });
   socket.emit("requestParticipants", this.gamePin);
+
+  socket.emit("adminRejoined", (this.gamePin))
+  console.log("adminRejoined",this.gamePin, this.userName)
 },
 methods: {
 
@@ -248,20 +248,20 @@ methods: {
     } else if (game.id === 'Quiz4') {
       this.$refs.modalQuiz4.openModal();
     }
+
+
   },
 
   onModalClosed() {
-    
     console.log('Modalen är stängd');
     this.currentGame = null;
   },
 
-  onQuestionsSaved(customQuestions, useStandardQuestions, useOwnQuestions, quiz) {
+  onQuestionsSaved(customQuestions, useStandardQuestions, useOwnQuestions, quiz) { // kanske kan skriva ihop denna med onModalClosed? //david
     if (!this.customQuestions[quiz]) {
     this.customQuestions[quiz] = {};
   }
 
-  // 2) Now you can safely set properties
   this.customQuestions[quiz].customQuestions = customQuestions;
   this.customQuestions[quiz].useStandardQuestions = useStandardQuestions;
   this.customQuestions[quiz].useOwnQuestions = useOwnQuestions;
@@ -274,7 +274,6 @@ methods: {
     this.customQuestions[quiz].useOwnQuestions
   );
 
-  // 3) If you also want to emit all custom questions
   socket.emit(
     "savedQuestionsToServer", 
     this.gamePin, 
@@ -286,8 +285,8 @@ methods: {
 },
 
   handleWindowClose(event) {
-      // console.log("Admin window closed! unactivating lobby")
-      // socket.emit("adminLeftGame", this.gamePin, this.username);
+      console.log("Admin window closed! unactivating lobby")
+      socket.emit("adminLeftGame", this.gamePin, this.userName);
     },
 
   checkIfRefreshPage() {
@@ -311,8 +310,7 @@ methods: {
         selectedMinutes: this.selectedMinutes,
         customQuestions: this.customQuestions,
         useStandardQuestions: this.useStandardQuestions,
-        useOwnQuestions: this.useOwnQuestions,
-        active: true
+        useOwnQuestions: this.useOwnQuestions
       }
       console.log("gameData: ", gameData);
       socket.emit('updateSettings', gameData);
@@ -334,19 +332,10 @@ methods: {
 mounted() {
     window.addEventListener("beforeunload", this.handleWindowClose);
     this.checkIfRefreshPage();
-    const savedSelectedGames = sessionStorage.getItem("selectedGames");
-    if (savedSelectedGames) {
-    // 2. Parse and set it back to your data
-    this.selectedGames = JSON.parse(savedSelectedGames);
-    // socket.emit("newAdmin", this.userName)
-    // console.log("Asked to become new admin: ", this.userName)
-  }
   },
 beforeDestroy() {
     window.removeEventListener("beforeunload", this.handleWindowClose);
   },
-
-
 }
 </script>
 
