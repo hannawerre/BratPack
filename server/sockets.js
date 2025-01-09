@@ -62,7 +62,7 @@ function sockets(io, socket, data) {
         data.newChosenParticipant(gamePin);       // Get new chosenParticipant
         data.nextQuestion_ThisOrThat(gamePin);    // Get next questionId
         io.to(gamePin).emit("roundUpdate", data.getGameData(gamePin).ThisOrThat);
-      }, 20000) // 20 seconds is exactly when question time ends.
+      }, 20000) // 20 seconds is just after the question time ends.
 
       setTimeout(() => {
         io.to(gamePin).emit("nextRound");

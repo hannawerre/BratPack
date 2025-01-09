@@ -110,8 +110,8 @@ Data.prototype.participateInCustomGame = function (gamePin, playerObj) {
     const game = this.customGames[gamePin];
     game.participants.push({
       name: playerObj.name || "Anonymous",
-      isPlaying: playerObj.isPlaying || true,
-      isAdmin: playerObj.isAdmin || false,
+      isPlaying: playerObj.isPlaying ?? null,
+      isAdmin: playerObj.isAdmin ?? false,
       scoreGame1: playerObj.scoreGame1 || 0,
       scoreGame2: playerObj.scoreGame2 || 0,
       scoreGame3: playerObj.scoreGame3 || 0,
@@ -208,6 +208,7 @@ Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
   }
 };
 Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
+  // TODO: ta bort return?
   return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
 };
 Data.prototype.roundInProgress = function(gamePin, isActive = null) {
@@ -216,24 +217,25 @@ Data.prototype.roundInProgress = function(gamePin, isActive = null) {
   }
   this.customGames[gamePin].ThisOrThat.roundInProgress = isActive;
 }
-Data.prototype.startGame_ThisOrThat = function(gamePin) {
-  let elapsedSeconds = 0;
+// Används inte
+// Data.prototype.startGame_ThisOrThat = function(gamePin) {
+//   let elapsedSeconds = 0;
 
-  const interval = setInterval(() => {
-    elapsedSeconds++;
-    if(elapsedSeconds === 20) { // Exactly when the question time runs out
+//   const interval = setInterval(() => {
+//     elapsedSeconds++;
+//     if(elapsedSeconds === 20) { // Exactly when the question time runs out
       
-      this.correctQuestion_ThisOrThat(gamePin, this.customGames[gamePin].ThisOrThat.currentQuestion);
-      this.newChosenParticipant(gamePin);
-      this.customGames[gamePin].ThisOrThat.currentQuestion++; //TODO: När den kört 15 eller 20 frågor borde spelet vara klart.
+//       this.correctQuestion_ThisOrThat(gamePin, this.customGames[gamePin].ThisOrThat.currentQuestion);
+//       this.newChosenParticipant(gamePin);
+//       this.customGames[gamePin].ThisOrThat.currentQuestion++; //TODO: När den kört 15 eller 20 frågor borde spelet vara klart.
 
-      io.to(gamePin).emit("roundUpdate", this.customGames[gamePin].ThisOrThat)
-    }
-    if(elapsedSeconds === 30) { // 30 seconds matches the combined duration of each phase in ThisOrThatComponent.vue. 
-      elapsedSeconds=0; 
-    }
-  }, 1000); 
-};
+//       io.to(gamePin).emit("roundUpdate", this.customGames[gamePin].ThisOrThat)
+//     }
+//     if(elapsedSeconds === 30) { // 30 seconds matches the combined duration of each phase in ThisOrThatComponent.vue. 
+//       elapsedSeconds=0; 
+//     }
+//   }, 1000); 
+// };
 // -------------------------------------------------------------------------------------------------
 
 // - Poll ------------------------------------------------------------------------------------------

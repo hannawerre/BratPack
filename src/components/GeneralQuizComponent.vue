@@ -24,16 +24,13 @@
 
   </div>
 
-
-
-
   <div v-else-if="currentPhase === 'questionPhase' ">
  
     <QuestionComponent
       v-if="questions.length > 0"
       :question="questions[currentQuestionIndex]"
       :isAdmin="isAdmin"
-      @answer="handleAnswer" 
+      @answer="onAnswer" 
     />
     <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
@@ -52,48 +49,55 @@
   </div>
 
   <div v-else-if="currentPhase === 'feedbackPhase'">
-    <div v-if="isAdmin">
-      <button @click="nextQuestion">Nästa fråga</button>
-    </div>
-    <!-- FEEDBACKPHASE (icke-admin) -->
-    <div v-else>
+  <!-- Visa rätt/fel-grafik endast för spelare -->
+  <div v-if="isPlaying">
     <!-- När man svarat rätt -->
-
-      <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
-        <div class="icon-circle icon-correct">✔</div>
-        <p>Du hade rätt</p>
-        <p v-for="participant in this.gameData.participants"> Din poäng är just nu: {{ participant.scoreGame1 }}</p>
-      </div>
+    <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
+      <div class="icon-circle icon-correct">✔</div>
+      <p>Du hade rätt</p>
+      <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+      <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
+      <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng </p>
+    </div>
 
     <!-- När man svarat fel -->
-      <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
-        <div class="icon-circle icon-wrong">✖</div>
-        <p>Du hade fel</p>
-      </div>
+    <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
+      <div class="icon-circle icon-wrong">✖</div>
+      <p>Du hade fel</p>
+      <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+      <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
+      <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng </p>
+    </div>
 
-    <!-- För långsam eller ej svarat -->
-      <div v-else class="feedback-icon-wrapper">
-        <div class="icon-circle icon-wrong">✖</div>
-        <p>Oooops, för långsam...</p>
-      </div>
-    
+    <!-- Om användaren inte hann svara -->
+    <div v-else class="feedback-icon-wrapper">
+      <div class="icon-circle icon-wrong">✖</div>
+      <p>Oooops, för långsam...</p>
+      <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+      <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
+      <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng</p>
     </div>
   </div>
 
-
-  <div v-else-if="currentPhase === 'feedbackPhase' && isAdmin">
+  <!-- Visa "Nästa fråga"-knappen endast för admin -->
+  <div v-if="isAdmin">
     <button @click="nextQuestion">Nästa fråga</button>
   </div>
-
+</div>
   
-  <div v-else-if="currentPhase === 'scoreBoard'">
-    <h2>Scoreboard</h2>
-    <ul>
-      <li v-for="(p, index) in this.gameData.participants" :key="index">
-        {{ p.name }}: {{ p.scoreGame1}}
-      </li>
-    </ul>
-  </div>
+<div v-else-if="currentPhase === 'scoreBoard'">
+  <h2>Scoreboard</h2>
+  <ul>
+    <li 
+        v-for="(p, index) in sortedParticipants" 
+        :key="index" 
+        :class="{ 'top-player': index === 0 }">
+        #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} poäng
+    </li>
+
+  </ul>
+</div>
+
 </template>
 
 <script>
@@ -126,6 +130,10 @@ export default {
     isAdmin: {
       type: Boolean,
       required: true
+    },
+    isPlaying: {
+      type: Boolean,
+      required: true
     }
   },
   data() {
@@ -143,6 +151,7 @@ export default {
       timeIsUp: false,
       playerAnsweredRight: false,
       
+
     };
   },
   created() {
@@ -171,7 +180,13 @@ export default {
     socket.emit('getQuestions', this.lang);
 
   },
- 
+  
+  computed: {
+    sortedParticipants() {
+      return [...this.gameData.participants].sort((a,b) => b.scoreGame1 - a.scoreGame1);
+    }
+
+  },
   
 
 
@@ -196,32 +211,32 @@ export default {
       
     },
 
-    handleAnswer(answerData) {
-    if (this.isAdmin) return; // Admin ska inte hantera svar
-    this.onAnswer(answerData);
-  },
+    
 
   onAnswer(answerData) {
     // Spara hela svarsdatan
-    this.currentAnswer = answerData;
-    this.currentPhase = "answeredPhase";
-
-    console.log("Svar från användaren:", answerData);
-
-    // Hitta rätt deltagare
     const participant = this.gameData.participants.find(p => p.name === this.userName);
-    
-    if (answerData.isCorrect) {
-      // Räkna poäng
-      const leftOverTime = this.timeLeftOnAnswer;
-      const fraction = leftOverTime / this.pointsTime;
-      const points = Math.floor(fraction * 1000);
+    console.log("spelaren spelar elr inte: ", participant.isPlaying)
+    if(participant.isPlaying){
+        this.currentAnswer = answerData;
+        this.currentPhase = "answeredPhase";
 
-      this.playerAnsweredRight = true;
-      participant.scoreGame1 += points;
+        console.log("Svar från användaren:", answerData);
 
-      console.log("Poäng uppdaterad:", participant.name, participant.scoreGame1);
-    }
+        // Hitta rätt deltagare
+        const participant = this.gameData.participants.find(p => p.name === this.userName);
+        
+        if (answerData.isCorrect) {
+          // Räkna poäng
+          const leftOverTime = this.timeLeftOnAnswer;
+          const fraction = leftOverTime / this.pointsTime;
+          const points = Math.floor(fraction * 1000);
+
+          this.playerAnsweredRight = true;
+          participant.scoreGame1 += points;
+
+          console.log("Poäng uppdaterad:", participant.name, participant.scoreGame1);}
+        }
 
     // Skicka poänguppdatering till servern
     this.updatePoints(participant);
@@ -282,21 +297,24 @@ export default {
           
           
           case "questionPhase":
-            if(!this.isAdmin){
-              this.currentPhase = "answeredPhase"
-            }
-            else{
-              this.currentPhase="feedbackPhase"
-            }
-            break;
+            if(this.currentAnswer!=null){
+              this.currentPhase = "answeredPhase"}
+              else{
+                this.currentPhase="feedbackPhase";
+              }
+            
+          
           
           case "answeredPhase":
+            
             this.currentPhase="feedbackPhase"
+
             break;
             
           case "feedbackPhase":
             if(this.currentQuestionIndex < this.questions.length - 1) {
               this.playerAnsweredRight = false;
+              this.currentAnswer = null;
               this.currentPhase = "introPhase";
               this.startCountdown(3)
             } else{
@@ -317,7 +335,37 @@ export default {
         })
        
 
-      }
+      },
+  getPlayerRank(userName) {
+      const rank = this.sortedParticipants.findIndex(p => p.name === userName) + 1;
+      return rank || "N/A"; // Returnerar "N/A" om spelaren inte hittas
+  },
+  getPointsBehind(userName) {
+    const sorted = this.sortedParticipants; // Använd den sorterade listan
+    const rank = sorted.findIndex(p => p.name === userName); // Hitta spelarens rank (0-indexerad)
+    
+    if (rank > 0) {
+      // Jämför spelarens poäng med spelaren precis före
+      const pointsBehind = sorted[rank - 1].scoreGame1 - sorted[rank].scoreGame1;
+      return pointsBehind;
+    }
+
+    // Om spelaren är först (rank 0), finns ingen att jämföra med
+    return null;
+},
+getPlayerAhead(userName) {
+    const sorted = this.sortedParticipants; // Använd den sorterade listan
+    const rank = sorted.findIndex(p => p.name === userName); // Hitta spelarens rank (0-indexerad)
+    
+    if (rank > 0) {
+      // Returnera namnet på spelaren precis före
+      return sorted[rank - 1].name;
+    }
+
+    // Om spelaren är först (rank 0), finns ingen att jämföra med
+    return null;
+  }
+
     }
     };
 </script>
@@ -399,6 +447,10 @@ export default {
   background-color: #f44336; /* Röd */
 }
 
+.top-player {
+  font-weight: bold;
+  color: gold;
+}
 </style>
 
 
