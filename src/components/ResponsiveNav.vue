@@ -6,24 +6,26 @@
       </router-link>
     </div>
     <div>
-      <span> {{ miniClock }} </span> 
+      <span> {{ miniClock }} </span>
     </div>
     <div id="Language">
-      <LanguageSwitcher 
-        :lang="lang" 
+      <LanguageSwitcher
+        :lang="lang"
         :uiLabels="uiLabels"
         @language-changed="emitLanguageChangeToParent"
-      />
+     />
     </div>
   </nav>
-</template>
-
-<script>
-import LanguageSwitcher from './LanguageSwitcher.vue'
-import io from 'socket.io-client';
-const socket = io("localhost:3000");
-
-export default {
+ </template>
+ 
+ 
+ <script>
+ import LanguageSwitcher from './LanguageSwitcher.vue'
+ import io from 'socket.io-client';
+ const socket = io("localhost:3000");
+ 
+ 
+ export default {
   name: 'ResponsiveNav',
   components: {
     LanguageSwitcher
@@ -44,14 +46,15 @@ export default {
   },
   data() {
     return {
-      miniClock: "", 
+      miniClock: "",
     };
   },
   methods: {
     emitLanguageChangeToParent(newLang) {
       this.$emit('language-changed', newLang);
     },
-
+ 
+ 
     playAlarm() {
       console.log("Spelar alarm...");
       const alarmSound = new Audio('/audio/alarm.mp3');
@@ -61,7 +64,8 @@ export default {
         console.error("Kunde inte spela upp alarmet:", error);
       });
     },
-
+ 
+ 
     playSilence() {
       console.log("Spelar tystnad...");
       const silenceSound = new Audio('/audio/silence.mp3');
@@ -71,41 +75,47 @@ export default {
         console.error("Kunde inte spela upp Silence:", error);
       });
     }
-  }, 
+  },
   created() {
     console.log("Testing sound playback...");
-
+ 
+ 
     const silenceSound = new Audio('/audio/silence.mp3');
     silenceSound.play().then(() => {
         console.log("Silence sound played successfully.");
     }).catch(error => {
         console.error("Failed to play silence:", error);
     });
-
-    
-
-    
+ 
+ 
+   
+ 
+ 
+   
     socket.on('update-timer', ({ timerDisplay, soundType }) => {
         console.log("TimerDisplay received in ResponsiveNav:", timerDisplay, "SoundType:", soundType);
-
+ 
+ 
         this.miniClock = timerDisplay;
-
+ 
+ 
         if (soundType === 'alarm') {
             this.playAlarm();
         } else if (soundType === 'silence') {
             this.playSilence();
         }
     });
-},
+ },
   beforeDestroy() {
    // Clean up the socket listener when the component is destroyed
     socket.off('update-timer');
   }
-};
-</script>
-
-<style scoped>
-nav {
+ };
+ </script>
+ 
+ 
+ <style scoped>
+ nav {
   position: sticky;
   top: 10px;
   left: 0;
@@ -120,40 +130,42 @@ nav {
   padding: 0 1rem;
   box-sizing: border-box;
   
-  
-}
-
-nav > div:nth-child(2) {
+ }
+ 
+ 
+ nav > div:nth-child(2) {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.5rem;
   border: double 9px #5b7C99;
   padding: 2px;
-}
-
-#Logo img {
-  
-  margin-top: 5px;
+ }
+ 
+ 
+ #Logo img {
+   margin-top: 5px;
   height: 90px;
   cursor: pointer;
-  
-}
-
-#Links {
+  }
+ 
+ 
+ #Links {
   display: flex;
   gap: 1.5rem;
-}
-
-#Links a {
+ }
+ 
+ 
+ #Links a {
   color: black;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
   cursor: pointer;
-}
-
-.hide {
+ }
+ 
+ 
+ .hide {
   display: none;
-}
-</style>
+ }
+ </style>

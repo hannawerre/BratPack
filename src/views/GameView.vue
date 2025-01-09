@@ -1,109 +1,203 @@
 <template>
-    <div v-if="!activeGame">
-        <TimerComponent/>
-        <p>{{ this.gamePin }}</p>
-        <p>{{ this.userName }}</p>
-        <p>{{ this.gameData }}</p>
-
-        <div class="button-container">
-                <!-- Här skapas play-knappar för de valda spelen /theo -->
-            <button v-for="game in this.gameData.selectedGames" v-on:click="playMiniGame(game)" v-bind:key="game" class="game-button">
-                {{game}}    
-            </button> 
-        </div>
-    </div>
-
-    <div v-else>
-        <GeneralQuizComponent
-            v-if="activeGame === 'General Quiz'"
-            :gameData="gameData"
-            :gamePin="gamePin"
-        />
-    </div>
+  <div v-if="!activeGame">
+     
+      <p>{{ this.gamePin }}</p>
+      <p>{{ this.userName }}</p>
+      <p>{{ this.gameData }}</p>
 
 
-    
+      <div class="button-container">
+              <!-- Här skapas play-knappar för de valda spelen /theo -->
+              <button
+              v-for="game in gameData.selectedGames"
+              :key="game"
+              class="game-button"
+              @click="playMiniGame(game)"
+          >
+              {{game}}   
+          </button>
+      </div>
+  </div>
+
+
+  <div v-else>
+      <component
+          :is="getActiveComponent"
+          :gameData="gameData"
+          :gamePin="gamePin"
+         
+     />
+      <!-- Ta bort raden nedan när spelet fungerar -->
+      <p>Active Component: {{ getActiveComponent }}</p>
+
+
+  </div>
+
+
+
+
+ 
 </template>
 
 
+
+
 <script>
-    const socket = io("localhost:3000");
-    import io from 'socket.io-client';  // kanske behövs /sebbe 
+  import io from 'socket.io-client';
+  const socket = io("localhost:3000");
+  
 import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
+import WhosMostLikelyToComponent from '../components/WhosMostLikelyToComponent.vue';
+//import MusicQuizComponent from '../components/MusicQuizComponent.vue';
+//import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
 
-    export default{
-        name: 'GameView',
-        components: {
-            GeneralQuizComponent
-        },
-        data: function(){
-            return {
-                gamePin: '',
-                userName: '',
-                gameData: {},
-                activeGame: null
-            }
-        },
-        created: function() {
-            
-            socket.on('updateGameData', gameData => {
-                this.gameData = gameData;
-                console.log("Updated gameData to: ", this.gameData)
-            });
-            this.setup();
-            // This will ensure the client will listen to messages emitted to the socket room. :)
-            socket.emit('joinSocketRoom', this.gamePin);
-        },
-        mounted: function() {
-            socket.emit('updateAllGameData', this.gamePin);
-            console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin)
 
-        },
-        methods: {
-            setup: function(){
-                this.gamePin = this.$route.params.gamePin;
-                this.userName = sessionStorage.getItem('userName');
-                socket.emit('requestGameData', this.gamePin);
-            },
+  export default{
+      name: 'GameView',
+      components: {
+          GeneralQuizComponent,
+          WhosMostLikelyToComponent
+          //MusicQuizComponent,
+          //ThisOrThatComponent
 
-            playMiniGame: function(game){
-                this.activeGame = game;
-                //socket.emit(miniGameStarted, gameid) ?? 
-                // på något sätt få varje spels komponent aktiverad
-                //theo
-            }
 
-        }
-    }
+      },
+      data()  {
+          return {
+              
+              gamePin: this.$route.params.gamePin || '',
+              userName: '',
+              gameData: {},
+              activeGame: null
+          };
+      },
+      created() {
+  
+  socket.on('updateGameData', (gameData) => {
+    this.gameData = gameData;
+    console.log("Updated gameData to: ", this.gameData);
+  });
+
+  socket.on("newStatement", (newStatement) => {
+    console.log("Received new statement:", newStatement);
+    this.nextMiniGame(); // Återställ och starta om minispel
+  });
+
+  this.setup();
+  // Ensure the client listens to messages emitted to the socket room
+  socket.emit('joinSocketRoom', this.gamePin);
+},
+
+      
+      mounted() {
+  // Kontrollera om gamePin finns
+  if (!this.gamePin) {
+      console.warn("gamePin saknas i props. Försöker hämta från localStorage...");
+
+
+      // Försök hämta från localStorage
+      const storedGamePin = localStorage.getItem("gamePin");
+
+
+      if (storedGamePin) {
+          console.log("Hittade gamePin i localStorage:", storedGamePin);
+          this.gamePin = storedGamePin; // Sätt gamePin från localStorage
+      } else {
+          console.error("gamePin saknas både i props och localStorage! Applikationen kanske inte fungerar korrekt.");
+          return; // Avbryt om inget gamePin finns
+      }
+  }
+
+
+  // Skicka gamePin till servern för att uppdatera gameData
+  socket.emit('updateAllGameData', this.gamePin);
+  console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin);
+},
+
+
+      methods: {
+          
+          setup(){
+              this.gamePin = this.$route.params.gamePin;
+              this.userName = sessionStorage.getItem('userName');
+              socket.emit('requestGameData', this.gamePin);
+          },
+
+
+          playMiniGame(game){
+              console.log("button clicked, selcted game:", game); // Logga vilket spel som valts
+              this.activeGame = game;
+              //socket.emit(miniGameStarted, gameid) ??
+              // på något sätt få varje spels komponent aktiverad
+              //theo
+              console.log("Active game set to:", this.activeGame);
+          },
+          nextMiniGame() {
+  const activeGame = this.activeGame;
+  this.activeGame = null; // Återställ
+  setTimeout(() => {
+    this.activeGame = activeGame; // Starta om samma minispel
+  }, 100); // Ge Vue tid att uppdatera
+}
+
+
+
+      },
+      computed: {
+          getActiveComponent(){
+
+
+              const gameMap = {
+                  "General Quiz": 'GeneralQuizComponent',
+                  "Who's most likely": 'WhosMostLikelyToComponent'
+                  //'Music quiz': 'MusicQuizComponent',
+                  //'This or that': 'ThisOrThatComponent'
+              };
+              console.log(  "Active game:", this.activeGame);
+              return gameMap[this.activeGame]|| null;
+          }
+
+
+      }
+  };
+
 
 </script>
 
+
 <style>
-    .game-button {
-        width: 120px; /* Anpassa bredd */
-        height: 50px; /* Anpassa höjd */
-        margin: 10px; /* Mellanrum mellan knappar */
-        background-color: #4CAF50; /* Grön bakgrundsfärg */
-        color: white; /* Textfärg */
-        font-size: 16px; /* Textstorlek */
-        border: none; /* Ingen kantlinje */
-        border-radius: 8px; /* Rundade hörn */
-        cursor: pointer; /* Ändrar muspekaren vid hover */
-        transition: background-color 0.3s ease, transform 0.2s ease; /* Mjuka animationer */
-}   
+  .game-button {
+      width: 120px; 
+      height: 50px; 
+      margin: 10px; 
+      background-color: #4CAF50; 
+      color: white;
+      font-size: 16px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: background-color 0.3s ease, transform 0.2s ease; 
+}  
 
-    .game-button:hover {
-        background-color: #45a049; /* Mörkare grön vid hover */
-        transform: scale(1.1); /* Gör knappen större vid hover */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Lägg till skugga vid hover */
-    }
 
-    .game-button:active {
-        transform: scale(0.95); /* Gör knappen mindre vid klick */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Minska skugga vid klick */
-    }
+  .game-button:hover {
+      background-color: #45a049; 
+      transform: scale(1.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); 
+  }
 
-        
+
+  .game-button:active {
+      transform: scale(0.95); 
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  }
+
+
+     
+
+
+
+
 
 
 
