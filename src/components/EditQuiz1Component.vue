@@ -95,87 +95,84 @@
   const emit = defineEmits([
     "modal-opened",
     "modal-closed",
-    "questions-saved-quiz1"
-  ]);
-  
-  const isModalOpen = ref(false);
-  
-  const useStandardQuestions = ref(true);
-  const useOwnQuestions = ref(false);
-  
-  const question = ref("");
-  const alternatives = ref([{ text: "", isCorrect: false }]);
-  const savedQuestions = ref([]);
-  
-  const addAlternative = () => {
-    console.log("Adding alternative");
-    alternatives.value.push({ text: "", isCorrect: false }); 
-  };
-  
-  const openModal = () => {
-    isModalOpen.value = true;
-    emit('modal-opened');
-  };
-  
-  const saveQuestion = () => {
-    if (question.value.trim() !== "") {
-      const hasCorrectAnswer = alternatives.value.some(alt => alt.isCorrect);
-      if (!hasCorrectAnswer) {
-        console.error("At least one alternative must be marked as correct.");
-        alert("Please mark at least one alternative as correct.");
-        return;
-      }
-      const newQuestionId = savedQuestions.value.length + 1;
-      const newQuestionObj = {
-        id: newQuestionId,
-        question: question.value, 
-        answers: alternatives.value.map((alt, index) => ({
-          id: index + 1,
-          answer: alt.text,
-          isCorrect: alt.isCorrect
-        }))
-      };
-      savedQuestions.value.push(newQuestionObj);
-      console.log("Currently saved questions:", savedQuestions.value);
-  
-      // Reset form
-      question.value = "";
-      alternatives.value = [{ text: "", isCorrect: false }];
-    }
-  };
-    const removeQuestion = (index) => {
-        if (confirm(`Are you sure you want to remove question ${index + 1}?`)) {
-            savedQuestions.value.splice(index, 1);
-            console.log(`Question ${index + 1} removed.`, savedQuestions.value);
-    }
-};
-  
-  const closeModal = () => {
-    if(!useStandardQuestions.value && !useOwnQuestions.value){
-      alert("Please select at least one option: 'Use standard questions' or 'Use own questions'.");
-      return;
-    }
-  
-    isModalOpen.value = false;
-    emit(
-      "questions-saved-quiz1",
-      savedQuestions.value,
-      useStandardQuestions.value,
-      useOwnQuestions.value,
-      "Quiz1"
-    );
-    
-    emit('modal-closed');
-    // Clean up empty alternatives except the first one
-    alternatives.value = alternatives.value.filter((alt, index) => {
-      return index === 0 || alt.text.trim() !== "";
+    "questions-saved-generalQuiz"
+]);
+
+    const isModalOpen = ref(false);
+
+    const useStandardQuestions = ref(true);
+    const useOwnQuestions = ref(false);
+
+    const question = ref("");
+    const alternatives = ref([{ text: "", isCorrect: false }]);
+
+    const savedQuestions = ref([]);
+
+    const addAlternative = () => {
+        console.log("Adding alternative");
+        alternatives.value.push({ text: "", isCorrect: false }); 
+    };
+
+    const openModal = () => {
+        isModalOpen.value = true;
+        emit('modal-opened');
+    };
+
+    const saveQuestion = () => {
+        if (question.value.trim() !== "") {
+
+            const hasCorrectAnswer = alternatives.value.some(alt => alt.isCorrect);
+        if (!hasCorrectAnswer) {
+            console.error("At least one alternative must be marked as correct.");
+            alert("Please mark at least one alternative as correct.");
+            return;
+        }
+            const newQuestionId = savedQuestions.value.length + 1;
+            
+            const newQuestionObj = {
+                id: newQuestionId,
+                question: question.value, 
+                answers: alternatives.value.map((alt, index) => ({
+                    id: index + 1,
+                    answer: alt.text,
+                    isCorrect: alt.isCorrect
+                }))
+            };
+
+        savedQuestions.value.push(newQuestionObj);
+        console.log("Currently saved questions:", savedQuestions.value);
+
+        question.value = "";
+        alternatives.value = [{ text: "", isCorrect: false }];
+     };
+    };
+    const closeModal = () => {
+
+        if(!useStandardQuestions.value && !useOwnQuestions.value){
+            alert("Please select at least one option: 'Use standard questions' or 'Use own questions'.");
+            return;
+        }
+
+        isModalOpen.value = false;
+        emit(
+            "questions-saved-generalQuiz",
+            savedQuestions.value,
+            useStandardQuestions.value,
+            useOwnQuestions.value,
+            "generalQuiz"
+
+        );
+        
+        emit('modal-closed');
+        alternatives.value = alternatives.value.filter((alt, index) => {
+        return index === 0 || alt.text.trim() !== "";
+        });
+    };
+
+    defineExpose({
+        openModal,
+        closeModal,
     });
-  };
-  
-  defineExpose({
-    openModal,
-    closeModal,
-  });
   </script>
   
   <style scoped>

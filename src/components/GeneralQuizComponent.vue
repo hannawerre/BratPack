@@ -1,103 +1,97 @@
 <template>
-  <div v-if="currentPhase === 'startPhase'">
-    <h1> {{ uiLabels.generalTrivia }}</h1>
+  <div>
+      <!-- Start Phase -->
+      <div v-if="currentPhase === 'startPhase'">
+        <h1> {{ uiLabels.generalTrivia }}</h1>
+        <div v-if="isAdmin">
+          <button @click="startQuiz">Start quiz</button>
+        </div>
+        <div v-else>Väntar på att admin ska starta quizet...</div>
+      </div>
 
-    <div v-if="isAdmin">
-      <button @click="startQuiz">
-        Start quiz
-      </button>
-    </div>
-    <div v-else>
-      Väntar på att admin ska starta quizet...
-    </div> 
-  </div>
-
-  <div v-else-if="currentPhase === 'introPhase'" class="intro-wrapper">
-    <transition name="countdown-flash" mode="out-in">
-      <h1
-        v-if="countDownNumber >= 0"
-        :key="countDownNumber"
-        class="countdown-number">
-        {{ countDownNumber }}
-      </h1>
-    </transition>
-
-  </div>
-
-  <div v-else-if="currentPhase === 'questionPhase' ">
- 
-    <QuestionComponent
-      v-if="questions.length > 0"
-      :question="questions[currentQuestionIndex]"
-      :isAdmin="isAdmin"
-      @answer="onAnswer" 
-    />
-    <div class="countdown-bar">
-        <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
-    </div>
-
-  </div>
-
-  <div v-else-if="currentPhase === 'answeredPhase'">
-    <h2>Du har svarat!</h2>
-    <p>Vänta tills tiden går ut...</p>
-    
-    <!-- Ex. Du kan fortfarande visa nedräkningen om du vill -->
-    <div class="countdown-bar">
-      <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
-    </div>
-  </div>
-
-  <div v-else-if="currentPhase === 'feedbackPhase'">
-  <!-- Visa rätt/fel-grafik endast för spelare -->
-  <div v-if="isPlaying">
-    <!-- När man svarat rätt -->
-    <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
-      <div class="icon-circle icon-correct">✔</div>
-      <p>Du hade rätt</p>
-      <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-      <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
-      <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng </p>
-    </div>
-
-    <!-- När man svarat fel -->
-    <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
-      <div class="icon-circle icon-wrong">✖</div>
-      <p>Du hade fel</p>
-      <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-      <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
-      <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng </p>
-    </div>
-
-    <!-- Om användaren inte hann svara -->
-    <div v-else class="feedback-icon-wrapper">
-      <div class="icon-circle icon-wrong">✖</div>
-      <p>Oooops, för långsam...</p>
-      <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-      <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
-      <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng</p>
-    </div>
-  </div>
-
-  <!-- Visa "Nästa fråga"-knappen endast för admin -->
-  <div v-if="isAdmin">
-    <button @click="nextQuestion">Nästa fråga</button>
-  </div>
-</div>
+      <!-- Intro Phase  -->
+      <div v-else-if="currentPhase === 'introPhase'" class="intro-wrapper">
+        <transition name="countdown-flash" mode="out-in">
+          <h1 v-if="countDownNumber >= 0" :key="countDownNumber" class="countdown-number">
+            {{ countDownNumber }}
+          </h1>
+        </transition>
+      </div>
   
-<div v-else-if="currentPhase === 'scoreBoard'">
-  <h2>Scoreboard</h2>
-  <ul>
-    <li 
-        v-for="(p, index) in sortedParticipants" 
-        :key="index" 
-        :class="{ 'top-player': index === 0 }">
-        #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} poäng
-    </li>
 
-  </ul>
-</div>
 
+      <!-- Question Phase-->
+      <div v-else-if="currentPhase === 'questionPhase'">
+        <QuestionComponent
+          v-if="questions.length > 0"
+          :question="questions[currentQuestionIndex]"
+          :isAdmin="isAdmin"
+          @answer="onAnswer" 
+        />
+        <div class="countdown-bar">
+            <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
+        </div>
+      </div>
+
+      <!-- Answered Phase-->
+      <div v-else-if="currentPhase === 'answeredPhase'">
+        <h2>Du har svarat!</h2>
+        <p>Vänta tills tiden går ut...</p>
+        <div class="countdown-bar">
+          <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
+        </div>
+      </div>
+      
+      <!-- Feedback Phase -->
+      <div v-else-if="currentPhase === 'feedbackPhase'">
+        
+        <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
+          <div class="icon-circle icon-correct">✔</div>
+          <p>Du hade rätt</p>
+          <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+          <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
+          <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng </p>
+        </div>
+
+
+        <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
+          <div class="icon-circle icon-wrong">✖</div>
+          <p>Du hade fel</p>
+          <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+          <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
+          <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng </p>
+        </div>
+
+        <!-- Om användaren inte hann svara -->
+        <div v-else class="feedback-icon-wrapper">
+          <div class="icon-circle icon-wrong">✖</div>
+          <p>Oooops, för långsam...</p>
+          <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+          <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
+          <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng</p>
+        </div>
+  
+        <div v-if="isAdmin">
+          <button v-if="!isLastQuestion" @click="nextQuestion">Nästa fråga</button>
+          <button v-else @click="showResults"> Show results</button>
+        </div>
+      
+      </div>
+      
+ <!-- Score board--> 
+      <div v-else-if="currentPhase === 'scoreBoard'">
+        <h2>Scoreboard</h2>
+          <ul>
+            <li 
+               v-for="(p, index) in sortedParticipants" 
+              :key="index" 
+              :class="{ 'top-player': index === 0 }"
+            >
+              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} poäng
+            </li>
+          </ul>
+      </div>
+  </div> 
 </template>
 
 <script>
@@ -114,28 +108,13 @@ export default {
     Nav
   },
   props: {
-    gameData: {
-      type: Object,
-      required: true
-    },
-    gamePin: {
-      type: String,
-      required: true
-    },
-    uiLabels: {
-      type: Object,
-      required: true
-
-    },
-    isAdmin: {
-      type: Boolean,
-      required: true
-    },
-    isPlaying: {
-      type: Boolean,
-      required: true
-    }
+    gameData: { type: Object, required: true },
+    gamePin: { type: String, required: true },
+    uiLabels: { type: Object, required: true },
+    isAdmin: { type: Boolean, required: true },
+    isPlaying: { type: Boolean, required: true },
   },
+
   data() {
     return {
       lang: localStorage.getItem("lang") || "en",
@@ -146,144 +125,79 @@ export default {
       userName: sessionStorage.getItem('userName'),
       currentAnswer: null,
       countDownNumber: 3,
-      timeLeftOnAnswer: 0,
       pointsTime: 0,
-      timeIsUp: false,
       playerAnsweredRight: false,
-      
-
     };
   },
-  created() {
 
-      socket.emit("joinSocketRoom", this.gamePin);
-  
+  computed: {
+    isLastQuestion() {
+      return this.currentQuestionIndex >= this.questions.length - 1;
+    },
+    sortedParticipants() {
+      return [...this.gameData.participants].sort(
+        (a, b) => b.scoreGame1 -a.scoreGame1
+      );
+    }
+  },
+
+  created() {
+    socket.emit("joinSocketRoom", this.gamePin);
       
     // När servern skickar frågorna, sätt dem i `questions`
-      socket.on('generalQuestions', quizQuestions => {
-          this.questions = quizQuestions.questions;
+    socket.on('generalQuestions', quizQuestions => {
+      this.questions = quizQuestions.questions;
     });
-      socket.on("startGeneralQuizQuestion", (currentQuestionIndex) =>{
-        this.currentQuestionIndex = currentQuestionIndex
-        console.log("startar fråga...")
-        this.goToNextPhase();
-      })
-
       
-    
-    socket.on("allParticipantsAnswered", () => {
-      if (!this.isAdmin){
-        this.currentPhase = "feedbackPhase";
-      }});
-    
+    socket.on("startGeneralQuizQuestion", (currentQuestionIndex) =>{
+      this.currentQuestionIndex = currentQuestionIndex
+      this.goToNextPhase();
+    })
     // Be om frågorna från servern
-    socket.emit('getQuestions', this.lang);
-
+    socket.emit('getQuestions', this.lang, this.gamePin, "generalQuiz");
   },
-  
-  computed: {
-    sortedParticipants() {
-      return [...this.gameData.participants].sort((a,b) => b.scoreGame1 - a.scoreGame1);
-    }
-
-  },
-  
-
-
  
   methods: {
-    updatePoints(participant) {
-      console.log("försöker uppdatera poäng")
-      socket.emit("updatePlayerPoints", {
-            gamePin: this.gamePin,
-            userName: this.userName,
-            newScore: participant.scoreGame1,
-            playerAnsweredRight: this.playerAnsweredRight
-          })
-
-    },
     startQuiz(){
       socket.emit("startingQuizQuestion", {
           gamePin: this.gamePin, 
           currentQuestionIndex: this.currentQuestionIndex
         })
-      console.log("starta quiz")
-      
-    },
-
-    
-
-  onAnswer(answerData) {
-    // Spara hela svarsdatan
-    const participant = this.gameData.participants.find(p => p.name === this.userName);
-    console.log("spelaren spelar elr inte: ", participant.isPlaying)
-    if(participant.isPlaying){
-        this.currentAnswer = answerData;
-        this.currentPhase = "answeredPhase";
-
-        console.log("Svar från användaren:", answerData);
-
-        // Hitta rätt deltagare
-        const participant = this.gameData.participants.find(p => p.name === this.userName);
-        
-        if (answerData.isCorrect) {
-          // Räkna poäng
-          const leftOverTime = this.timeLeftOnAnswer;
-          const fraction = leftOverTime / this.pointsTime;
-          const points = Math.floor(fraction * 1000);
-
-          this.playerAnsweredRight = true;
-          participant.scoreGame1 += points;
-
-          console.log("Poäng uppdaterad:", participant.name, participant.scoreGame1);}
-        }
-
-    // Skicka poänguppdatering till servern
-    this.updatePoints(participant);
-  },
-
-    startCountdown(duration) {
-      const updateInterval = 100; 
-      const startTime = Date.now();
-      const endTime = startTime + duration * 1000 
-      const totalTime = duration * 1000; 
-      this.pointsTime = totalTime;
-
-      this.timeIsUp = false;
-
-      this.countDownNumber = duration;
-
-
-      const interval = setInterval(() => {
-          const now = Date.now();
-          let remainingTime = endTime - now;
-          
-          if (remainingTime < 0) remainingTime = 0;
-
-          const progress = (remainingTime / totalTime) * 100;
-          this.countdownProgress = progress;
-
-          const timeLeftInMilliSeconds = remainingTime;
-          this.timeLeftOnAnswer = timeLeftInMilliSeconds;
-          const timeLeftInSeconds = Math.ceil(remainingTime/1000);
-          this.countDownNumber = timeLeftInSeconds
-
-          if (remainingTime <= 0) {
-              clearInterval(interval);
-              this.countdownProgress = 0;
-              this.timeIsUp = true;
-              console.log(this.currentPhase);
-
-              setTimeout(() => {
-                this.goToNextPhase(); 
-              }, 200)    
-          }
-      }, 
-      updateInterval); 
       },
+      onAnswer(answerData) {
+      const participant = this.gameData.participants.find(
+        (p) => p.name === this.userName
+      );
+      if (!participant?.isPlaying) return;
 
-  
-      goToNextPhase(){
+      this.currentAnswer = answerData;
+      this.currentPhase = "answeredPhase";
+
+      if (answerData.isCorrect) {
+        const points = Math.floor((this.countdownProgress / 100) * 1000);
+        this.playerAnsweredRight = true;
+        participant.scoreGame1 += points;
+        this.updatePoints(participant);
+      }
+    },
+    updatePoints(participant) {
+      socket.emit("updatePlayerPoints", {
+        gamePin: this.gamePin,
+        userName: this.userName,
+        newScore: participant.scoreGame1
+      })
+    },
+    nextQuestion() {
+      this.currentQuestionIndex++;
+      socket.emit("startingQuizQuestion", {
+        gamePin: this.gamePin,
+        currentQuestionIndex: this.currentQuestionIndex,
+      });
+    },
+    showResults() {
+      this.currentPhase = "scoreBoard";
+    },
+    goToNextPhase(){
         switch (this.currentPhase) {
           case "startPhase":
             this.currentPhase = 'introPhase';
@@ -295,79 +209,96 @@ export default {
             this.startCountdown(10)
             break;
           
-          
           case "questionPhase":
             if(this.currentAnswer!=null){
               this.currentPhase = "answeredPhase"}
               else{
                 this.currentPhase="feedbackPhase";
               }
-            
-          
-          
-          case "answeredPhase":
-            
-            this.currentPhase="feedbackPhase"
 
+          case "answeredPhase":
+            this.currentPhase="feedbackPhase"
             break;
             
           case "feedbackPhase":
-            if(this.currentQuestionIndex < this.questions.length - 1) {
-              this.playerAnsweredRight = false;
+            if(this.currentQuestionIndex < this.questions.length) {
               this.currentAnswer = null;
               this.currentPhase = "introPhase";
               this.startCountdown(3)
-            } else{
-              this.currentPhase = "scoreBoard"
-            }
+            } 
             break;
-          
-
         }
       },
-      nextQuestion () {
-        if (this.currentQuestionIndex < this.questions.length - 1) {
-          this.currentQuestionIndex++;
-      }
-        socket.emit("startingQuizQuestion", {
-          gamePin: this.gamePin, 
-          currentQuestionIndex: this.currentQuestionIndex
-        })
-       
+      startCountdown(duration) {
+        const updateInterval = 100; 
+        const startTime = Date.now();
+        const endTime = startTime + duration * 1000 
+        const totalTime = duration * 1000; 
+        this.pointsTime = totalTime;
 
+        this.timeIsUp = false;
+
+        this.countDownNumber = duration;
+
+
+        const interval = setInterval(() => {
+            const now = Date.now();
+            let remainingTime = endTime - now;
+            
+            if (remainingTime < 0) remainingTime = 0;
+
+            const progress = (remainingTime / totalTime) * 100;
+            this.countdownProgress = progress;
+
+            const timeLeftInMilliSeconds = remainingTime;
+            this.timeLeftOnAnswer = timeLeftInMilliSeconds;
+            const timeLeftInSeconds = Math.ceil(remainingTime/1000);
+            this.countDownNumber = timeLeftInSeconds
+
+            if (remainingTime <= 0) {
+                clearInterval(interval);
+                this.countdownProgress = 0;
+                this.timeIsUp = true;
+                console.log(this.currentPhase);
+
+                setTimeout(() => {
+                  this.goToNextPhase(); 
+                }, 200)    
+            }
+        }, 
+        updateInterval); 
+        },
+      getPlayerRank(userName) {
+        const rank = this.sortedParticipants.findIndex(p => p.name === userName) + 1;
+        return rank || "N/A"; // Returnerar "N/A" om spelaren inte hittas
       },
-  getPlayerRank(userName) {
-      const rank = this.sortedParticipants.findIndex(p => p.name === userName) + 1;
-      return rank || "N/A"; // Returnerar "N/A" om spelaren inte hittas
-  },
-  getPointsBehind(userName) {
-    const sorted = this.sortedParticipants; // Använd den sorterade listan
-    const rank = sorted.findIndex(p => p.name === userName); // Hitta spelarens rank (0-indexerad)
-    
-    if (rank > 0) {
-      // Jämför spelarens poäng med spelaren precis före
-      const pointsBehind = sorted[rank - 1].scoreGame1 - sorted[rank].scoreGame1;
-      return pointsBehind;
-    }
+      getPointsBehind(userName) {
+        const sorted = this.sortedParticipants; // Använd den sorterade listan
+        const rank = sorted.findIndex(p => p.name === userName); // Hitta spelarens rank (0-indexerad)
+        
+        if (rank > 0) {
+          // Jämför spelarens poäng med spelaren precis före
+          const pointsBehind = sorted[rank - 1].scoreGame1 - sorted[rank].scoreGame1;
+          return pointsBehind;
+        }
 
-    // Om spelaren är först (rank 0), finns ingen att jämföra med
-    return null;
-},
-getPlayerAhead(userName) {
-    const sorted = this.sortedParticipants; // Använd den sorterade listan
-    const rank = sorted.findIndex(p => p.name === userName); // Hitta spelarens rank (0-indexerad)
-    
-    if (rank > 0) {
-      // Returnera namnet på spelaren precis före
-      return sorted[rank - 1].name;
-    }
+        // Om spelaren är först (rank 0), finns ingen att jämföra med
+        return null;
+    },
+    getPlayerAhead(userName) {
+      const sorted = this.sortedParticipants; // Använd den sorterade listan
+      const rank = sorted.findIndex(p => p.name === userName); // Hitta spelarens rank (0-indexerad)
+        
+      if (rank > 0) {
+          // Returnera namnet på spelaren precis före
+        return sorted[rank - 1].name;
+        }
 
-    // Om spelaren är först (rank 0), finns ingen att jämföra med
-    return null;
-  }
-
+        // Om spelaren är först (rank 0), finns ingen att jämföra med
+      return null;
+      },
     }
-    };
+ };
 </script>
 
 <style scoped>

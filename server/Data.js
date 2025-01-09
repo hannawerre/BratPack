@@ -142,12 +142,30 @@ Data.prototype.getUILabels = function (lang) {
   return JSON.parse(labels);
 };
 
-Data.prototype.getQuestions = function (lang) {
+Data.prototype.getQuestions = function (lang, gamePin, gameName) {
   //check if lang is valid before trying to load the dictionary file
   if (!["en", "sv"].some( el => el === lang))
     lang = "en";
-  const questions = readFileSync("./server/data/questions-" + lang + ".json");
-  return JSON.parse(questions);
+  const standardQuestions = JSON.parse(readFileSync("./server/data/questions-" + lang + ".json"));
+  console.log("Alla spel i customGames:", this.customGames);
+  console.log("GamePin:", gamePin);
+  console.log("Data för gamePin:", this.customGames?.[gamePin]);
+  console.log("spelnamnet är: ", gameName)
+
+  if (this.customGameExists(gamePin)) {
+    const gameData = this.customGames[gamePin];
+    const allQuestions = gameData?.allCustomQuestions;
+    const customQuestions = allQuestions?.[gameName]?.customQuestions;
+    if(customQuestions && Array.isArray(customQuestions)){
+      const questionObj = {
+        questions: customQuestions
+      }
+      return questionObj
+    }else{
+    
+  return standardQuestions
+    }
+  }
 };
 
 // ThisOrThat -------------------------------------------------------------------------------------
@@ -406,24 +424,25 @@ Data.prototype.startTimer = function (gamePin, selectedMinutes, io) {
 };
 
 
-Data.prototype.saveQuestions = function(gamePin, customQuestions, whichQuiz) {
+Data.prototype.saveQuestions = function(gamePin, allCustomQuestions, whichQuiz) {
   console.log("Saving questions for pin: ", gamePin);
-  console.log("Saved questions: ", customQuestions);
+  console.log("Saved questions: ", allCustomQuestions);
   console.log("Which quiz: ", whichQuiz);
 
   if (!this.customGameExists(gamePin)) {
     console.error(`Cannot save questions. Game with pin ${gamePin} does not exist.`);
     return;
   }
-  if (!this.customGames[gamePin].customQuestions) {
-    this.customGames[gamePin].customQuestions = {};
+  if (!this.customGames[gamePin].allCustomQuestions) {
+    this.customGames[gamePin].allCustomQuestions = {};
   }
-  if (!this.customGames[gamePin].customQuestions[whichQuiz]) {
-    this.customGames[gamePin].customQuestions[whichQuiz] = {};
+  if (!this.customGames[gamePin].allCustomQuestions[whichQuiz]) {
+    this.customGames[gamePin].allCustomQuestions[whichQuiz] = {};
   }
-  this.customGames[gamePin].customQuestions[whichQuiz] = customQuestions;
+  this.customGames[gamePin].allCustomQuestions = allCustomQuestions;
+ 
 
-  console.log("Saved questions for pin: ", gamePin, " are: ", this.customGames[gamePin].customQuestions[whichQuiz]);
+  console.log("Saved questions for pin: ", gamePin, " are: ", this.customGames[gamePin].allCustomQuestions[whichQuiz]);
 
   // this.customGames[gamePin].selectedGames[whichQuiz].saveQuestions = savedQuestions;
   // this.customGames[gamePin].selectedGames[whichQuiz].useStandardQuestions = useStandardQuestions;
