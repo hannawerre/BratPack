@@ -1,28 +1,38 @@
 <template>
     <div v-if="isModalOpen" class="modal-background" @click.self="closeModal">
-      <!-- The .modal-wrapper holds both the questions-list and the modal-content -->
       <div v-if="isModalOpen" class="modal-wrapper" @click.self="closeModal">
-        <!-- Questions list pinned to the left edge of the screen -->
         <div class="questions-list" @click.stop>
           <h2>Questions</h2>
           <ul>
-            <li v-for="(question, index) in savedQuestions" :key="index">
-              <strong>Q{{ index + 1 }}: {{ question.question }}</strong>
-              <ul>
-                <li v-for="(answer, i) in question.answers" :key="i">
-                  {{ answer.answer }} 
-                  <span v-if="answer.isCorrect">(Correct)</span>
-                </li>
-              </ul>
-            </li>
-          </ul>
+  <li v-for="(question, index) in savedQuestions" :key="index" class="question-item">
+    <div class="question-container">
+      <!-- Left side: Question and answers -->
+      <div class="question-details">
+        <strong class="question-title">Q{{ index + 1 }}: {{ question.question }}</strong>
+        <ul>
+          <li v-for="(answer, i) in question.answers" :key="i" class="answer-item">
+            {{ answer.answer }} 
+            <span v-if="answer.isCorrect">(Correct)</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right side: Remove button -->
+      <button 
+        @click="removeQuestion(index)" 
+        class="remove-button" 
+        title="Remove this question">
+        &times;
+      </button>
+    </div>
+  </li>
+</ul>
         </div>
   
-        <!-- Modal content centered in the screen -->
         <div class="modal-content" @click.stop>
           <h1>Edit {{ GameName }}</h1>
           <p>Here you can add questions to the game</p>
-          <br>
+          <br />
           <div class="checkboxes-container">
             <label>
               <input 
@@ -39,7 +49,7 @@
               Use own questions
             </label>
           </div>
-          <br>
+          <br />
   
           <p>Add question</p>
           <input 
@@ -47,7 +57,7 @@
             placeholder="Add question" 
             class="question"
           />
-          
+  
           <div v-for="(alt, index) in alternatives" :key="index" class="alternative-row">
             <input
               v-model="alt.text"
@@ -133,6 +143,12 @@
       alternatives.value = [{ text: "", isCorrect: false }];
     }
   };
+    const removeQuestion = (index) => {
+        if (confirm(`Are you sure you want to remove question ${index + 1}?`)) {
+            savedQuestions.value.splice(index, 1);
+            console.log(`Question ${index + 1} removed.`, savedQuestions.value);
+    }
+};
   
   const closeModal = () => {
     if(!useStandardQuestions.value && !useOwnQuestions.value){
@@ -164,12 +180,6 @@
   
   <style scoped>
 
-/* 
-  ----- Base Layout (screens >= 1024px) -----
-
-  The question list is pinned to the left side and 
-  the modal content is centered by margin-left.
-*/
 .modal-background {
   position: fixed;
   top: 0;
@@ -177,7 +187,6 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  /* Use flex so we can center the modal-wrapper */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -191,13 +200,12 @@
   min-height: 600px;
 }
 
-/* Orange, rounded box for the question list */
 .questions-list {
   position: absolute;
   left: 20px;
   top: 50%;
   transform: translateY(-50%);
-  width: 280px; /* Slightly wider */
+  width: 280px; 
   max-height: 80vh;
   overflow-y: auto;
   
@@ -252,12 +260,10 @@
   background-color: #fff;
   border-radius: 8px;
   text-align: center;
-  /* Extra left margin to avoid overlap with the questions-list */
   margin-left: 360px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Checkboxes */
 .checkboxes-container {
   display: flex;
   justify-content: center;
@@ -276,7 +282,6 @@
   box-sizing: border-box;
 }
 
-/* Generic input styling */
 input[type="text"],
 input[placeholder] {
   width: 100%;
@@ -302,7 +307,6 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
-/* Buttons */
 button {
   border: none;
   border-radius: 6px;
@@ -317,7 +321,7 @@ button {
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Add alternative button */
+
 #alternatative-button {
   background-color: green;
 }
@@ -327,7 +331,6 @@ button {
   transform: scale(1.05);
 }
 
-/* Save question button */
 #save-button {
   background-color: green;
 }
@@ -337,7 +340,55 @@ button {
   transform: scale(1.05);
 }
 
-/* Close button */
+.question-item {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgb(255, 153, 0); 
+  border: 1px solid rgb(0, 0, 0); 
+  border-radius: 5px;
+}
+
+.question-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.question-details {
+  flex: 1; 
+}
+
+.question-title {
+  margin: 0 0 10px;
+  font-weight: bold;
+}
+
+
+.answer-item {
+  list-style: none; 
+  margin-bottom: 5px;
+}
+
+
+.remove-button {
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: rgb(213, 8, 8); 
+  color: white;
+  
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.remove-button:hover {
+  background-color: rgb(247, 44, 44);
+  box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
+}
+
+
 #close-button {
   background-color: rgb(213, 8, 8);
 }
@@ -347,7 +398,7 @@ button {
   transform: scale(1.05);
 }
 
-/* Alternatives row */
+
 .alternative-row {
   display: flex;
   align-items: center;
@@ -355,9 +406,8 @@ button {
   margin: 10px 0;
 }
   
-  /* --- Responsive adjustments for screens below 1024px --- */
+  
   @media (max-width: 1024px) {
-  /* The entire wrapper is fixed and scrollable inside if needed */
   .modal-wrapper {
     position: fixed;
     top: 0;
@@ -368,11 +418,11 @@ button {
     display: flex; 
     flex-direction: column;
     align-items: center; 
-    justify-content: flex-start; /* stack from top down */
-    padding-top: 40px; /* some space at the top */
+    justify-content: flex-start; 
+    padding-top: 40px; 
   }
 
-  /* The orange list is no longer absolute; it’s pinned at the top, centered horizontally */
+ 
   .questions-list {
     position: static;
     transform: none;
@@ -380,16 +430,15 @@ button {
     max-width: 600px;
     margin: 0 auto 20px auto;
     border-right: none;
-    border-bottom: 2px solid #ccc; /* optional dividing line under list */
+    border-bottom: 2px solid #ccc; 
   }
 
-  /* The modal itself is also fixed, centered horizontally just below the list */
   .modal-content {
     position: static;
     margin-left: 0;
     width: 90%;
     max-width: 600px;
-    margin: 0 auto 40px auto; /* space below the modal */
+    margin: 0 auto 40px auto; 
   }
 }
 
