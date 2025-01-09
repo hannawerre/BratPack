@@ -62,6 +62,7 @@
 
     <!-- Game Phase 4: Display Final Results -->
     <div v-if="showFinalResults">
+        <h2>Final results</h2>
         <div v-for="[key,value] in Object.entries(participants)" :key="key">
         <p>{{ key }}: {{ value.points }}</p>
       </div>

@@ -1,7 +1,7 @@
 <template>
     <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
 
-        <ThisOrThatComponent v-if="gameData.selectedGames.includes('This or that')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
+        <ThisOrThatComponent v-if="gameData.selectedGames.includes('ThisOrThat')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
 
         <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
             <div>

@@ -108,7 +108,7 @@ data: function() {
       { id: 'Quiz1', name: 'General Quiz'} ,
       { id: 'Quiz2', name: 'Who´s most likely'},
       { id: 'Quiz3', name: 'Music quiz'},
-      { id: 'Quiz4', name: 'This or that'}
+      { id: 'ThisOrThat', name: 'This or that'}
     ],
     selectedGames: [],
     participants: [],
