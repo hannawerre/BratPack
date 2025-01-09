@@ -166,50 +166,28 @@ function sockets(io, socket, data) {
     data.saveQuestions(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz);
   });
 
+  socket.on("adminLeftGame", (gamePin, userName) => {
+    console.log(`Admin left for gamepin: ${gamePin}`);
+    data.deleteGame(gamePin);
+  });
 
-// socket.on("adminLeftGame", (gamepin, userName) => {
+// socket.on("adminLeftGame", (gamePin, userName) => {
+//     console.log(`Admin left for gamepin: ${gamePin}`);
 
-//     console.log(`Admin left for gamepin: ${gamepin}`);
+//     data.setAdminRejoined(gamePin, false);
 
-//     let adminAssigned = false;
-//     // Start a listener for the 'newAdmin' event
-//     // Track if a new admin has been assigned
-
-//     socket.on("newAdmin", (newGamePin, newAdmin) => {
-//       if (newGamePin === gamepin) {
-//           adminAssigned = true;
-//           if (newAdmin === userName) {
-//               console.log("Admin returned for the same game.");
-//           } else {
-//               io.to(gamePin).emit("newAdmin", newAdmin);
-//               console.log(`New admin ${newAdmin} assigned for gamePin: ${gamePin}`);
-//           }
-//       }
-//   });
 //   setTimeout(() => {
-//     if (gamePin) { // Ensure gamePin is still valid
-//         io.to(gamePin).emit("adminLeft", { message: "Admin has left the game." });
-//         console.log(`Notified gamePin: ${gamePin} that admin has left.`);
+//     if (!adminRejoined) {
+//         console.log(`No admin rejoined. Deleting game for gamepin: ${gamePin}`);
+//         data.deleteGame(gamePin); // Delete the game if no admin rejoined
 //     } else {
-//         console.error("gamePin is undefined when attempting to emit 'adminLeft'.");
+//         console.log(`Gamepin ${gamePin} continues with a new admin.`);
 //     }
-// }, 5000);
+// }, 10000); 
 
-//     // Wait for one minute before checking if a new admin was assigned
-//     setTimeout(() => {
-//         if (!adminAssigned) {
-//           if (gamePin) {
-//             io.to(gamePin).emit("deletingGame");
-//             data.deleteGame(gamePin);
-//             console.log(`Game deleted for gamePin: ${gamePin}`);
-//         } else {
-//             console.error("gamePin is undefined when attempting to delete the game.");
-//         }
-//         } else {
-//             console.log(`Gamepin ${gamepin} continues with a new admin.`);
-//         }
-//     }, 60000); // 60000 ms = 1 minute
-    //  });
+
+// });
+
 }
 
 

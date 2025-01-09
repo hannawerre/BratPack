@@ -76,8 +76,6 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
 
 Data.prototype.storeGameDataAndStart = function (gameData){
   // Update the gameData and set gameStarted = true
-  // console.log("gamedata:",gameData);
-  // console.log("this.customgames",this.customGames)
  
   // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
   this.customGames[gameData.gamePin].participants = gameData.participants;
@@ -87,7 +85,7 @@ Data.prototype.storeGameDataAndStart = function (gameData){
   
   
 
-  console.log("Reached to data.storeGameData with current customGames: ", this.customGames[gameData.gamePin]);
+  console.log("Reached to data.storeGameDataAndStart with current customGames: ", this.customGames[gameData.gamePin]);
   
 };
 
@@ -438,6 +436,16 @@ Data.prototype.saveQuestions = function(gamePin, customQuestions, whichQuiz) {
 Data.prototype.deleteGame = function(gamePin) {
   console.log("Deleting game with pin: ", gamePin);
 
+  console.log("this.customGames before deletion", this.customGames)
+
+  if (this.customGames[gamePin]) {
+    delete this.customGames[gamePin];
+    console.log("Updated customGames:", this.customGames);
+  } else {
+    console.error("No game found for index:", gamePin);
+}
+  
+  
 }
 
 
