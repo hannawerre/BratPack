@@ -160,12 +160,17 @@ button:hover {
 }
 
 .waitingRoom div{
-  background-color: #ff8c42;
+  background-color: var(--our-orange);
   border-radius: 15px;
   border: 4px solid #da6822;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
   width: 20%;
   margin: 5% 0% 0% 40%
+}
+
+.waitingRoom li{ /* vill ha som i customGamesView men de fungrar ej*/
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border-orange);
 }
 
 </style>

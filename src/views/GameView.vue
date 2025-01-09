@@ -1,34 +1,47 @@
 <template>
-  <div v-if="!activeGame">
-     
-      <p>{{ this.gamePin }}</p>
-      <p>{{ this.userName }}</p>
-      <p>{{ this.gameData }}</p>
+        <Nav :hideNav="false"
+    :gamePin="gamePin"
+    @language-changed="handleLanguageChange">
+    </Nav>
+    <div v-if="!activeGame">
+        <TimerComponent/>
+        <p>{{ this.gamePin }}</p>
+        <p>{{ this.userName }}</p>
+        <p>{{ this.gameData }}</p>
 
+        <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
+            <div>
+                <span>{{ participant.name }}</span>
+                <span v-if="participant.isAdmin">(Admin)</span>
+            </div>
+  <!-- Visa bara knapparna om detta är den inloggade användarens namn OCH om den är admin -->
+            <div v-if="participant.name === this.userName && participant.isAdmin">
+                <button
+                    v-for="gameName in gameData.selectedGames"
+                    :key="gameName"
+                    class="game-button"
+                    @click="playMiniGame(gameName)"
+                    >
+                        {{ gameName }}
+                </button>
+            </div>
+        </div>
 
-      <div class="button-container">
-              <!-- Här skapas play-knappar för de valda spelen /theo -->
-              <button
-              v-for="game in gameData.selectedGames"
-              :key="game"
-              class="game-button"
-              @click="playMiniGame(game)"
-          >
-              {{game}}   
-          </button>
-      </div>
-  </div>
+        
 
+        
+    </div>
 
   <div v-else>
       <component
           :is="getActiveComponent"
           :gameData="gameData"
           :gamePin="gamePin"
+          :uiLabels="uiLabels"
+            :isAdmin="isAdmin"
          
      />
-      <!-- Ta bort raden nedan när spelet fungerar -->
-      <p>Active Component: {{ getActiveComponent }}</p>
+
 
 
   </div>
@@ -43,124 +56,79 @@
 
 
 <script>
-  import io from 'socket.io-client';
-  const socket = io("localhost:3000");
-  
+const socket = io("localhost:3000");
+import io from 'socket.io-client';  // kanske behövs /sebbe 
+import Nav from '@/components/ResponsiveNav.vue'
 import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
 import WhosMostLikelyToComponent from '../components/WhosMostLikelyToComponent.vue';
-//import MusicQuizComponent from '../components/MusicQuizComponent.vue';
-//import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
+import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
 
 
-  export default{
-      name: 'GameView',
-      components: {
-          GeneralQuizComponent,
-          WhosMostLikelyToComponent
-          //MusicQuizComponent,
-          //ThisOrThatComponent
+    export default{
+        name: 'GameView',
+        components: {
+            GeneralQuizComponent,
+            WhosMostLikelyToComponent,
+            ThisOrThatComponent,
+            Nav
+        },
+        data: function(){
+            return {
+                gamePin: '',
+                userName: '',
+                gameData: {},
+                uiLabels: {},
+                activeGame: null,
+                isAdmin: false
+            }
+        },
+        created: function() {
+            socket.on( "uiLabels", labels => this.uiLabels = labels );
+            socket.on('updateGameData', gameData => {
+                this.gameData = gameData;
+                console.log("Updated gameData to: ", this.gameData)
+                this.determineAdminStatus();
+            });
+            
+            socket.on("newStatement", (newStatement) => {
+            console.log("Received new statement:", newStatement);
+            this.nextMiniGame(); // Återställ och starta om minispel
+            });
 
+            this.setup();
+            // This will ensure the client will listen to messages emitted to the socket room. :)
+            socket.emit('joinSocketRoom', this.gamePin);
+            socket.emit( "getUILabels", this.lang );
+        },
+        mounted: function() {
+            socket.emit('updateAllGameData', this.gamePin);
+            console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin)
 
-      },
-      data()  {
-          return {
-              
-              gamePin: this.$route.params.gamePin || '',
-              userName: '',
-              gameData: {},
-              activeGame: null
-          };
-      },
-      created() {
-  
-  socket.on('updateGameData', (gameData) => {
-    this.gameData = gameData;
-    console.log("Updated gameData to: ", this.gameData);
-  });
+        },
+        methods: {
+            setup: function(){
+                this.gamePin = this.$route.params.gamePin;
+                this.userName = sessionStorage.getItem('userName');
+                socket.emit('requestGameData', this.gamePin);
+            },
+            determineAdminStatus () {
+                const user = this.gameData.participants?.find(p=> p.name === this.userName)
+                this.isAdmin = user ? user.isAdmin : false;
+            },
 
-  socket.on("newStatement", (newStatement) => {
-    console.log("Received new statement:", newStatement);
-    this.nextMiniGame(); // Återställ och starta om minispel
-  });
+            playMiniGame: function(game){
+                if(this.isAdmin){
+                    socket.emit("startMiniGame", {
+                        gameName: game, 
+                        gamePin: this.gamePin
+                })}
+                //socket.emit(miniGameStarted, gameid) ?? 
+                // på något sätt få varje spels komponent aktiverad
+                //theo
+            }
 
-  this.setup();
-  // Ensure the client listens to messages emitted to the socket room
-  socket.emit('joinSocketRoom', this.gamePin);
-},
-
-      
-      mounted() {
-  // Kontrollera om gamePin finns
-  if (!this.gamePin) {
-      console.warn("gamePin saknas i props. Försöker hämta från localStorage...");
-
-
-      // Försök hämta från localStorage
-      const storedGamePin = localStorage.getItem("gamePin");
-
-
-      if (storedGamePin) {
-          console.log("Hittade gamePin i localStorage:", storedGamePin);
-          this.gamePin = storedGamePin; // Sätt gamePin från localStorage
-      } else {
-          console.error("gamePin saknas både i props och localStorage! Applikationen kanske inte fungerar korrekt.");
-          return; // Avbryt om inget gamePin finns
-      }
-  }
-
-
-  // Skicka gamePin till servern för att uppdatera gameData
-  socket.emit('updateAllGameData', this.gamePin);
-  console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin);
-},
-
-
-      methods: {
-          
-          setup(){
-              this.gamePin = this.$route.params.gamePin;
-              this.userName = sessionStorage.getItem('userName');
-              socket.emit('requestGameData', this.gamePin);
-          },
-
-
-          playMiniGame(game){
-              console.log("button clicked, selcted game:", game); // Logga vilket spel som valts
-              this.activeGame = game;
-              //socket.emit(miniGameStarted, gameid) ??
-              // på något sätt få varje spels komponent aktiverad
-              //theo
-              console.log("Active game set to:", this.activeGame);
-          },
-          nextMiniGame() {
-  const activeGame = this.activeGame;
-  this.activeGame = null; // Återställ
-  setTimeout(() => {
-    this.activeGame = activeGame; // Starta om samma minispel
-  }, 100); // Ge Vue tid att uppdatera
-}
-
-
-
-      },
-      computed: {
-          getActiveComponent(){
-
-
-              const gameMap = {
-                  "General Quiz": 'GeneralQuizComponent',
-                  "Who's most likely": 'WhosMostLikelyToComponent'
-                  //'Music quiz': 'MusicQuizComponent',
-                  //'This or that': 'ThisOrThatComponent'
-              };
-              console.log(  "Active game:", this.activeGame);
-              return gameMap[this.activeGame]|| null;
-          }
-
-
-      }
-  };
-
+        }
+    }
 
 </script>
 

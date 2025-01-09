@@ -55,157 +55,143 @@
        :GameName="currentGame ? currentGame.name : ''"
        @modal-closed="onModalClosed"
   />
-  
-  
-   <div class="startbutton-container">
-       <button class="startbutton" @click="startGame">Start Game</button>
-   </div>
+
+  <div class="startbutton-container">
+      <button class="startbutton" @click="startGame">Start Game</button>
   </div>
-   <div class="participants">
-     <h2>Participants</h2>
-     <ul>
-       <li v-for="(participant, index) in participants" :key="index">
-         {{ participant}}
-       </li>
-  
-  
-     </ul>
-  
-  
-   </div>
-   </div>
-  </template>
-  
-  
-  <script>
-  import io from 'socket.io-client';  
-  import EditQuiz1Component from '../components/EditQuiz1Component.vue';
-  import EditQuiz2Component from '../components/EditQuiz2Component.vue';
-  import EditQuiz3Component from '../components/EditQuiz3Component.vue';
-  import EditQuiz4Component from '../components/EditQuiz4Component.vue';
-  
-  
-  const socket = io("localhost:3000");
-  
-  
-  export default {
-  name: 'CustomGames',
-  components: {
-   EditQuiz1Component,
-   EditQuiz2Component,
-   EditQuiz3Component,
-   EditQuiz4Component
+</div>
+  <div class="participants">
+    <h2>Participants</h2>
+    <ul>
+        <li v-for="(participant, index) in participants" :key="index">
+          <strong>{{ participant.name }}</strong> 
+          <span v-if="participant.isAdmin && participant.isPlaying">: Admin & Playing</span>
+          <span v-else-if="participant.isAdmin">: Admin</span>
+          <span v-else-if="participant.isPlaying">- Playing</span>
+          <span v-else>- Spectator</span>
+      </li>
+
+    </ul>
+
+  </div>
+  </div>
+</template>
+
+<script>
+import io from 'socket.io-client';   
+import EditQuiz1Component from '../components/EditQuiz1Component.vue';
+import EditQuiz2Component from '../components/EditQuiz2Component.vue';
+import EditQuiz3Component from '../components/EditQuiz3Component.vue';
+import EditQuiz4Component from '../components/EditQuiz4Component.vue';
+
+const socket = io("localhost:3000");
+
+export default {
+name: 'CustomGames',
+components: {
+  EditQuiz1Component,
+  EditQuiz2Component,
+  EditQuiz3Component,
+  EditQuiz4Component
+},
+data: function() {
+  return {
+    lang:'en',
+    selectedMinutes: 60,
+    games: [
+      { id: 'General Quiz', name: 'Quiz 1'} ,
+      { id: "Who's most likely', name: 'Quiz 2"},
+      { id: 'Music quiz', name: 'Quiz 3'},
+      { id: 'This or that', name: 'Quiz 4'}
+    ],
+    selectedGames: [],
+    participants: [],
+    gamePin: '',
+    currentGame: null,
+  };
+},
+
+created: function () {
+  socket.on("updateGameData", function(gameData) {
+    this.selectedGames = gameData.selectedGames;
+    this.participants = gameData.participants;
+    this.selectedMinutes = gameData.selectedMinutes;
+    console.log("Updated gameData to: ", this.participants)
+  })
+
+  if (!this.$route.params.gamePin) { 
+    socket.on('gameCreated', pin => {
+      this.gamePin = pin
+      socket.emit('joinCustomGame', pin); 
+      this.$router.replace({ path: `/customgames/${pin}` });
+    });
+    console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
+    socket.emit("createGame", this.lang);
+    console.log("Emitted createGame from CustomGamesView.vue")
+  } else { 
+    console.log("Insde else-statement with participants: ", this.participants)
+    this.gamePin = this.$route.params.gamePin;
+    console.log("GamePin: ", this.gamePin);
+    socket.emit("joinCustomGame",this.gamePin);
+    socket.emit("requestGameData", this.gamePin);
+  };
+
+  socket.on('participantsUpdate', participants => {
+    this.participants = participants;
+    console.log("Active participants: ", this.participants);
+  });
+  socket.emit("requestParticipants", this.gamePin);
+},
+methods: {
+
+  incrementMinutes: function() {
+    this.selectedMinutes += 10;
   },
-  data: function() {
-   return {
-     lang:'en',
-     selectedMinutes: 60,
-     games: [
-       { id: 'General Quiz', name: 'Quiz 1'} ,
-       { id: "Who's most likely", name: 'Quiz 2'}, // 26/12 testar att ha rak apostrof och dubbel citationstecken, var tvärtom förut
-       { id: 'Music quiz', name: 'Quiz 3'},
-       { id: 'This or that', name: 'Quiz 4'}
-     ],
-     selectedGames: [],
-     participants: [],
-     gamePin: '',
-     currentGame: null,
-   };
+
+  decrementMinutes: function () {
+    if(this.selectedMinutes > 10){
+      this.selectedMinutes -= 10;
+    }
   },
-  
-  
-  created: function () {
-   socket.on("updateGameData", function(gameData) {
-     this.selectedGames = gameData.selectedGames;
-     this.participants = gameData.participants;
-     this.selectedMinutes = gameData.selectedMinutes;
-     console.log("Updated gameData to: ", this.participants)
-   })
-  
-  
-   if (!this.$route.params.gamePin) {
-     socket.on('gameCreated', pin => {
-       this.gamePin = pin
-       socket.emit('joinCustomGame', pin);
-       this.$router.replace({ path: `/customgames/${pin}` });
-     });
-     console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
-     socket.emit("createGame", this.lang);
-     console.log("Emitted createGame from CustomGamesView.vue")
-   } else {
-     console.log("Insde else-statement with participants: ", this.participants)
-     this.gamePin = this.$route.params.gamePin;
-     console.log("GamePin: ", this.gamePin);
-     socket.emit("joinCustomGame",this.gamePin);
-     socket.emit("requestGameData", this.gamePin);
-   };
-  
-  
-   socket.on('participantsUpdate', participants => {
-     this.participants = participants;
-     console.log("Active participants: ", this.participants);
-   });
-  },
-  methods: {
-  
-  
-   incrementMinutes: function() {
-     this.selectedMinutes += 10;
-   },
-  
-  
-   decrementMinutes: function () {
-     if(this.selectedMinutes > 10){
-       this.selectedMinutes -= 10;
-     }
-   },
-  
-  
-   startGame: function () {
-     if (this.selectedGames.length === 0) {
-       alert("Please select at least one game.");
-       return;
-     }
-  
-  
-     if (this.participants.length === 0) {
-       alert("No players have joined yet.");
-       return;
-     }
-  
-  
-     
-     let countDownDate = Date.now() + this.selectedMinutes * 60 * 1000;
-  
-  
-     const interval = setInterval(() => {
-         const now = Date.now();
-         const distance = countDownDate - now;
-  
-  
-         if (distance <= 0) {
-             clearInterval(interval);
-             socket.emit('update-timer', {
-                 timerDisplay: "Tiden är slut!",
-                 soundType: "alarm"
-             });
-             return;
-         }
-  
-  
-         const totalSeconds = Math.floor(distance / 1000);
-         const minutes = Math.floor(totalSeconds / 60);
-         const seconds = totalSeconds % 60;
-  
-  
-         socket.emit('update-timer', {
-             timerDisplay: `${minutes}m ${seconds}s`,
-             soundType: totalSeconds % 60 === 0 ? "alarm" : null
-         });
-     }, 1000);
-  
-  
-     console.log("Timer startad i CustomGameView för test.");
+
+  startGame: function () {
+    if (this.selectedGames.length === 0) {
+      alert("Please select at least one game.");
+      return;
+    }
+
+    if (this.participants.length === 0) {
+      alert("No players have joined yet.");
+      return;
+    }
+
+    // Simulera timerstart lokalt för teständamål
+    let countDownDate = Date.now() + this.selectedMinutes * 60 * 1000;
+
+    const interval = setInterval(() => {
+        const now = Date.now();
+        const distance = countDownDate - now;
+
+        if (distance <= 0) {
+            clearInterval(interval);
+            socket.emit('update-timer', {
+                timerDisplay: "Tiden är slut!",
+                soundType: "alarm"
+            });
+            return;
+        }
+
+        const totalSeconds = Math.floor(distance / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        socket.emit('update-timer', {
+            timerDisplay: `${minutes}m ${seconds}s`,
+            soundType: totalSeconds % 60 === 0 ? "alarm" : null
+        });
+    }, 1000);
+
+    console.log("Timer startad i CustomGameView för test.");
     
      let gameData = {  // borde den inte vara const? /theo
        gamePin: this.gamePin,
@@ -259,158 +245,140 @@
      justify-content: space-between;
      padding: 20px;
     
-   }
-  
-  
-   .main-content {
-     flex: 1;
-     text-align: center;
   }
-  
-  
-  
-  
-  .decrement-button{
-   background-color: rgb(213, 8, 8);
-   border: none;
-   border-radius: 4px;
-   color: white;
-   cursor: pointer;
-   height: 30px;
-   width: 30px;
-  }
-  
-  
-  .decrement-button:hover{
-   background-color: rgb(247, 44, 44);
-   box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
-   transform: scale(1.05);
-  }
-  .increment-button{
-   background-color: green;
-   border: none;
-   border-radius: 4px;
-   color: white;
-   cursor: pointer;
-   height: 30px;
-   width: 30px;
-  }
-  
-  
-  .increment-button:hover{
-   background-color: rgb(8, 179, 8);
-   box-shadow: 0 0 5px 2px rgba(8, 179, 8, 0.5);
-   transform: scale(1.05);
-  }
-  
-  
-  .startbutton{
-   background-color: green;
-   border: none;
-   border-radius: 6px;
-   color: white;
-   cursor: pointer; 
-   display: inline-block;
-   font-size: 16px;
-   margin: 30px 4px;
-   padding: 15px;
-   text-align: center;
-   text-decoration: none; 
-   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  
-  .startbutton:hover{
-   background-color: rgb(8, 179, 8);
-   box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5);
-   transform: scale(1.05);
-  }
-  
-  
-  .game-item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  }
-  
-  
-  .game-item label {
-  margin-left: 10px;
-  margin-right: 20px;
-  font-weight: bold;
-  }
-  
-  
-  .edit-button {
-  display: inline-block;
-  background-color: rgb(183, 183, 183);
-  color: white;
+
+  .main-content {
+    flex: 1;
+    text-align: center;
+}
+
+
+.decrement-button{
+  background-color: rgb(213, 8, 8);
   border: none;
-  border-radius: 40px;
-  padding: 6px 8px;
-  text-align: center;
-  text-decoration: none;
-  font-size: 14px;
+  border-radius: 4px;
+  color: white;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  
-  .edit-button:hover {
-  background-color: rgb(170, 168, 168);
-  transform: scale(1.02);
-  box-shadow: 0 0 5px 2px  rgba(0, 0, 0, 0.5);
-  }
-  
-  
-  .edit-button:active {
-  transform: scale(1);
-  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.5);
-  }
-  .edit-icon {
-  width: 30px;
   height: 30px;
-  vertical-align: middle;
+  width: 30px;
+}
+
+.decrement-button:hover{
+  background-color: rgb(247, 44, 44);
+  box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
+  transform: scale(1.05);
+}
+.increment-button{
+  background-color: green;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+}
+
+.increment-button:hover{
+  background-color: rgb(8, 179, 8);
+  box-shadow: 0 0 5px 2px rgba(8, 179, 8, 0.5);
+  transform: scale(1.05);
+}
+
+.startbutton{
+  background-color: green;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;  
+  display: inline-block;
+  font-size: 16px;
+  margin: 30px 4px;
+  padding: 15px;
+  text-align: center;
+  text-decoration: none;  
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.startbutton:hover{
+  background-color: rgb(8, 179, 8);
+  box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5); 
+  transform: scale(1.05);
+}
+
+.game-item {
+display: flex;
+justify-content: center; 
+align-items: center; 
+margin-bottom: 20px; 
+}
+
+.game-item label {
+margin-left: 10px; 
+margin-right: 20px; 
+font-weight: bold;
+}
+
+.edit-button {
+display: inline-block;
+background-color: rgb(183, 183, 183);
+color: white;
+border: none;
+border-radius: 40px;
+padding: 6px 8px;
+text-align: center;
+text-decoration: none;
+font-size: 14px;
+cursor: pointer;
+transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.edit-button:hover {
+background-color: rgb(170, 168, 168);
+transform: scale(1.02);
+box-shadow: 0 0 5px 2px  rgba(0, 0, 0, 0.5);
+}
+
+.edit-button:active {
+transform: scale(1);
+box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.5);
+}
+.edit-icon {
+width: 30px; 
+height: 30px; 
+vertical-align: middle; 
+}
+
+input[type="checkbox"] {  
+      width: 20px;
+      height: 20px;
   }
-  
-  
-  input[type="checkbox"] { 
-       width: 20px;
-       height: 20px;
-   }
-  
-  
-   .participants {
-     flex: 0 0 auto;
-     border: 1px solid #ccc;
-     border-radius: 8px;
-     padding: 15px;
-     background-color: lightblue;
-     position: absolute;
-     right: 0;
-     margin-right: 40px;
-     margin-top: 40px;
-     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
-  
-  
+
+  .participants {
+    flex: 0 0 auto;
+    border: 4px solid var(--border-orange);
+    border-radius: 8px;
+    padding: 15px;
+    background-color: var(--our-orange);
+    position: absolute;
+    right: 0;
+    margin-right: 40px;
+    margin-top: 40px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+
+}
+
+  .participants h2{
+    text-align: center;
+    margin-bottom: 10px;
   }
-  
-  
-   .participants h2{
-     text-align: center;
-     margin-bottom: 10px;
-   }
-  
-  
-   .participants ul{
-     list-style-type: none;
-     padding: 0;
-   }
-  
-  
-   .participants li{
-     padding: 5px 0;
-     border-bottom: 1px solid #ddd;
-   }
-  </style>
+
+  .participants ul{
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .participants li{
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-orange);
+  }
+</style>

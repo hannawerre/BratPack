@@ -1,0 +1,164 @@
+{
+    "questions": [
+        {
+            "id": 1,
+            "question": "Burger or Pizza?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Burger",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Pizza",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "question": "Coffee or Tea?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Coffee",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Tea",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "question": "Cats or Dogs?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Cats",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Dogs",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "question": "Beach or Mountains?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Beach",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Mountains",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "question": "Summer or Winter?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Summer",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Winter",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "question": "Books or Movies?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Books",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Movies",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "question": "Android or iOS?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Android",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "iOS",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "question": "Chocolate or Vanilla?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Chocolate",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Vanilla",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "question": "Morning or Night?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "Morning",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Night",
+                    "isCorrect": false
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "question": "City or Countryside?",
+            "answers": [
+                {
+                    "id": 1,
+                    "answer": "City",
+                    "isCorrect": false
+                },
+                {
+                    "id": 2,
+                    "answer": "Countryside",
+                    "isCorrect": false
+                }
+            ]
+        }
+    ]
+}
