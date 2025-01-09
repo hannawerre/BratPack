@@ -31,9 +31,10 @@
 
   <!-- Modal-komponenter med unika ref -->
   <EditQuiz1Component 
-      ref="modalQuiz1" 
+      ref="modalGeneralQuiz" 
       :GameName="currentGame ? currentGame.name : ''"
       @modal-closed="onModalClosed"
+      @questions-saved-generalQuiz="onQuestionsSaved"
   />
    <EditQuiz2Component
        ref="modalQuiz2"
@@ -51,9 +52,13 @@
        @modal-closed="onModalClosed"
   />
 
-  <div>
-      <button class="button green" @click="startGame">Start Game</button>
+  <div class="startbutton-container">
+      <button class="startbutton" @click="startGame">Start Game</button> <!-- should be button green fix this-->
+      <button class="startbutton" @click="unactiveGame">Unactive Game</button>
+      <button class="startbutton" @click="updateSettings">Update Info</button>
+      <button class="startbutton" @click="logGameData">logGameData</button>
   </div>
+
 </div>
   <div class="participants">
     <h2>Participants</h2>
@@ -94,53 +99,82 @@ data: function() {
     lang:'en',
     selectedMinutes: 60,
     games: [
-      { id: 'General Quiz', name: 'Quiz 1'} ,
-      { id: "Who's most likely', name: 'Quiz 2"},
-      { id: 'Music quiz', name: 'Quiz 3'},
-      { id: 'This or that', name: 'Quiz 4'}
+      // { id: 'General Quiz', name: 'Quiz 1'} ,
+      // { id: 'Who´s most likely', name: 'Quiz 2'},
+      // { id: 'Music quiz', name: 'Quiz 3'},
+      // { id: 'This or that', name: 'Quiz 4'}
+      { id: 'generalQuiz', name: 'General Quiz'} ,
+      { id: 'Quiz2', name: 'Who´s most likely'},
+      { id: 'Quiz3', name: 'Music quiz'},
+      { id: 'ThisOrThat', name: 'This or that'}
     ],
     selectedGames: [],
     participants: [],
     gamePin: '',
-    currentGame: null,
+    currentGame: null, // Används denna? /sebbe
+    customQuestions:{},
+    useStandardQuestions: true,
+    useOwnQuestions: false,
+    active: true, // Används denna? /sebbe
+    userName: ''
+
   };
 },
 
 created: function () {
-  socket.on("updateGameData", function(gameData) {
-    this.selectedGames = gameData.selectedGames;
-    this.participants = gameData.participants;
-    this.selectedMinutes = gameData.selectedMinutes;
-    console.log("Updated gameData to: ", this.participants)
-  })
-
-  if (!this.$route.params.gamePin) { 
-    socket.on('gameCreated', pin => {
-      this.gamePin = pin
-      socket.emit('joinCustomGame', pin); 
-      this.$router.replace({ path: `/customgames/${pin}` });
-    });
-    console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
-    socket.emit("createGame", this.lang);
-    console.log("Emitted createGame from CustomGamesView.vue")
-  } else { 
-    console.log("Insde else-statement with participants: ", this.participants)
-    this.gamePin = this.$route.params.gamePin;
+  this.gamePin = this.$route.params.gamePin;
     console.log("GamePin: ", this.gamePin);
     socket.emit("joinCustomGame",this.gamePin);
+    socket.on("updateGameData", (gameData) => {
+      if (gameData.selectedGames && gameData.selectedGames.length > 0) {
+        this.selectedGames = gameData.selectedGames;
+    }
+    /*if (gameData.customQuestions && gameData.customQuestions.length > 0) {
+        this.customQuestions = gameData.customQuestions;
+    }*/
+    if (gameData.useStandardQuestions) {
+        this.useStandardQuestions = gameData.useStandardQuestions;
+    }
+    if (gameData.customQuestions && gameData.customQuestions.length > 0) {
+        this.customQuestions = gameData.customQuestions;
+    }
+
+    this.participants = gameData.participants;
+    this.selectedMinutes = gameData.selectedMinutes;
+    console.log("Updated gameData, participants: ", this.participants);
+    this.userName = this.participants[0]
+    console.log("Username: ", this.userName);
+
+    
+  });
+
+  
+    console.log("Insde else-statement with participants: ", this.participants)
     socket.emit("requestGameData", this.gamePin);
   };
 
-  socket.on('participantsUpdate', participants => {
+    socket.on('participantsUpdate', participants => {
     this.participants = participants;
     console.log("Active participants: ", this.participants);
+    
+  });
+  socket.on('lobbyUnactive',(gamePin) => {
+    console.log("Unactivating lobby", gamePin);
+
+    participants.forEach(participant => {
+    console.log(`Participant: ${participant.name}, isPlaying: ${participant.isPlaying}`);
+  });
   });
   socket.emit("requestParticipants", this.gamePin);
+
+  socket.emit("adminRejoined", (this.gamePin))
+  console.log("adminRejoined",this.gamePin, this.userName)
 },
 methods: {
 
   incrementMinutes: function() {
     this.selectedMinutes += 10;
+    console.log(this.participants);
   },
 
   decrementMinutes: function () {
@@ -159,86 +193,138 @@ methods: {
       alert("No players have joined yet.");
       return;
     }
-
-    // Simulera timerstart lokalt för teständamål
-    let countDownDate = Date.now() + this.selectedMinutes * 60 * 1000;
-
-    const interval = setInterval(() => {
-        const now = Date.now();
-        const distance = countDownDate - now;
-
-        if (distance <= 0) {
-            clearInterval(interval);
-            socket.emit('update-timer', {
-                timerDisplay: "Tiden är slut!",
-                soundType: "alarm"
-            });
-            return;
-        }
-
-        const totalSeconds = Math.floor(distance / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-
-        socket.emit('update-timer', {
-            timerDisplay: `${minutes}m ${seconds}s`,
-            soundType: totalSeconds % 60 === 0 ? "alarm" : null
-        });
-    }, 1000);
-
-    console.log("Timer startad i CustomGameView för test.");
     
-     let gameData = {  // borde den inte vara const? /theo
-       gamePin: this.gamePin,
-       selectedGames: this.selectedGames,
-       participants: this.participants,
-       selectedMinutes: this.selectedMinutes
-       //lang: this.lang    språk sparas i gameData eller localStorage?
-     }
-  
-  
-     socket.emit('startGame', gameData)
-     this.$router.push("/game/" + this.gamePin)
-     // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
-     // this.$router.push({
-     //   name: 'GameView',
-     //   params: { gamePin }
-     // });
-     console.log("--> After startGame!")
-   },
-  
-  
-   openModal(game) {
-     this.currentGame = game;
-     // Öppna rätt modal baserat på vilken quiz det är
-     if (game.name === 'Quiz 1') {
-       this.$refs.modalQuiz1.openModal();
-     } else if (game.name === 'Quiz 2') {
-       this.$refs.modalQuiz2.openModal();
-     } else if (game.name === 'Quiz 3') {
-       this.$refs.modalQuiz3.openModal();
-     } else if (game.name === 'Quiz 4') {
-       this.$refs.modalQuiz4.openModal();
-     }
-   },
-  
-  
-   onModalClosed() {
-     console.log('Modalen är stängd');
-     this.currentGame = null;
-   }
+    let gameData = {  // borde den inte vara const? /theo
+      gamePin: this.gamePin,
+      selectedGames: this.selectedGames,
+      participants: this.participants,
+      selectedMinutes: this.selectedMinutes
+      //lang: this.lang språk sparas i gameData eller localStorage?
+    }
+
+    socket.emit('startGame', gameData)
+    this.$router.push("/game/" + this.gamePin)
+    // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
+    // this.$router.push({
+    //   name: 'GameView',
+    //   params: { gamePin }
+    // });
+    console.log("--> After startGame!")
+  },
+
+  openModal(game) {
+    this.currentGame = game;
+    // Öppna rätt modal baserat på vilken quiz det är
+    if (game.id === 'generalQuiz') {
+      this.$refs.modalGeneralQuiz.openModal();
+    } else if (game.id === 'Quiz2') {
+      this.$refs.modalQuiz2.openModal();
+    } else if (game.id === 'Quiz3') {
+      this.$refs.modalQuiz3.openModal();
+    } else if (game.id === 'Quiz4') {
+      this.$refs.modalQuiz4.openModal();
+    }
+
+
+  },
+
+  onModalClosed() {
+    console.log('Modalen är stängd');
+    
+    this.currentGame = null;
+  },
+
+  onQuestionsSaved(customQuestions, useStandardQuestions, useOwnQuestions, quiz) { // kanske kan skriva ihop denna med onModalClosed? //david
+    if (!this.customQuestions[quiz]) {
+    this.customQuestions[quiz] = {};
   }
-  }
-  </script>
-  
-  
-  <style>
-   .container {
-     align-items: flex-start;
-     display: flex;
-     gap: 20px;
-     justify-content: space-between;
-     padding: 20px;
+
+  this.customQuestions[quiz].customQuestions = customQuestions;
+  this.customQuestions[quiz].useStandardQuestions = useStandardQuestions;
+  this.customQuestions[quiz].useOwnQuestions = useOwnQuestions;
+  console.log("Theo loggar: custom questions objektet för quiz", quiz,  this.customQuestions[quiz])
+  console.log(
+    'Questions received from child:',
+    quiz
+    
+    /*this.customQuestions[quiz].customQuestions,
+    this.customQuestions[quiz].useStandardQuestions,
+    this.customQuestions[quiz].useOwnQuestions,
+    this.customQuestions */
+  );
+
+  socket.emit(
+    "savedQuestionsToServer", 
+    this.gamePin, 
+    this.customQuestions, 
+    quiz
+  );
+},
+
+  handleWindowClose(event) {
+      console.log("Admin window closed! unactivating lobby")
+      socket.emit("adminLeftGame", this.gamePin, this.userName);
+    },
+
+  checkIfRefreshPage() {
+    // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
+      let storagePin = sessionStorage.getItem('gamePin');
+      if (storagePin) {
+        
+        this.gamePin = storagePin;
+        socket.emit("requestParticipants", this.gamePin);
+        
+      }
+    console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
+    },
+
+    updateSettings: function() {
+      console.log("Pressed update info button");
+      
+      let gameData = {
+        gamePin: this.gamePin,
+        selectedGames: this.selectedGames,
+        participants: this.participants,
+        selectedMinutes: this.selectedMinutes,
+        customQuestions: this.customQuestions,
+        useStandardQuestions: this.useStandardQuestions,
+        useOwnQuestions: this.useOwnQuestions
+      }
+      console.log("gameData: ", gameData);
+      socket.emit('updateSettings', gameData);
+    },
+    deleteGame: function() {
+      console.log("Pressed delete game button");
+      socket.emit('deleteGame', this.gamePin);
+    },
+    unactiveGame: function() {
+      console.log("Pressed unactive game button");
+      socket.emit('unactiveLobby', this.gamePin);
+    },
+    logGameData: function() {
+      console.log("Pressed log game data button");
+      socket.emit('requestGameData', this.gamePin);
+      console.log("Game data: ", this.gamePin, this.selectedGames, this.participants, this.selectedMinutes, this.customQuestions, this.useStandardQuestions, this.useOwnQuestions, this.active);
+    }
+  },
+mounted() {
+    window.addEventListener("beforeunload", this.handleWindowClose);
+    this.checkIfRefreshPage();
+  },
+beforeDestroy() {
+    window.removeEventListener("beforeunload", this.handleWindowClose);
+  },
+}
+</script>
+
+
+<style>
+  .container {
+    align-items: flex-start;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    padding: 20px;
     
   }
 
@@ -247,6 +333,57 @@ methods: {
     text-align: center;
 }
 
+.decrement-button{
+  background-color: rgb(213, 8, 8);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+}
+
+.decrement-button:hover{
+  background-color: rgb(247, 44, 44);
+  box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
+  transform: scale(1.05);
+}
+.increment-button{
+  background-color: green;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+}
+
+.increment-button:hover{
+  background-color: rgb(8, 179, 8);
+  box-shadow: 0 0 5px 2px rgba(8, 179, 8, 0.5);
+  transform: scale(1.05);
+}
+
+.startbutton{
+  background-color: green;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;  
+  display: inline-block;
+  font-size: 16px;
+  margin: 30px 4px;
+  padding: 15px;
+  text-align: center;
+  text-decoration: none;  
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.startbutton:hover{
+  background-color: rgb(8, 179, 8);
+  box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5); 
+  transform: scale(1.05);
+}
 
 .game-item {
 display: flex;

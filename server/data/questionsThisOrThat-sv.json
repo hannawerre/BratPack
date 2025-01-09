@@ -1,7 +1,7 @@
 {
     "questions": [
         {
-            "id": 1,
+            "id": 0,
             "question": "Hamburgare eller Pizza?",
             "answers": [
                 {
@@ -17,7 +17,7 @@
             ]
         },
         {
-            "id": 2,
+            "id": 1,
             "question": "Kaffe eller Te?",
             "answers": [
                 {
@@ -33,7 +33,7 @@
             ]
         },
         {
-            "id": 3,
+            "id": 2,
             "question": "Katter eller Hundar?",
             "answers": [
                 {
@@ -49,7 +49,7 @@
             ]
         },
         {
-            "id": 4,
+            "id": 3,
             "question": "Strand eller Berg?",
             "answers": [
                 {
@@ -65,7 +65,7 @@
             ]
         },
         {
-            "id": 5,
+            "id": 4,
             "question": "Sommar eller Vinter?",
             "answers": [
                 {
@@ -81,7 +81,7 @@
             ]
         },
         {
-            "id": 6,
+            "id": 5,
             "question": "Böcker eller Filmer?",
             "answers": [
                 {
@@ -97,7 +97,7 @@
             ]
         },
         {
-            "id": 7,
+            "id": 6,
             "question": "Android eller iOS?",
             "answers": [
                 {
@@ -113,7 +113,7 @@
             ]
         },
         {
-            "id": 8,
+            "id": 7,
             "question": "Choklad eller Vanilj?",
             "answers": [
                 {
@@ -129,7 +129,7 @@
             ]
         },
         {
-            "id": 9,
+            "id": 8,
             "question": "Morgon eller Kväll?",
             "answers": [
                 {
@@ -145,7 +145,7 @@
             ]
         },
         {
-            "id": 10,
+            "id": 9,
             "question": "Stad eller Landsbygd?",
             "answers": [
                 {

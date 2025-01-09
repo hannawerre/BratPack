@@ -1,17 +1,13 @@
 <template>
-        <Nav :hideNav="false"
-    :gamePin="gamePin"
-    @language-changed="handleLanguageChange">
-    </Nav>
-    <div v-if="!activeGame">
-        <TimerComponent/>
-        <p>{{ this.gamePin }}</p>
-        <p>{{ this.userName }}</p>
-        <p>{{ this.gameData }}</p>
+    <TimerComponent :gamePin="gamePin" :selectedMinutes="gameData.selectedMinutes"></TimerComponent>
+
+    <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
+
+        <ThisOrThatComponent v-if="gameData.selectedGames.includes('ThisOrThat')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
 
         <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
             <div>
-                <span>{{ participant.name }}</span>
+                <span>{{ participant.name }}</span> 
                 <span v-if="participant.isAdmin">(Admin)</span>
             </div>
   <!-- Visa bara knapparna om detta är den inloggade användarens namn OCH om den är admin -->
@@ -32,45 +28,40 @@
         
     </div>
 
-  <div v-else>
-      <component
-          :is="getActiveComponent"
-          :gameData="gameData"
-          :gamePin="gamePin"
-          :uiLabels="uiLabels"
+    <div v-else> <!--Visas bara så länge ett spel är aktiverat-->
+        <GeneralQuizComponent
+            v-if="activeGame === 'generalQuiz'"
+            :gameData="gameData"
+            :gamePin="gamePin"
+            :uiLabels="uiLabels"
             :isAdmin="isAdmin"
-         
-     />
+            :isPlaying="isPlaying"
+        />
+    </div>
 
 
-
-  </div>
-
-
-
-
- 
+    
 </template>
 
 
 
 
 <script>
-const socket = io("localhost:3000");
-import io from 'socket.io-client';  // kanske behövs /sebbe 
-import Nav from '@/components/ResponsiveNav.vue'
-import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
-import WhosMostLikelyToComponent from '../components/WhosMostLikelyToComponent.vue';
-import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
-
+    //import {socket} from '../socketClient.js';  // kanske behövs /sebbe 
+    
+    
+    const socket = io("localhost:3000");
+    import io from 'socket.io-client';  // kanske behövs /sebbe 
+    import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
+    import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
+    import TimerComponent from '../components/TimerComponent.vue';
 
     export default{
         name: 'GameView',
         components: {
             GeneralQuizComponent,
-            WhosMostLikelyToComponent,
             ThisOrThatComponent,
-            Nav
+            TimerComponent
         },
         data: function(){
             return {
@@ -78,8 +69,8 @@ import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
                 userName: '',
                 gameData: {},
                 uiLabels: {},
-                activeGame: null,
-                isAdmin: false
+                isAdmin: false,
+                isPlaying: false
             }
         },
         created: function() {
@@ -114,6 +105,7 @@ import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
             determineAdminStatus () {
                 const user = this.gameData.participants?.find(p=> p.name === this.userName)
                 this.isAdmin = user ? user.isAdmin : false;
+                this.isPlaying = user ? user.isPlaying : false;
             },
 
             playMiniGame: function(game){
