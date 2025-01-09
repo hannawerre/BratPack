@@ -1,4 +1,6 @@
 <template>
+    <TimerComponent :gamePin="gamePin" :selectedMinutes="gameData.selectedMinutes"></TimerComponent>
+
     <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
 
         <ThisOrThatComponent v-if="gameData.selectedGames.includes('ThisOrThat')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
@@ -50,12 +52,14 @@
     import io from 'socket.io-client';  // kanske behövs /sebbe 
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
+    import TimerComponent from '../components/TimerComponent.vue';
 
     export default{
         name: 'GameView',
         components: {
             GeneralQuizComponent,
-            ThisOrThatComponent         
+            ThisOrThatComponent,
+            TimerComponent
         },
         data: function(){
             return {

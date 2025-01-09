@@ -45,7 +45,6 @@
 
     <!-- Game Phase 3: Display Correct Answer -->
     <div v-if="showAnswer">
-        <p>testmest</p>
         <!-- If chosenParticipant didn't answer -->
         <h2 v-if="showChosenParticipantNoAnswer">Chosen Participant {{ this.chosenParticipant }} didn't answer</h2>
         <h2 v-else>Correct Answer: {{ questions.questions[currentQuestion-1].answers[correctAnswer-1].answer }}</h2>
@@ -77,7 +76,7 @@ const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
 
 export default {
-    name: 'GeneralQuizComponent',
+    name: 'ThisOrThatComponent',
     components: {
         QuestionComponent
     },
