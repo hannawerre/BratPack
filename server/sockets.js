@@ -27,9 +27,11 @@ function sockets(io, socket, data) {
   });
 
   // Games getQuestions
-  socket.on('getQuestions', function(lang) {
-    console.log("hämtar quiz frågor")
-    socket.emit('generalQuestions', data.getQuestions(lang))
+  socket.on('getQuestions', function(lang, gamePin, gameName) {
+    console.log("hämtar quiz frågor");
+    console.log("Lang:", lang, "GamePin:", gamePin, "GameName:", gameName);
+    console.log("Theo loggar Getquestions:", data.getQuestions(lang, gamePin, gameName))
+    socket.emit('generalQuestions', data.getQuestions(lang, gamePin, gameName))
   });
 
   // ThisOrThat -------------------------------------------------------------------
@@ -159,6 +161,7 @@ socket.on('requestGameTime', (gamePin, callback) => {
   
   socket.on("savedQuestionsToServer", function(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz) {
   data.saveQuestions(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz);
+  console.log("Theo loggar quiz:", quiz);
   });
 
   socket.on("adminLeftGame", (gamePin, userName) => {

@@ -30,7 +30,7 @@
 
     <div v-else> <!--Visas bara så länge ett spel är aktiverat-->
         <GeneralQuizComponent
-            v-if="activeGame === 'General Quiz'"
+            v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
             :gamePin="gamePin"
             :uiLabels="uiLabels"

@@ -31,10 +31,10 @@
 
   <!-- Modal-komponenter med unika ref -->
   <EditQuiz1Component 
-      ref="modalQuiz1" 
+      ref="modalGeneralQuiz" 
       :GameName="currentGame ? currentGame.name : ''"
       @modal-closed="onModalClosed"
-      @questions-saved-quiz1="onQuestionsSaved"
+      @questions-saved-generalQuiz="onQuestionsSaved"
   />
   <EditQuiz2Component 
       ref="modalQuiz2" 
@@ -105,7 +105,7 @@ data: function() {
       // { id: 'Who´s most likely', name: 'Quiz 2'},
       // { id: 'Music quiz', name: 'Quiz 3'},
       // { id: 'This or that', name: 'Quiz 4'}
-      { id: 'Quiz1', name: 'General Quiz'} ,
+      { id: 'generalQuiz', name: 'General Quiz'} ,
       { id: 'Quiz2', name: 'Who´s most likely'},
       { id: 'Quiz3', name: 'Music quiz'},
       { id: 'ThisOrThat', name: 'This or that'}
@@ -131,9 +131,9 @@ created: function () {
       if (gameData.selectedGames && gameData.selectedGames.length > 0) {
         this.selectedGames = gameData.selectedGames;
     }
-    if (gameData.customQuestions && gameData.customQuestions.length > 0) {
+    /*if (gameData.customQuestions && gameData.customQuestions.length > 0) {
         this.customQuestions = gameData.customQuestions;
-    }
+    }*/
     if (gameData.useStandardQuestions) {
         this.useStandardQuestions = gameData.useStandardQuestions;
     }
@@ -216,8 +216,8 @@ methods: {
   openModal(game) {
     this.currentGame = game;
     // Öppna rätt modal baserat på vilken quiz det är
-    if (game.id === 'Quiz1') {
-      this.$refs.modalQuiz1.openModal();
+    if (game.id === 'generalQuiz') {
+      this.$refs.modalGeneralQuiz.openModal();
     } else if (game.id === 'Quiz2') {
       this.$refs.modalQuiz2.openModal();
     } else if (game.id === 'Quiz3') {
@@ -231,6 +231,7 @@ methods: {
 
   onModalClosed() {
     console.log('Modalen är stängd');
+    
     this.currentGame = null;
   },
 
@@ -242,21 +243,21 @@ methods: {
   this.customQuestions[quiz].customQuestions = customQuestions;
   this.customQuestions[quiz].useStandardQuestions = useStandardQuestions;
   this.customQuestions[quiz].useOwnQuestions = useOwnQuestions;
-
+  console.log("Theo loggar: custom questions objektet för quiz", quiz,  this.customQuestions[quiz])
   console.log(
     'Questions received from child:',
-    quiz, 
-    this.customQuestions[quiz].customQuestions,
+    quiz
+    
+    /*this.customQuestions[quiz].customQuestions,
     this.customQuestions[quiz].useStandardQuestions,
-    this.customQuestions[quiz].useOwnQuestions
+    this.customQuestions[quiz].useOwnQuestions,
+    this.customQuestions */
   );
 
   socket.emit(
     "savedQuestionsToServer", 
     this.gamePin, 
     this.customQuestions, 
-    this.useStandardQuestions, 
-    this.useOwnQuestions, 
     quiz
   );
 },
@@ -280,6 +281,7 @@ methods: {
 
     updateSettings: function() {
       console.log("Pressed update info button");
+      
       let gameData = {
         gamePin: this.gamePin,
         selectedGames: this.selectedGames,
