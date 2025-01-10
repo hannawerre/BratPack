@@ -68,8 +68,6 @@ export default {
     participateInCustomGame: function () {
       socket.emit( "participateInCustomGame", this.gamePin, {
         name: this.userName,
-        isPlaying: true,
-        isAdmin: false,
         scoreGame1: 0,
         scoreGame2: 0,
         scoreGame3: 0,
