@@ -126,6 +126,7 @@
 
 
 <style>
+/* Styling för knappar */
   .game-button {
       width: 120px; 
       height: 50px; 

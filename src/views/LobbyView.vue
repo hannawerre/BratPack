@@ -7,9 +7,9 @@
   
   <div>
     <h3>Lobby ID: {{gamePin}}</h3>
-    <div class="usernameInput" v-if="!joined">
-      <input type="text" v-model="userName" @input=isNameTaken(userName) :placeholder=this.uiLabels.userName>
-      <button v-if="!nameTaken" v-on:click="participateInCustomGame">
+    <div class="textBox-wrapper" v-if="!joined">
+      <input class="textBox input" type="text" v-model="userName" @input=isNameTaken(userName) :placeholder=this.uiLabels.userName>
+      <button class="textBox click" v-if="!nameTaken" v-on:click="participateInCustomGame">
         {{ this.uiLabels.participateInPoll }}
       </button>
       <p v-else>
@@ -126,12 +126,13 @@ export default {
 </script>
 
 <style scoped>
+/*
 .usernameInput {
     position: fixed;  
     top: 50%;         
     left: 50%;        
     transform: translate(-50%, -50%); 
-    background-color: rgb(199, 233, 199) !important; /*av nån anledning blir det inte rätt färg annars... */
+    background-color: rgb(199, 233, 199) !important; av nån anledning blir det inte rätt färg annars... 
     padding: 20px;
     border: 2px solid rgb(12, 66, 1);
     border-radius: 6px;
@@ -158,14 +159,16 @@ export default {
 button:hover {
   background-color: rgb(126, 201, 130);
 }
+*/
 
 .waitingRoom div{
+  /* how do i get it to be centered? */
   background-color: var(--our-orange);
   border-radius: 15px;
   border: 4px solid #da6822;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-  width: 20%;
-  margin: 5% 0% 0% 40%
+  width: 40%;
+  margin: 5% 0% 0% 30%
 }
 
 .waitingRoom li{ /* vill ha som i customGamesView men de fungrar ej*/

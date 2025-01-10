@@ -6,14 +6,15 @@
       @language-changed="handleLanguageChange">
     </Nav>
 
-    <div class="usernameInput">
+    <div>
       <h2>{{ uiLabels.enterDetails }}</h2>
-      <input 
-      type="text"
-      v-model="userName"
-      :placeholder="uiLabels.userName">
-      <button @click="createGame"> {{ uiLabels.createGame }}</button>
-
+      <div class="textBox wrapper"> <!-- fungerar ej:(( -->
+        <input class="textBox input"
+        type="text"
+        v-model="userName"
+        :placeholder="uiLabels.userName">
+        <button class="textBox click" @click="createGame"> {{ uiLabels.createGame }}</button>
+      </div>
       <div class="playAsAdmin">
         <p> {{ uiLabels.playAsAdmin }}</p>
         <label>

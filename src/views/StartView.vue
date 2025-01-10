@@ -24,12 +24,12 @@
 
   <div class="items">
     <button class="button green" v-if="!isPlay" @click="togglePlay">Join Game</button>
-    <div v-if="isPlay" class="modal" ref="modal">
-      <input type="text" @input="checkGameExists(gamePin)" v-model="gamePin" :placeholder="'Game PIN'">
+    <div v-if="isPlay" class="textBox-wrapper" ref="modal">
+      <input class="textBox input" type="text" @input="checkGameExists(gamePin)" v-model="gamePin" :placeholder="'Game PIN'">
 
       <!-- The router link only appears if the input poll actually exists -->
       <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + gamePin">
-        <button>Join</button>
+        <button class="textBox click">Join</button>
       </router-link>
     </div>
       <router-link to="/create/">
@@ -159,13 +159,13 @@ border: #ff8c42 10px double;
   }
   
   /* When "Join Game" is pressed, the modal appears */
-  /*Vill ändra färg på modal men vet inte till vad //HANNA */
+  /*Vill ändra färg på modal men vet inte till vad //HANNA 
   .modal {
     position: fixed;  
     top: 50%;         
     left: 50%;        
     transform: translate(-50%, -50%); 
-    background-color: rgb(149, 235, 153 ) !important; /*av nån anledning blir det inte rätt färg annars... */
+    background-color: rgb(149, 235, 153 ) !important; av nån anledning blir det inte rätt färg annars... 
     padding: 20px;
     border: 2px solid rgb(12, 66, 1);
     border-radius: 6px;
@@ -194,7 +194,7 @@ border: #ff8c42 10px double;
   .modal button:hover {
     background-color: rgb(126, 201, 130);
   }
-
+  */
 
 
 /* Inte säker att nedan behövs
