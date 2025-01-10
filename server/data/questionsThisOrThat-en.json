@@ -6,13 +6,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Burger",
-                    "isCorrect": false
+                    "answer": "Burger"
                 },
                 {
                     "id": 2,
-                    "answer": "Pizza",
-                    "isCorrect": false
+                    "answer": "Pizza"
                 }
             ]
         },
@@ -22,13 +20,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Coffee",
-                    "isCorrect": false
+                    "answer": "Coffee"
                 },
                 {
                     "id": 2,
-                    "answer": "Tea",
-                    "isCorrect": false
+                    "answer": "Tea"
                 }
             ]
         },
@@ -38,13 +34,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Cats",
-                    "isCorrect": false
+                    "answer": "Cats"
                 },
                 {
                     "id": 2,
-                    "answer": "Dogs",
-                    "isCorrect": false
+                    "answer": "Dogs"
                 }
             ]
         },
@@ -54,13 +48,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Beach",
-                    "isCorrect": false
+                    "answer": "Beach"
                 },
                 {
                     "id": 2,
-                    "answer": "Mountains",
-                    "isCorrect": false
+                    "answer": "Mountains"
                 }
             ]
         },
@@ -70,13 +62,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Summer",
-                    "isCorrect": false
+                    "answer": "Summer"
                 },
                 {
                     "id": 2,
-                    "answer": "Winter",
-                    "isCorrect": false
+                    "answer": "Winter"
                 }
             ]
         },
@@ -86,13 +76,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Books",
-                    "isCorrect": false
+                    "answer": "Books"
                 },
                 {
                     "id": 2,
-                    "answer": "Movies",
-                    "isCorrect": false
+                    "answer": "Movies"
                 }
             ]
         },
@@ -102,13 +90,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Android",
-                    "isCorrect": false
+                    "answer": "Android"
                 },
                 {
                     "id": 2,
-                    "answer": "iOS",
-                    "isCorrect": false
+                    "answer": "iOS"
                 }
             ]
         },
@@ -118,13 +104,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Chocolate",
-                    "isCorrect": false
+                    "answer": "Chocolate"
                 },
                 {
                     "id": 2,
-                    "answer": "Vanilla",
-                    "isCorrect": false
+                    "answer": "Vanilla"
                 }
             ]
         },
@@ -134,13 +118,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "Morning",
-                    "isCorrect": false
+                    "answer": "Morning"
                 },
                 {
                     "id": 2,
-                    "answer": "Night",
-                    "isCorrect": false
+                    "answer": "Night"
                 }
             ]
         },
@@ -150,13 +132,11 @@
             "answers": [
                 {
                     "id": 1,
-                    "answer": "City",
-                    "isCorrect": false
+                    "answer": "City"
                 },
                 {
                     "id": 2,
-                    "answer": "Countryside",
-                    "isCorrect": false
+                    "answer": "Countryside"
                 }
             ]
         }
