@@ -128,9 +128,9 @@ Data.prototype.deleteUser = function (gamePin, userName) {
   if (this.customGameExists(gamePin)) {
     const participants = this.customGames[gamePin].participants;
     this.customGames[gamePin].participants = participants.filter(
-      (name) => name !== userName
+      (participant) => participant.name !== userName
     );
-    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", this.participants)
+    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", this.customGames[gamePin].participants)
   }
   else console.log("ERROR, could not delete user because gamePin does not exist!");
 };

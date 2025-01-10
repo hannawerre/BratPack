@@ -125,6 +125,7 @@ data: function() {
 
 created: function () {
   this.gamePin = this.$route.params.gamePin;
+
     console.log("GamePin: ", this.gamePin);
     socket.emit("joinCustomGame",this.gamePin);
     socket.on("updateGameData", (gameData) => {
@@ -154,7 +155,7 @@ created: function () {
     console.log("Insde else-statement with participants: ", this.participants)
     socket.emit("requestGameData", this.gamePin);
 
-    socket.on('participantsUpdate', participants => {
+    socket.on('participantsUpdate', participants => { 
     this.participants = participants;
     console.log("Active participants: ", this.participants);
     
