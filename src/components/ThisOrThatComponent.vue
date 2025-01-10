@@ -1,13 +1,4 @@
 <template>
-    <!-- <div>
-        <p>Chosen Participant: {{ this.chosenParticipant }}, answer: {{ this.correctAnswer }}</p>
-        <br>
-        <p>Current question: {{currentQuestion}}</p>
-        <br>
-        <p>Participants: {{ this.participants }}</p>
-  </div> -->
-  
-
     <div>
     <!-- Rules -->
     <div v-if="showRules">
@@ -33,6 +24,7 @@
 
     <!-- Game Phase 2: Display Question -->
     <div v-if="showQuestion">
+        <h2>Chosen participant: {{ chosenParticipant }}</h2>
       <QuestionComponent
         v-if="questions?.questions?.[currentQuestion]"
         :question="questions.questions[currentQuestion]"
@@ -118,12 +110,7 @@ export default {
     },
     created: function() {
         socket.emit('joinSocketRoom', this.gamePin);
-        // socket.on('getParticipants', ThisOrThat => { // Hoppas denna listener inte krockar med emits från andra spel...
-        //     this.participants = ThisOrThat.participants;
-        //     this.chosenParticipant = ThisOrThat.chosenParticipant;
-        //     console.log("Updated participants to: ", this.participants);
-        //     console.log("Updated chosenParticipant to: ", this.chosenParticipant);
-        // });
+
         socket.on("chosenParticipantAnswer", answer => this.correctAnswer = answer);
         socket.on("newChosenParticipant", participant => this.chosenParticipant = participant)
 
@@ -160,7 +147,6 @@ export default {
         },
         roundUpdate(ThisOrThat){
             this.participants = ThisOrThat.participants;
-            this.chosenParticipant = ThisOrThat.chosenParticipant;
 
             // If chosenParticipant didn't answer.
             if(!ThisOrThat.correctAnswers[this.currentQuestion]){ 
@@ -169,12 +155,13 @@ export default {
                 this.correctParticipants = [];
             }
             else {
-                // TODO: display the correct answer texxt
-                this.correctAnswer = ThisOrThat.correctAnswers[this.currentQuestion]; // Correct answer for last question
+                this.correctAnswer = ThisOrThat.correctAnswers[this.currentQuestion]; 
                 this.setCorrectParticipants();
             };
+            // Slight delay to prevent it from being displayed too early.
             setTimeout(() => {
-                this.currentQuestion = ThisOrThat.currentQuestion; // Next question, slight delay to prevent it from being displayed too early.
+                this.chosenParticipant = ThisOrThat.chosenParticipant;
+                this.currentQuestion = ThisOrThat.currentQuestion; 
             }, 300)
             console.log("roundUpdate: ", ThisOrThat);
         },
@@ -202,10 +189,14 @@ export default {
                 this.showChosenParticipant = false;
                 this.showQuestion = true;
                 this.startCountdown(15, "question");
-            } else if (currentPhase === "question") {
+            } 
+            else if (currentPhase === "question") {
                 this.showQuestion = false;
                 this.showAnswer = true;
                 this.startCountdown(10, "answer");
+            }
+            else if (currentPhase === "finalResults"){
+                this.$emit('gameCompleted');
             }
         },
         revealCorrectAnswer() {

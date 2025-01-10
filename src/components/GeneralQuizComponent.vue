@@ -219,6 +219,10 @@ export default {
           case "feedbackPhase":
             if(this.currentQuestionIndex > this.questions.length - 1) {
               this.currentPhase = "scoreBoard"
+              // Close down game component after 30 seconds.
+              setTimeout(()=> {
+                this.$emit('gameCompleted');
+              }, 30000)
             }
             else{
               this.currentAnswer = null;
