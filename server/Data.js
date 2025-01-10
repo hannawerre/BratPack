@@ -66,6 +66,9 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   customGame.selectedMinutes = 60; // 60 minutes default
   customGame.remainingTime = 3600; //
   customGame.gameStarted = false;
+
+  
+
   this.customGames[pin] = customGame;
   
   console.log("Custom Game created", pin, customGame);

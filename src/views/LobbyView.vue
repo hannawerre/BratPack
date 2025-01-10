@@ -77,7 +77,8 @@ export default {
       
       // Detta kan vara användbart senare om vi ska lösa så att användare inte raderas vid refresh! /sebbe
       // Används också i skrivande stund så att varje persons userName skickas över till GameView rätt.
-      sessionStorage.setItem('userName', this.userName); 
+      sessionStorage.setItem('userName', this.userName);
+      sessionStorage.setItem('isAdmin', false); 
       console.log("Updated sessionStorage with item ('userName',", this.userName, ")");
       
       // This if statement checks if the game is already running. In that case, the user will immediately get pushed to GameView!

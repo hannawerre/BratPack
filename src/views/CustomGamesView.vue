@@ -317,38 +317,11 @@ methods: {
         scoreGame4: 0
       }
       console.log("adminName: ", adminName);
-      socket.emit( "participateInCustomGame", this.gamePin,  adminName);
+      // socket.emit( "participateInCustomGame", this.gamePin,  adminName);
+      this.participants.push(adminName);
       sessionStorage.setItem('userName', this.userName); 
       sessionStorage.setItem('isAdmin', true);
     }
-
-    // Simulera timerstart lokalt för teständamål
-    let countDownDate = Date.now() + this.selectedMinutes * 60 * 1000;
-
-    const interval = setInterval(() => {
-        const now = Date.now();
-        const distance = countDownDate - now;
-
-        if (distance <= 0) {
-            clearInterval(interval);
-            socket.emit('update-timer', {
-                timerDisplay: "Tiden är slut!",
-                soundType: "alarm"
-            });
-            return;
-        }
-
-        const totalSeconds = Math.floor(distance / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-
-        socket.emit('update-timer', {
-            timerDisplay: `${minutes}m ${seconds}s`,
-            soundType: totalSeconds % 60 === 0 ? "alarm" : null
-        });
-    }, 1000);
-
-    console.log("Timer startad i CustomGameView för test.");
     
     let gameData = {  // borde den inte vara const? /theo
       gamePin: this.gamePin,
@@ -357,6 +330,7 @@ methods: {
       selectedMinutes: this.selectedMinutes
       //lang: this.lang språk sparas i gameData eller localStorage?
     }
+    console.log("Davids och sebbes test: ", gameData);
 
     socket.emit('startGame', gameData)
     this.$router.push("/game/" + this.gamePin)
