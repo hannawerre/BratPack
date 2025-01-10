@@ -84,8 +84,10 @@ socket.on('requestGameTime', (gamePin, callback) => {
 // ---------------------------------------------------------------------------------
 
   socket.on('createGame', function(lang) {
-    const pin = data.createCustomGame(lang); 
+    const {pin, customGame} = data.createCustomGame(lang);
+    console.log("Game created with pin: ", pin); 
     socket.emit('gameCreated', pin);
+    socket.emit('updateGameData', customGame);
     // Implement error handling if game could not be created
   });
   

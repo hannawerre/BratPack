@@ -34,7 +34,7 @@
         <button>Join</button>
       </router-link>
     </div>
-      <router-link to="/create/">
+      <router-link to="/customGames/">
         <button v-if="!isPlay" @click="createGame" id="create">Create Game</button>
       </router-link>
   </div>

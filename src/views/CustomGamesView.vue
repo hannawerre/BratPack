@@ -3,7 +3,30 @@
   <div class="main-content">
   <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
   <h1 v-else>Loading Game PIN...</h1>
+  <div class="admin-player">
+    <h2>Choose Your Role</h2>
+    <div class="play-as-admin">
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" value="play" v-model="userRole" />
+          Play
+        </label>
+        <label class="radio-option">
+          <input type="radio" value="host" v-model="userRole" />
+          Host Only
+        </label>
+      </div>
+    </div>
 
+    <div v-if="userRole === 'play'" class="form-group">
+      <input
+        type="text"
+        v-model="userName"
+        placeholder="Admin"
+        class="input-field"
+      />
+    </div>
+</div>
   <div>
       <p>Choose the time in minutes:</p>
       <div class="button-container">
@@ -63,15 +86,11 @@
   <div class="participants">
     <h2>Participants</h2>
       <ul>
+        <li v-if="userRole === 'play'"><strong>{{ userName ? userName : "Admin" }}</strong></li>
         <li v-for="(participant, index) in participants" :key="index">
           <strong>{{ participant.name }}</strong> 
-          <span v-if="participant.isAdmin && participant.isPlaying">: Admin & Playing</span>
-          <span v-else-if="participant.isAdmin">: Admin</span>
-          <span v-else-if="participant.isPlaying">- Playing</span>
-          <span v-else>- Spectator</span>
         </li>
       </ul>
-
 
   </div>
   </div>
@@ -117,49 +136,130 @@ data: function() {
     customQuestions:{},
     useStandardQuestions: true,
     useOwnQuestions: false,
-    active: true, // Används denna? /sebbe
-    userName: ''
+    userName:'',
+    userRole: 'host'
 
   };
 },
 
 created: function () {
-  this.gamePin = this.$route.params.gamePin;
-
-    console.log("GamePin: ", this.gamePin);
-    socket.emit("joinCustomGame",this.gamePin);
-    socket.on("updateGameData", (gameData) => {
-      if (gameData.selectedGames && gameData.selectedGames.length > 0) {
+  socket.on("updateGameData", (gameData) => {
+        
+        console.log("Game data received: ", gameData);
+        // this.customQuestions = gameData.customQuestions;
+        // this.useStandardQuestions = gameData.useStandardQuestions;
+        // this.useOwnQuestions = gameData.useOwnQuestions;
         this.selectedGames = gameData.selectedGames;
-    }
-    /*if (gameData.customQuestions && gameData.customQuestions.length > 0) {
+        this.participants = gameData.participants;
+        this.selectedMinutes = gameData.selectedMinutes;
         this.customQuestions = gameData.customQuestions;
-    }*/
-    if (gameData.useStandardQuestions) {
-        this.useStandardQuestions = gameData.useStandardQuestions;
-    }
-    if (gameData.customQuestions && gameData.customQuestions.length > 0) {
-        this.customQuestions = gameData.customQuestions;
-    }
+        console.log("Updated gameData, participants: ", this.participants);
+        
 
+        });
+  if (!this.$route.params.gamePin) { 
+    socket.on('gameCreated', pin => {
+      this.gamePin = pin
+      console.log("GamePin created: ", this.gamePin);
+      socket.emit('joinSocketRoom', pin); //joins the socket room 'gamePin'
+      this.$router.replace({ path: `/customgames/${pin}` });
+
+      });
+  console.log("Listener for 'updateGameData' in CustomGamesView.vue is active");
+  socket.emit("createGame", this.lang);
+}else {
+      console.log("Insde else-statement, this means created gamepin exists");
+      this.gamePin = this.$route.params.gamePin; // just nu kommer gamePin finnas kvar vid refresh, men jag tror att all game data raderas
+      console.log("GamePin: ", this.gamePin);
+      socket.emit("joinSocketRoom",this.gamePin);
+      socket.emit("requestGameData", this.gamePin);
+  
+};
+    
+socket.on('participantsUpdate', participants => {
+    this.participants = participants;
+    console.log("Participants updatet, active participants: ", this.participants);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+  // this.gamePin = this.$route.params.gamePin;
+  //   console.log("GamePin: ", this.gamePin);
+  //   socket.emit("joinCustomGame",this.gamePin);
+    socket.on("updateGameData", (gameData) => {
+    //   if (gameData.selectedGames && gameData.selectedGames.length > 0) {
+    //     this.selectedGames = gameData.selectedGames;
+    // }
+    // if (gameData.customQuestions && gameData.customQuestions.length > 0) {
+    //     this.customQuestions = gameData.customQuestions;
+    // }
+    // if (gameData.useStandardQuestions) {
+    //     this.useStandardQuestions = gameData.useStandardQuestions;
+    // }
+    // if (gameData.customQuestions && gameData.customQuestions.length > 0) {
+    //     this.customQuestions = gameData.customQuestions;
+    // }
+
+    console.log("Game data received: ", gameData);
+    // this.customQuestions = gameData.customQuestions;
+    // this.useStandardQuestions = gameData.useStandardQuestions;
+    // this.useOwnQuestions = gameData.useOwnQuestions;
+    this.selectedGames = gameData.selectedGames;
     this.participants = gameData.participants;
     this.selectedMinutes = gameData.selectedMinutes;
     console.log("Updated gameData, participants: ", this.participants);
-    this.userName = this.participants[0]
+    if (this.participants && this.participants.length > 0) {
+      // Kod för att använda participants[0]
+      this.userName = this.participants[0].name;
+    }
     console.log("Username: ", this.userName);
-
-    
   });
+  console.log("Listener for 'updateGameData' in CustomGamesView.vue is active");
 
-  
-    console.log("Insde else-statement with participants: ", this.participants)
-    socket.emit("requestGameData", this.gamePin);
+  if (!this.$route.params.gamePin) { 
+      socket.on('gameCreated', pin => {
+        this.gamePin = pin
+        console.log("GamePin created: ", this.gamePin);
+        socket.emit('joinCustomGame', pin); //joins the socket room 'gamePin'
+        this.$router.replace({ path: `/customgames/${pin}` });
+      });
+      console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
+      socket.emit("createGame", this.lang);
+      console.log("Emitted createGame from CustomGamesView.vue")
+    }
+    // This else-statement gets triggered if the site is refreshed.
+    else { 
+      // TODO: när sidan laddas om så tror jag att all sparad data raderas. Därför borde allt som har med spelet och göra att sparas i localStorage eller sessionStorage
+      console.log("Insde else-statement, this means created gamepin exists");
+      this.gamePin = this.$route.params.gamePin; // just nu kommer gamePin finnas kvar vid refresh, men jag tror att all game data raderas
+      console.log("GamePin: ", this.gamePin);
+      socket.emit("joinSoketRoom",this.gamePin);
+      // alltså ska vi här lägga till att vi hämtar den sparade datan relaterad till gamePin från localStorage eller sessionStorage
+    };
+    
 
-    socket.on('participantsUpdate', participants => { 
+
+
+    // Lyssna på uppdateringar av deltagare, när någon joinar
+    socket.on('participantsUpdate', participants => {
     this.participants = participants;
     console.log("Active participants: ", this.participants);
     
   });
+  //Används ej
   socket.on('lobbyUnactive',(gamePin) => {
     console.log("Unactivating lobby", gamePin);
 
@@ -167,10 +267,14 @@ created: function () {
     console.log(`Participant: ${participant.name}, isPlaying: ${participant.isPlaying}`);
   });
   });
-  socket.emit("requestParticipants", this.gamePin);
+  socket.emit("requestParticipants", this.gamePin); // Behövs dennaP
 
+
+  //Används ej
   socket.emit("adminRejoined", (this.gamePin))
   console.log("adminRejoined",this.gamePin, this.userName)
+
+  */
 },
 methods: {
 
@@ -186,6 +290,9 @@ methods: {
   },
 
   startGame: function () {
+    console.log("playerRole: ", this.playerRole);
+
+
     if (this.selectedGames.length === 0) {
       alert("Please select at least one game.");
       return;
@@ -195,6 +302,26 @@ methods: {
       alert("No players have joined yet.");
       return;
     }
+
+    if (this.userRole === 'play') {
+      if (!this.userName) {
+        alert("Please enter your username.");
+        return;
+      }
+      console.log("hej",   this.userName);
+      const adminName={      
+        name: this.userName,
+        scoreGame1: 0,
+        scoreGame2: 0,
+        scoreGame3: 0,
+        scoreGame4: 0
+      }
+      console.log("adminName: ", adminName);
+      // socket.emit( "participateInCustomGame", this.gamePin,  adminName);
+      this.participants.push(adminName);
+      sessionStorage.setItem('userName', this.userName); 
+      sessionStorage.setItem('isAdmin', true);
+    }
     
     let gameData = {  // borde den inte vara const? /theo
       gamePin: this.gamePin,
@@ -203,6 +330,7 @@ methods: {
       selectedMinutes: this.selectedMinutes
       //lang: this.lang språk sparas i gameData eller localStorage?
     }
+    console.log("Davids och sebbes test: ", gameData);
 
     socket.emit('startGame', gameData)
     this.$router.push("/game/" + this.gamePin)
@@ -265,7 +393,7 @@ methods: {
 
   handleWindowClose(event) {
       console.log("Admin window closed! unactivating lobby")
-      socket.emit("adminLeftGame", this.gamePin, this.userName);
+      //socket.emit("adminLeftGame", this.gamePin, this.userName);
     },
 
   checkIfRefreshPage() {
@@ -296,12 +424,10 @@ methods: {
       socket.emit('updateSettings', gameData);
     },
     deleteGame: function() {
-      console.log("Pressed delete game button");
-      socket.emit('deleteGame', this.gamePin);
+ 
     },
     unactiveGame: function() {
-      console.log("Pressed unactive game button");
-      socket.emit('unactiveLobby', this.gamePin);
+
     },
     logGameData: function() {
       console.log("Pressed log game data button");
@@ -310,8 +436,30 @@ methods: {
     }
   },
 mounted() {
+  // console.log(this.participants.length > 0,"participants >0")
+  //   if (this.participants.length == 0) {
+  //     console.log("YES")
+  //     // If the first participant’s name is not the same as userName
+  //       socket.emit("participateInCustomGame", this.gamePin, {
+  //         name: "ADMIN",
+  //         isPlaying: false,
+  //         isAdmin: true,
+  //         scoreGame1: 0,
+  //         scoreGame2: 0,
+  //         scoreGame3: 0,
+  //         scoreGame4: 0
+  //       });
+  //       console.log("Created ADMIN")
+  //   }
+
+  //   console.log("Emitted participateInCustomGame from CustomGamesView.vue")
+  //   //Hämta gameData från servern
+  //   socket.emit("requestGameData", this.gamePin);
+  //   console.log("Emitted requestGameData from CustomGamesView.vue")
+
+
     window.addEventListener("beforeunload", this.handleWindowClose);
-    this.checkIfRefreshPage();
+    //this.checkIfRefreshPage();
   },
 beforeDestroy() {
     window.removeEventListener("beforeunload", this.handleWindowClose);
@@ -335,6 +483,83 @@ beforeDestroy() {
     text-align: center;
 }
 
+.admin-player {
+  padding: 10px;
+  margin: 20px 0;
+  text-align: center;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.admin-player h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #555;
+}
+
+.radio-option input[type="radio"] {
+  transform: scale(1.2);
+  accent-color: #4caf50;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.form-group {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-field {
+  width: 100%;
+  max-width: 250px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+  outline: none;
+}
+
+.action-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: rgb(8, 179, 8);
+  box-shadow: 0 0 10px 3px rgba(8, 179, 8, 0.5);
+  transform: scale(1.05);
+}
 
 .decrement-button{
   background-color: rgb(213, 8, 8);

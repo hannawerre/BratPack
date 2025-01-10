@@ -2,13 +2,12 @@
     <TimerComponent :gamePin="gamePin" :selectedMinutes="gameData.selectedMinutes"></TimerComponent>
     <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
 
-        <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
-            <div>
+        <div class="button-container">
+            <div v-for="participant in gameData.participants" :key="participant.name" >
                 <span>{{ participant.name }}</span> 
-                <span v-if="participant.isAdmin">(Admin)</span>
             </div>
   <!-- Visa bara knapparna om detta är den inloggade användarens namn OCH om den är admin -->
-            <div v-if="participant.name === this.userName && participant.isAdmin">
+            <div v-if="this.isAdmin">
                 <button
                     v-for="gameName in gameData.selectedGames"
                     :key="gameName"
@@ -28,7 +27,6 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
-            :isPlaying="isPlaying"
             @gameCompleted="onGameCompleted"
         />
         <ThisOrThatComponent 
@@ -63,8 +61,8 @@
                 gameData: {},
                 activeGame: '',
                 uiLabels: {},
-                isAdmin: false,
-                isPlaying: false
+                isAdmin: false
+
             }
         },
         created: function() {
@@ -97,8 +95,8 @@
 
             determineAdminStatus () {
                 const user = this.gameData.participants?.find(p=> p.name === this.userName)
-                this.isAdmin = user ? user.isAdmin : false;
-                this.isPlaying = user ? user.isPlaying : false;
+                this.isAdmin = sessionStorage.getItem("isAdmin") === "true" || false;
+                console.log("Davids Log: Admin status: ", this.isAdmin);    
             },
 
             playMiniGame: function(game){
