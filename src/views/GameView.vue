@@ -22,10 +22,6 @@
                 </button>
             </div>
         </div>
-
-        
-
-        
     </div>
 
     <div v-else> <!--Visas bara så länge ett spel är aktiverat-->
@@ -38,18 +34,12 @@
             :isPlaying="isPlaying"
         />
     </div>
-
-
-    
 </template>
 
-
 <script>
-    //import {socket} from '../socketClient.js';  // kanske behövs /sebbe 
-    
-    
+
     const socket = io("localhost:3000");
-    import io from 'socket.io-client';  // kanske behövs /sebbe 
+    import io from 'socket.io-client';
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
     import TimerComponent from '../components/TimerComponent.vue';
@@ -86,10 +76,11 @@
             socket.emit( "getUILabels", this.lang );
         },
         mounted: function() {
-            socket.on("onGameStart", gameName=> this.activeGame = gameName)
+            socket.on("onGameStart", gameName=> this.activeGame = gameName);
+            socket.on("participantsUpdate", participants => this.gameData.participants = participants)
             socket.emit('updateAllGameData', this.gamePin);
-            console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin)
-
+            console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin);
+            window.addEventListener("beforeunload", this.handleWindowClose);
         },
         
 
@@ -115,8 +106,16 @@
                 //socket.emit(miniGameStarted, gameid) ?? 
                 // på något sätt få varje spels komponent aktiverad
                 //theo
+            },
+            // Delete user on window close / refresh
+            handleWindowClose(event) {
+            console.log("Window closed!!! Deleting user")
+            socket.emit('deleteUser', this.gamePin, this.userName);
             }
 
+        },
+        beforeDestroy() {
+            window.removeEventListener("beforeunload", this.handleWindowClose);
         }
     }
 

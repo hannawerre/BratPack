@@ -228,11 +228,13 @@ Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
   return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
 };
 Data.prototype.roundInProgress = function(gamePin, isActive = null) {
-  if (isActive === null) {
-    return this.customGames[gamePin].ThisOrThat.roundInProgress;
+  if(this.customGames[gamePin]){
+    if (isActive === null) {
+      return this.customGames[gamePin].ThisOrThat.roundInProgress;
+    }
+    this.customGames[gamePin].ThisOrThat.roundInProgress = isActive;
   }
-  this.customGames[gamePin].ThisOrThat.roundInProgress = isActive;
-}
+};
 Data.prototype.startGame_ThisOrThat = function(gamePin) {
   let elapsedSeconds = 0;
 

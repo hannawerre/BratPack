@@ -109,7 +109,7 @@ export default {
             questions: [],
             countdownProgress: 100,
             currentQuestion: 0,
-            participants: {}, //Name and score in this manner: [{name: sebbe, points: 0}, {...}, ...]
+            participants: {}, 
             myAnswers: [],
             chosenParticipant: null,
             correctAnswer: null,
@@ -118,12 +118,12 @@ export default {
     },
     created: function() {
         socket.emit('joinSocketRoom', this.gamePin);
-        socket.on('getParticipants', ThisOrThat => { // Hoppas denna listener inte krockar med emits från andra spel...
-            this.participants = ThisOrThat.participants;
-            this.chosenParticipant = ThisOrThat.chosenParticipant;
-            console.log("Updated participants to: ", this.participants);
-            console.log("Updated chosenParticipant to: ", this.chosenParticipant);
-        });
+        // socket.on('getParticipants', ThisOrThat => { // Hoppas denna listener inte krockar med emits från andra spel...
+        //     this.participants = ThisOrThat.participants;
+        //     this.chosenParticipant = ThisOrThat.chosenParticipant;
+        //     console.log("Updated participants to: ", this.participants);
+        //     console.log("Updated chosenParticipant to: ", this.chosenParticipant);
+        // });
         socket.on("chosenParticipantAnswer", answer => this.correctAnswer = answer);
         socket.on("newChosenParticipant", participant => this.chosenParticipant = participant)
 
@@ -173,7 +173,9 @@ export default {
                 this.correctAnswer = ThisOrThat.correctAnswers[this.currentQuestion]; // Correct answer for last question
                 this.setCorrectParticipants();
             };
-            this.currentQuestion = ThisOrThat.currentQuestion; // Next question
+            setTimeout(() => {
+                this.currentQuestion = ThisOrThat.currentQuestion; // Next question, slight delay to prevent it from being displayed too early.
+            }, 300)
             console.log("roundUpdate: ", ThisOrThat);
         },
         startCountdown(duration, phase) {
