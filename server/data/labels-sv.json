@@ -19,6 +19,23 @@
 	"waitingForHost": "Väntar på spelledaren...",
 	"Lang": "Svenska",
 	"Welcome": "Välkommen",
-	"generalTrivia": "Frågesportspelet"
+	"generalTrivia": "Frågesportspelet",
+	"waitingOnAdmin": "Väntar på att admin ska starta quizet...",
+	"startQuiz": "Starta spel",
+	"youHaveAnswered": "Du har svarat!",
+	"waitForTimeToRunOut": "Väntar tills tiden gått ut...",
+	"youAnsweredRight": "Du svarade rätt",
+	"yourPointsRightNow": "Din poäng just nu:",
+	"yourRankRightNow" : "Din plats just nu",
+	"youAreBehind" : "Du ligger bakom",
+	"youWereWrong" : "Du hade fel",
+	"tooSlow": "Ooops, du var för långsam",
+	"nextQuestion": "Nästa fråga",
+	"showResults": "Visa resultat",
+	"scoreboard": "Poängställning",
+	"points": "poäng",
+	"with": "med"
+	
+
 
 }

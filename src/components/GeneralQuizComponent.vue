@@ -4,9 +4,9 @@
       <div v-if="currentPhase === 'startPhase'">
         <h1> {{ uiLabels.generalTrivia }}</h1>
         <div v-if="isAdmin">
-          <button @click="startQuiz">Start quiz</button>
+          <button @click="startQuiz"> {{ uiLabels.startQuiz }}</button>
         </div>
-        <div v-else>Väntar på att admin ska starta quizet...</div>
+        <div v-else> {{ uiLabels.waitingOnAdmin }}</div>
       </div>
 
       <!-- Intro Phase  -->
@@ -17,9 +17,7 @@
           </h1>
         </transition>
       </div>
-  
-
-
+      
       <!-- Question Phase-->
       <div v-else-if="currentPhase === 'questionPhase'">
         <QuestionComponent
@@ -35,8 +33,8 @@
 
       <!-- Answered Phase-->
       <div v-else-if="currentPhase === 'answeredPhase'">
-        <h2>Du har svarat!</h2>
-        <p>Vänta tills tiden går ut...</p>
+        <h2> {{ uiLabels.youHaveAnswered }}</h2>
+        <p> {{ uiLabels.waitingForTimeToRunOut }}</p>
         <div class="countdown-bar">
           <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
         </div>
@@ -47,47 +45,46 @@
         
         <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
-          <p>Du hade rätt</p>
-          <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng </p>
+          <p> {{ uiLabels.youAnsweredRight }}</p>
+          <p> {{ uiLabels.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+          <p> {{ uiLabels.yourRankRightNow }} {{ getPlayerRank(userName) }} </p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.youAreBehind}} {{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} poäng </p>
         </div>
-
 
         <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p>Du hade fel</p>
-          <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng </p>
+          <p> {{ uiLabels.youWereWrong }}</p>
+          <p> {{ uiLabels.yourPointsRightNow}} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+          <p> {{uiLabels.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
+          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
         </div>
 
         <!-- Om användaren inte hann svara -->
         <div v-else class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p>Oooops, för långsam...</p>
-          <p>Din poäng är just nu: {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p>Du ligger på plats {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1">Du ligger bakom {{ getPlayerAhead(userName) }} med {{ getPointsBehind(userName) }} poäng</p>
+          <p> {{ uiLabels.tooSlow }}</p>
+          <p>{{ uiLabels.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+          <p> {{uiLabels.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
+          <p v-if="getPlayerRank(userName)!=1"> {{ uiLabels.youAreBehind }} {{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }}</p>
         </div>
   
         <div v-if="isAdmin">
-          <button v-if="!isLastQuestion" @click="nextQuestion">Nästa fråga</button>
-          <button v-else @click="showResults"> Show results</button>
+          <button v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
+          <button v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
         </div>
       
       </div>
       
  <!-- Score board--> 
       <div v-else-if="currentPhase === 'scoreBoard'">
-        <h2>Scoreboard</h2>
+        <h2>{{ uiLabels.scoreboard }}</h2>
           <ul>
             <li 
                v-for="(p, index) in sortedParticipants" 
               :key="index" 
               :class="{ 'top-player': index === 0 }"
             >
-              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} poäng
+              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} {{ uiLabels.points }}
             </li>
           </ul>
       </div>
@@ -194,9 +191,7 @@ export default {
         currentQuestionIndex: this.currentQuestionIndex,
       });
     },
-    showResults() {
-      this.currentPhase = "scoreBoard";
-    },
+    
     goToNextPhase(){
         switch (this.currentPhase) {
           case "startPhase":
@@ -212,16 +207,20 @@ export default {
           case "questionPhase":
             if(this.currentAnswer!=null){
               this.currentPhase = "answeredPhase"}
-              else{
+            else{
                 this.currentPhase="feedbackPhase";
               }
+            break;
 
           case "answeredPhase":
             this.currentPhase="feedbackPhase"
             break;
             
           case "feedbackPhase":
-            if(this.currentQuestionIndex < this.questions.length) {
+            if(this.currentQuestionIndex > this.questions.length - 1) {
+              this.currentPhase = "scoreBoard"
+            }
+            else{
               this.currentAnswer = null;
               this.currentPhase = "introPhase";
               this.startCountdown(3)
@@ -293,7 +292,6 @@ export default {
           // Returnera namnet på spelaren precis före
         return sorted[rank - 1].name;
         }
-
         // Om spelaren är först (rank 0), finns ingen att jämföra med
       return null;
       },

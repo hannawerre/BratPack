@@ -74,6 +74,8 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
 
 Data.prototype.storeGameDataAndStart = function (gameData){
   // Update the gameData and set gameStarted = true
+  // console.log("gamedata:",gameData);
+  // console.log("this.customgames",this.customGames)
  
   // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
   this.customGames[gameData.gamePin].participants = gameData.participants;
@@ -146,23 +148,21 @@ Data.prototype.getQuestions = function (lang, gamePin, gameName) {
   if (!["en", "sv"].some( el => el === lang))
     lang = "en";
   const standardQuestions = JSON.parse(readFileSync("./server/data/questions-" + lang + ".json"));
-  console.log("Alla spel i customGames:", this.customGames);
-  console.log("GamePin:", gamePin);
-  console.log("Data för gamePin:", this.customGames?.[gamePin]);
-  console.log("spelnamnet är: ", gameName)
+ 
 
   if (this.customGameExists(gamePin)) {
     const gameData = this.customGames[gamePin];
     const allQuestions = gameData?.allCustomQuestions;
     const customQuestions = allQuestions?.[gameName]?.customQuestions;
+    
+    
     if(customQuestions && Array.isArray(customQuestions)){
       const questionObj = {
         questions: customQuestions
       }
       return questionObj
-    }else{
-    
-  return standardQuestions
+    } else{
+    return standardQuestions
     }
   }
 };
@@ -225,7 +225,6 @@ Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
   }
 };
 Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
-  // TODO: ta bort return?
   return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
 };
 Data.prototype.roundInProgress = function(gamePin, isActive = null) {
@@ -234,6 +233,24 @@ Data.prototype.roundInProgress = function(gamePin, isActive = null) {
   }
   this.customGames[gamePin].ThisOrThat.roundInProgress = isActive;
 }
+Data.prototype.startGame_ThisOrThat = function(gamePin) {
+  let elapsedSeconds = 0;
+
+  const interval = setInterval(() => {
+    elapsedSeconds++;
+    if(elapsedSeconds === 20) { // Exactly when the question time runs out
+      
+      this.correctQuestion_ThisOrThat(gamePin, this.customGames[gamePin].ThisOrThat.currentQuestion);
+      this.newChosenParticipant(gamePin);
+      this.customGames[gamePin].ThisOrThat.currentQuestion++; //TODO: När den kört 15 eller 20 frågor borde spelet vara klart.
+
+      io.to(gamePin).emit("roundUpdate", this.customGames[gamePin].ThisOrThat)
+    }
+    if(elapsedSeconds === 30) { // 30 seconds matches the combined duration of each phase in ThisOrThatComponent.vue. 
+      elapsedSeconds=0; 
+    }
+  }, 1000); 
+};
 // -------------------------------------------------------------------------------------------------
 // Timer -------------------------------------------------------------------------------------------
 Data.prototype.startCountDown = function() {
