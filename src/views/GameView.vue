@@ -32,11 +32,11 @@
             @gameCompleted="onGameCompleted"
         />
         <ThisOrThatComponent 
-        v-if="gameData.selectedGames.includes('ThisOrThat')" 
-        :gameData="gameData" 
-        :gamePin="gamePin" 
-        :userName="userName"
-        @gameCompleted="onGameCompleted"
+            v-if="activeGame === 'ThisOrThat'" 
+            :gameData="gameData" 
+            :gamePin="gamePin" 
+            :userName="userName"
+            @gameCompleted="onGameCompleted"
         />
     </div>
 </template>
