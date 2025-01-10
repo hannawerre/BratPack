@@ -5,13 +5,13 @@ import {readFileSync} from "fs";
 function Data() {
   // TODO: Uppdatera customgames['test'] så att den ser exakt ut som ett äkta spel
   // Custom Game
+  this.countDown = null;
   this.customGames = {};
   this.customGames['test'] = {
     lang: "en",
     participants: [],
     selectedGames: [],
-    selectedMinutes: 60, // Var ska tiden sparas? Vi vill kunna hämta tiden som är kvar för att veta när nästa spel ska köras igång! /sebbe
-    timerDisplay: '',
+    selectedMinutes: 60,
     gameStarted: false,
     playerAnswers: {},
   };
@@ -45,7 +45,6 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
 
 // - Custom Game -
 Data.prototype.customGameExists = function (gamePin) {
-  //console.log("Checking if '", gamePin, "' is a customGame. Customgames: ", this.customGames)
   return typeof this.customGames[gamePin] !== "undefined";
 };
 
@@ -64,7 +63,8 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   customGame.lang = lang;  
   customGame.participants = [];
   customGame.selectedGames = [];
-  customGame.selectedMinutes = 60;
+  customGame.selectedMinutes = 60; // 60 minutes default
+  customGame.remainingTime = 3600; //
   customGame.gameStarted = false;
   this.customGames[pin] = customGame;
   
@@ -74,17 +74,20 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
 
 Data.prototype.storeGameDataAndStart = function (gameData){
   // Update the gameData and set gameStarted = true
+  // console.log("gamedata:",gameData);
+  // console.log("this.customgames",this.customGames)
  
   // customGame.lang = gameData.lang; // För närvarande skickas denna inte.. för den finns inte i CustomGamesView.vue
   this.customGames[gameData.gamePin].participants = gameData.participants;
   this.customGames[gameData.gamePin].selectedGames = gameData.selectedGames;
   this.customGames[gameData.gamePin].selectedMinutes = gameData.selectedMinutes;
+  this.customGames[gameData.gamePin].remainingTime = gameData.selectedMinutes*60; // Convert to seconds
   this.customGames[gameData.gamePin].gameStarted = true;
   
-  
+  // If countdown is not already on -> start the countdown.
+  if(!this.countDown) this.startCountDown(); 
 
   console.log("Reached to data.storeGameDataAndStart with current customGames: ", this.customGames[gameData.gamePin]);
-  
 };
 
 Data.prototype.getGameData = function(gamePin) {
@@ -123,9 +126,9 @@ Data.prototype.deleteUser = function (gamePin, userName) {
   if (this.customGameExists(gamePin)) {
     const participants = this.customGames[gamePin].participants;
     this.customGames[gamePin].participants = participants.filter(
-      (name) => name !== userName
+      (participant) => participant.name !== userName
     );
-    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", this.participants)
+    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", this.customGames[gamePin].participants)
   }
   else console.log("ERROR, could not delete user because gamePin does not exist!");
 };
@@ -138,12 +141,28 @@ Data.prototype.getUILabels = function (lang) {
   return JSON.parse(labels);
 };
 
-Data.prototype.getQuestions = function (lang) {
+Data.prototype.getQuestions = function (lang, gamePin, gameName) {
   //check if lang is valid before trying to load the dictionary file
   if (!["en", "sv"].some( el => el === lang))
     lang = "en";
-  const questions = readFileSync("./server/data/questions-" + lang + ".json");
-  return JSON.parse(questions);
+  const standardQuestions = JSON.parse(readFileSync("./server/data/questions-" + lang + ".json"));
+ 
+
+  if (this.customGameExists(gamePin)) {
+    const gameData = this.customGames[gamePin];
+    const allQuestions = gameData?.allCustomQuestions;
+    const customQuestions = allQuestions?.[gameName]?.customQuestions;
+    
+    
+    if(customQuestions && Array.isArray(customQuestions)){
+      const questionObj = {
+        questions: customQuestions
+      }
+      return questionObj
+    } else{
+    return standardQuestions
+    }
+  }
 };
 
 // ThisOrThat -------------------------------------------------------------------------------------
@@ -204,118 +223,53 @@ Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
   }
 };
 Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
-  // TODO: ta bort return?
   return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
 };
 Data.prototype.roundInProgress = function(gamePin, isActive = null) {
-  if (isActive === null) {
-    return this.customGames[gamePin].ThisOrThat.roundInProgress;
+  if(this.customGames[gamePin]){
+    if (isActive === null) {
+      return this.customGames[gamePin].ThisOrThat.roundInProgress;
+    }
+    this.customGames[gamePin].ThisOrThat.roundInProgress = isActive;
   }
-  this.customGames[gamePin].ThisOrThat.roundInProgress = isActive;
-}
-// Används inte
-// Data.prototype.startGame_ThisOrThat = function(gamePin) {
-//   let elapsedSeconds = 0;
+};
+Data.prototype.startGame_ThisOrThat = function(gamePin) {
+  let elapsedSeconds = 0;
 
-//   const interval = setInterval(() => {
-//     elapsedSeconds++;
-//     if(elapsedSeconds === 20) { // Exactly when the question time runs out
+  const interval = setInterval(() => {
+    elapsedSeconds++;
+    if(elapsedSeconds === 20) { // Exactly when the question time runs out
       
-//       this.correctQuestion_ThisOrThat(gamePin, this.customGames[gamePin].ThisOrThat.currentQuestion);
-//       this.newChosenParticipant(gamePin);
-//       this.customGames[gamePin].ThisOrThat.currentQuestion++; //TODO: När den kört 15 eller 20 frågor borde spelet vara klart.
+      this.correctQuestion_ThisOrThat(gamePin, this.customGames[gamePin].ThisOrThat.currentQuestion);
+      this.newChosenParticipant(gamePin);
+      this.customGames[gamePin].ThisOrThat.currentQuestion++; //TODO: När den kört 15 eller 20 frågor borde spelet vara klart.
 
-//       io.to(gamePin).emit("roundUpdate", this.customGames[gamePin].ThisOrThat)
-//     }
-//     if(elapsedSeconds === 30) { // 30 seconds matches the combined duration of each phase in ThisOrThatComponent.vue. 
-//       elapsedSeconds=0; 
-//     }
-//   }, 1000); 
-// };
+      io.to(gamePin).emit("roundUpdate", this.customGames[gamePin].ThisOrThat)
+    }
+    if(elapsedSeconds === 30) { // 30 seconds matches the combined duration of each phase in ThisOrThatComponent.vue. 
+      elapsedSeconds=0; 
+    }
+  }, 1000); 
+};
 // -------------------------------------------------------------------------------------------------
-
-// - Poll ------------------------------------------------------------------------------------------
-Data.prototype.pollExists = function (pollId) {
-  return typeof this.polls[pollId] !== "undefined"
-}
-Data.prototype.createPoll = function(pollId, lang="en") {
-  if (!this.gameExists(pollId)) {
-    let poll = {};
-    poll.lang = lang;  
-    poll.questions = [];
-    poll.answers = [];
-    poll.participants = [];
-    poll.currentQuestion = 0;              
-    this.polls[pollId] = poll;
-    console.log("poll created", pollId, poll);
-  }
-  return this.polls[pollId];
-}
-Data.prototype.getPoll = function(pollId) {
-  if (this.gameExists(pollId)) {
-    return this.polls[pollId];
-  }
-  return {};
-}
-Data.prototype.participateInPoll = function(pollId, name) {
-  console.log("participant will be added to", pollId, name);
-  if (this.gameExists(pollId)) {
-    this.polls[pollId].participants.push({name: name, answers: []})
-  }
-}
-Data.prototype.getParticipants = function(pollId) {
-  const poll = this.polls[pollId];
-  console.log("participants requested for", pollId);
-  if (this.pollExists(pollId)) { 
-    return this.polls[pollId].participants
-  }
-  return [];
-}
-Data.prototype.addQuestion = function(pollId, q) {
-  if (this.gameExists(pollId)) {
-    this.polls[pollId].questions.push(q);
-  }
-}
-Data.prototype.getQuestion = function(pollId, qId = null) {
-  if (this.gameExists(pollId)) {
-    const poll = this.polls[pollId];
-    if (qId !== null) {
-      poll.currentQuestion = qId;
+// Timer -------------------------------------------------------------------------------------------
+Data.prototype.startCountDown = function() {
+  // Loop through all games and decrease remainingTime each second.
+  this.countDown = setInterval(() => {
+    for(const customGame of Object.values(this.customGames)) {
+      if (customGame.remainingTime > 0) {
+        customGame.remainingTime--;
+      }
+      // TODO: Delete customGame if it reaches 0?
     }
-    return poll.questions[poll.currentQuestion];
-  }
-  return {}
-}
-Data.prototype.getSubmittedAnswers = function(pollId) {
-  if (this.gameExists(pollId)) {
-    const poll = this.polls[pollId];
-    const answers = poll.answers[poll.currentQuestion];
-    if (typeof poll.questions[poll.currentQuestion] !== 'undefined') {
-      return answers;
-    }
-  }
-  return {}
-}
-Data.prototype.submitAnswer = function(pollId, answer) {
-  if (this.gameExists(pollId)) {
-    const poll = this.polls[pollId];
-    let answers = poll.answers[poll.currentQuestion];
-    // create answers object if no answers have yet been submitted
-    if (typeof answers !== 'object') {
-      answers = {};
-      answers[answer] = 1;
-      poll.answers.push(answers);
-    }
-    // create answer property if that specific answer has not yet been submitted
-    else if (typeof answers[answer] === 'undefined') {
-      answers[answer] = 1;
-    }
-    // if the property already exists, increase the number
-    else
-      answers[answer] += 1
-    console.log("answers looks like ", answers, typeof answers);
-  }
-}
+}, 1000);
+};
+Data.prototype.getGameTime = function (gamePin) { 
+  console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin])
+  console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin)
+  return this.customGames[gamePin].remainingTime;
+};
+// -------------------------------------------------------------------------------------------------
 
 Data.prototype.setScore = function(gamePin, userName, newScore){
   console.log("går in i setscore")
@@ -328,107 +282,34 @@ Data.prototype.setScore = function(gamePin, userName, newScore){
   const participant = game.participants.find(p => p.name === userName);
   participant.scoreGame1 = newScore;
   console.log("spelet efter uppdaterad poäng:", this.customGames[gamePin])
-}
-//Ändrat från pollId till gamePin
-// Lägg denna funktion längst ned i prototypsektionen:
-Data.prototype.startTimer = function (gamePin, selectedMinutes, io) {
-  if (!this.customGameExists(gamePin)) {
-      console.log("Game does not exist:", gamePin);
-      return;
-  } 
-
-  const game = this.customGames[gamePin];
-  game.selectedMinutes = selectedMinutes;
-  const countDownDate = Date.now() + selectedMinutes * 60 * 1000;
-
-  let lastMinute = null; // Inledningsvis null
-
-  console.log("Starting timer for gamePin:", gamePin, "with", selectedMinutes, "minutes.");
-
-  const interval = setInterval(() => {
-      const now = Date.now();
-      const distance = countDownDate - now;
-
-      if (distance <= 0) {
-          clearInterval(interval);
-          game.timerDisplay = "Tiden är slut!";
-          io.to(gamePin).emit("update-timer", {
-              timerDisplay: game.timerDisplay,
-              soundType: "alarm" // When there is no time left, play alarm
-          });
-          console.log("Timer ended for gamePin:", gamePin);
-          return;
-      }
-      const totalSeconds = Math.floor(distance / 1000);
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
- 
- 
-      game.timerDisplay = `${minutes}m ${seconds}s`;
-
-
-      // Play silence when starting the timer (lastMinute is null)
-      if (lastMinute === null) {
-          lastMinute = minutes; // Uppdate lastMinute
-          io.to(gamePin).emit("update-timer", {
-              timerDisplay: game.timerDisplay,
-              soundType: "silence" // Play silence when start
-          });
-          console.log("Playing silence for gamePin:", gamePin);
-          return;
-      }
-
-      
-      if (totalSeconds % 60 === 0) {
-          lastMinute = minutes; //  updating lastMinute 
-          io.to(gamePin).emit("update-timer", {
-              timerDisplay: game.timerDisplay,
-              soundType: "alarm" // play alarm
-          });
-          console.log("Playing alarm for gamePin:", gamePin);
-          return;
-      }
-
-      // Send  Timer-update without sound
-      io.to(gamePin).emit("update-timer", {
-          timerDisplay: game.timerDisplay,
-          soundType: "soundType" // No soundsingla for other seconds
-          
-      });
-
-      // denna rad orsakar problem för soundType finns inte /sebbe
-      //console.log("Sending update-timer to gamePin:", gamePin, "TimerDisplay:", game.timerDisplay, "SoundType:", soundType);
-  }, 1000); // Update every second
 };
 
-
-Data.prototype.saveQuestions = function(gamePin, customQuestions, whichQuiz) {
+Data.prototype.saveQuestions = function(gamePin, allCustomQuestions, whichQuiz) {
   console.log("Saving questions for pin: ", gamePin);
-  console.log("Saved questions: ", customQuestions);
+  console.log("Saved questions: ", allCustomQuestions);
   console.log("Which quiz: ", whichQuiz);
 
   if (!this.customGameExists(gamePin)) {
     console.error(`Cannot save questions. Game with pin ${gamePin} does not exist.`);
     return;
   }
-  if (!this.customGames[gamePin].customQuestions) {
-    this.customGames[gamePin].customQuestions = {};
+  if (!this.customGames[gamePin].allCustomQuestions) {
+    this.customGames[gamePin].allCustomQuestions = {};
   }
-  if (!this.customGames[gamePin].customQuestions[whichQuiz]) {
-    this.customGames[gamePin].customQuestions[whichQuiz] = {};
+  if (!this.customGames[gamePin].allCustomQuestions[whichQuiz]) {
+    this.customGames[gamePin].allCustomQuestions[whichQuiz] = {};
   }
-  this.customGames[gamePin].customQuestions[whichQuiz] = customQuestions;
+  this.customGames[gamePin].allCustomQuestions = allCustomQuestions;
+ 
 
-  console.log("Saved questions for pin: ", gamePin, " are: ", this.customGames[gamePin].customQuestions[whichQuiz]);
+  console.log("Saved questions for pin: ", gamePin, " are: ", this.customGames[gamePin].allCustomQuestions[whichQuiz]);
 
   // this.customGames[gamePin].selectedGames[whichQuiz].saveQuestions = savedQuestions;
   // this.customGames[gamePin].selectedGames[whichQuiz].useStandardQuestions = useStandardQuestions;
   // this.customGames[gamePin].selectedGames[whichQuiz].useOwnQuestions = useOwnQuestions;
 
   // Save
-
-}
-
+};
 Data.prototype.deleteGame = function(gamePin) {
   console.log("Deleting game with pin: ", gamePin);
 
@@ -439,11 +320,7 @@ Data.prototype.deleteGame = function(gamePin) {
     console.log("Updated customGames:", this.customGames);
   } else {
     console.error("No game found for index:", gamePin);
+}  
 }
-  
-  
-}
-
-
 
 export { Data };

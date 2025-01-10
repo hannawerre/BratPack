@@ -1,4 +1,6 @@
 <template>
+    <TimerComponent :gamePin="gamePin" :selectedMinutes="gameData.selectedMinutes"></TimerComponent>
+
     <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
 
         <ThisOrThatComponent v-if="gameData.selectedGames.includes('ThisOrThat')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
@@ -20,15 +22,11 @@
                 </button>
             </div>
         </div>
-
-        
-
-        
     </div>
 
     <div v-else> <!--Visas bara så länge ett spel är aktiverat-->
         <GeneralQuizComponent
-            v-if="activeGame === 'General Quiz'"
+            v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
             :gamePin="gamePin"
             :uiLabels="uiLabels"
@@ -36,26 +34,22 @@
             :isPlaying="isPlaying"
         />
     </div>
-
-
-    
 </template>
 
-
 <script>
-    //import {socket} from '../socketClient.js';  // kanske behövs /sebbe 
-    
-    
+
     const socket = io("localhost:3000");
-    import io from 'socket.io-client';  // kanske behövs /sebbe 
+    import io from 'socket.io-client';
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
+    import TimerComponent from '../components/TimerComponent.vue';
 
     export default{
         name: 'GameView',
         components: {
             GeneralQuizComponent,
-            ThisOrThatComponent         
+            ThisOrThatComponent,
+            TimerComponent
         },
         data: function(){
             return {
@@ -64,8 +58,7 @@
                 gameData: {},
                 activeGame: '',
                 uiLabels: {},
-                isAdmin: false,
-                isPlaying: false
+                isAdmin: false
             }
         },
         created: function() {
@@ -82,10 +75,11 @@
             socket.emit( "getUILabels", this.lang );
         },
         mounted: function() {
-            socket.on("onGameStart", gameName=> this.activeGame = gameName)
+            socket.on("onGameStart", gameName=> this.activeGame = gameName);
+            socket.on("participantsUpdate", participants => this.gameData.participants = participants)
             socket.emit('updateAllGameData', this.gamePin);
-            console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin)
-
+            console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin);
+            window.addEventListener("beforeunload", this.handleWindowClose);
         },
         
 
@@ -98,8 +92,7 @@
 
             determineAdminStatus () {
                 const user = this.gameData.participants?.find(p=> p.name === this.userName)
-                this.isAdmin = user ? user.isAdmin : false;
-                this.isPlaying = user ? user.isPlaying : false;
+                this.isAdmin = localStorage.getItem("isAdmin") === "true" || false;
             },
 
             playMiniGame: function(game){
@@ -111,8 +104,16 @@
                 //socket.emit(miniGameStarted, gameid) ?? 
                 // på något sätt få varje spels komponent aktiverad
                 //theo
+            },
+            // Delete user on window close / refresh
+            handleWindowClose(event) {
+            console.log("Window closed!!! Deleting user")
+            socket.emit('deleteUser', this.gamePin, this.userName);
             }
 
+        },
+        beforeDestroy() {
+            window.removeEventListener("beforeunload", this.handleWindowClose);
         }
     }
 

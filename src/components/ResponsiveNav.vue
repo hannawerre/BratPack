@@ -6,7 +6,8 @@
       </router-link>
     </div>
     <div>
-      <span> {{ miniClock }} </span> 
+      <!-- TODO: timer here? /sebbe -->
+      <span>  </span>
     </div>
     <div id="Language">
       <LanguageSwitcher 
@@ -20,8 +21,6 @@
 
 <script>
 import LanguageSwitcher from './LanguageSwitcher.vue'
-import io from 'socket.io-client';
-const socket = io("localhost:3000");
 
 export default {
   name: 'ResponsiveNav',
@@ -43,62 +42,13 @@ export default {
     }
   },
   data() {
-    return {
-      miniClock: "", 
+    return { 
     };
   },
   methods: {
     emitLanguageChangeToParent(newLang) {
       this.$emit('language-changed', newLang);
-    },
-
-    playAlarm() {
-      const alarmSound = new Audio('/audio/alarm.mp3');
-      alarmSound.play().then(() => {
-
-      }).catch((error) => {
-        console.error("Kunde inte spela upp alarmet:", error);
-      });
-    },
-
-    playSilence() {
-      console.log("Spelar tystnad...");
-      const silenceSound = new Audio('/audio/silence.mp3');
-      silenceSound.play().then(() => {
-  
-      }).catch((error) => {
-        console.error("Kunde inte spela upp Silence:", error);
-      });
     }
-  }, 
-  created() {
-    console.log("Testing sound playback...");
-
-    const silenceSound = new Audio('/audio/silence.mp3');
-    silenceSound.play().then(() => {
-        console.log("Silence sound played successfully.");
-    }).catch(error => {
-        console.error("Failed to play silence:", error);
-    });
-
-    
-
-    
-    socket.on('update-timer', ({ timerDisplay, soundType }) => {
-        // console.log("TimerDisplay received in ResponsiveNav:", timerDisplay, "SoundType:", soundType);
-
-        this.miniClock = timerDisplay;
-
-        if (soundType === 'alarm') {
-            this.playAlarm();
-        } else if (soundType === 'silence') {
-            this.playSilence();
-        }
-    });
-},
-  beforeDestroy() {
-   // Clean up the socket listener when the component is destroyed
-    socket.off('update-timer');
   }
 };
 </script>
