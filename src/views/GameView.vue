@@ -1,9 +1,6 @@
 <template>
     <TimerComponent :gamePin="gamePin" :selectedMinutes="gameData.selectedMinutes"></TimerComponent>
-
     <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
-
-        <ThisOrThatComponent v-if="gameData.selectedGames.includes('ThisOrThat')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
 
         <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
             <div>
@@ -32,6 +29,14 @@
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
             :isPlaying="isPlaying"
+            @gameCompleted="onGameCompleted"
+        />
+        <ThisOrThatComponent 
+        v-if="gameData.selectedGames.includes('ThisOrThat')" 
+        :gameData="gameData" 
+        :gamePin="gamePin" 
+        :userName="userName"
+        @gameCompleted="onGameCompleted"
         />
     </div>
 </template>
@@ -83,7 +88,6 @@
             window.addEventListener("beforeunload", this.handleWindowClose);
         },
         
-
         methods: {
             setup: function(){
                 this.gamePin = this.$route.params.gamePin;
@@ -106,6 +110,9 @@
                 //socket.emit(miniGameStarted, gameid) ?? 
                 // på något sätt få varje spels komponent aktiverad
                 //theo
+            },
+            onGameCompleted() {
+                this.activeGame = '';
             },
             // Delete user on window close / refresh
             handleWindowClose(event) {
