@@ -22,32 +22,51 @@
     <a href="">FAQ</a>
   </ResponsiveNav>
 
-  <div class="items">
-    <button class="button green" v-if="!isPlay" @click="togglePlay">Join Game</button>
-    <div v-if="isPlay" class="textBox-wrapper" ref="modal">
-      <input class="textBox input" type="text" @input="checkGameExists(gamePin)" v-model="gamePin" :placeholder="'Game PIN'">
+  
+  <SlideComponant @slideChanged="handleSlideChange">
+    <!-- Slide 1: Join Game -->
+    <div class="items">
+      <div class="join-container" v-if="!isPlay">
+        <button class="button green" @click="togglePlay">Join Game</button>
+      </div>
+      <div class="join-container" v-if="isPlay">
+        <div class="textBox-wrapper">
+          <input 
+            class="textBox input" 
+            type="text" 
+            @input="checkGameExists(gamePin)" 
+            v-model="gamePin" 
+            :placeholder="'Game PIN'"
+          />
+          <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + gamePin">
+            <button class="button green small" @click="nextSlide">Join</button>
+          </router-link>
+        </div>
+      </div>
+    
 
-      <!-- The router link only appears if the input poll actually exists -->
-      <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + gamePin">
-        <button class="textBox click">Join</button>
+    <!-- Slide 2: Create Game -->
+    
+      <router-link to="/create/">
+        <button @click="createGame" class="button">Create Game</button>
       </router-link>
     </div>
-      <router-link to="/create/">
-        <button v-if="!isPlay" @click="createGame" class="button">Create Game</button>
-      </router-link>
-  </div>
+  </SlideComponant>
+  
 </template>
 
 <script>
 import ResponsiveNav from '@/components/ResponsiveNav.vue';
 //import {socket} from '../socketClient.js';
+import SlideComponant from '../components/SlideComponant.vue';
 const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
 
 export default {
   name: 'StartView',
   components: {
-    ResponsiveNav
+    ResponsiveNav,
+    SlideComponant
   },
   data: function () {
     return {
@@ -69,7 +88,6 @@ export default {
     socket.on("gameExists", exists => this.gameExists = exists);
   },
   methods: {
-
     // method currently not used.
   createGame: function(){
       console.log("Requesting to create game...");
@@ -106,6 +124,17 @@ export default {
       this.isPlay = !this.isPlay;
       event.stopPropagation(); // Stops the event listener when the input box isn't up.
     },
+
+    prevSlide() {
+      this.$refs.slideComponent.slide('prev');
+    },
+    nextSlide() {
+      this.$refs.slideComponent.slide('next');
+    },
+    handleSlideChange(index) {
+      console.log("Active slide index:", index);
+    },
+
     closeOnClickOutside: function(event) {
       console.log("closeOnClickOutside")
       const modal = this.$refs.modal;
@@ -154,47 +183,11 @@ border: #ff8c42 10px double;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin: 20% 20% 20% 20%;
+  margin: 15% 0 15% 0;
   position: relative; 
   }
   
-  /* When "Join Game" is pressed, the modal appears */
-  /*Vill ändra färg på modal men vet inte till vad //HANNA 
-  .modal {
-    position: fixed;  
-    top: 50%;         
-    left: 50%;        
-    transform: translate(-50%, -50%); 
-    background-color: rgb(149, 235, 153 ) !important; av nån anledning blir det inte rätt färg annars... 
-    padding: 20px;
-    border: 2px solid rgb(12, 66, 1);
-    border-radius: 6px;
-    z-index: 9999;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-  }
-  .modal input {
-    width: 200px;
-    font-size: 1.5rem;
-    outline: none;
-    border: 2px solid rgb(12, 66, 1);
-    border-radius: 6px;
-    padding: 10px;
-  }
-  
-  .modal button {
-    background-color: rgb(149, 235, 153);
-    font-size: 1.5rem;
-    cursor: pointer;
-    border-radius: 6px;
-    border: 2px solid rgb(12, 66, 1);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0);
-    padding: 10px;
-    margin: 0;
-  }
-  .modal button:hover {
-    background-color: rgb(126, 201, 130);
-  }
-  */
+ 
 
 
 /* Inte säker att nedan behövs

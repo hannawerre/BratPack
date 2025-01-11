@@ -139,7 +139,7 @@
   border-radius: 6px;
   color: white;
   cursor: pointer;  
-  display: inline-block;
+  display: inline-block; 
   /*font-size: 25px;*/
   margin: 30px 4px;
   padding: 15px;
@@ -153,42 +153,63 @@
   box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5);
   transform: scale(1.05);
 }
+.button.green.small {
+  padding: 8px 12px;
+  font-size: 16px;
+  height: 100%;
+  border: 2px solid rgb(0, 58, 0);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0);
+  cursor: pointer;
+  margin: 0;
+}
 
+.join-container {
+  /*display: flex;*/
+  gap: 10px;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+}
 
-
-.toxtBox-wrapper { /* generic rules for text boxes som inte fungerar*/
-  position: fixed; 
-  top: 50%;         
-  left: 50%;        
-  transform: translate(-50%, -50%); 
-  background-color: rgb(149, 235, 153 ); 
+.textBox-wrapper { /* generic rules for text boxes PLACERINGEN ÄR FEL*/
+  display: flex;
+  justify-content: center;
+  position: relative;
+  align-items: center; 
+  margin-left: 280px;
+  margin-right: 280px;
+  background-color: green; 
   padding: 20px;
-  border: 2px solid rgb(12, 66, 1);
+  border: 2px solid rgb(0, 58, 0);
   border-radius: 6px;
   z-index: 9999;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
 }
+
 .textBox.input {
-  width: 200px;
-  font-size: 1.5rem;
-  outline: none;
-  border: 2px solid var(--border-orange);
-  border-radius: 6px;
+  border: 2px solid rgb(0, 58, 0);
+  border-radius: 4px;
   padding: 10px;
+  font-size: 18px;
+  flex: 1;
+}
+.textBox.input:focus {
+  outline: none;
+  border-color: green;
 }
 
 .textBox.click {
-  background-color: var(--our-orange);
-  font-size: 1.5rem;
-  cursor: pointer;
-  border-radius: 6px;
-  border: 2px solid var(--border-orange);
+  background-color: green;
+  border-radius: 4px;
+  font-size: 16px;
+  height: 100%;
+  border: 2px solid rgb(0, 58, 0);
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0);
+  cursor: pointer;
   padding: 10px;
   margin: 0;
 }
 .textBox.click:hover {
-  background-color: var(--border-orange);
+  background-color: rgb(8, 179, 8);
 }
 
 /* REGLER HÄRFRÅN FÖR SPELKNAPPAR */ 
@@ -214,3 +235,4 @@
   box-shadow: 0 0 5px 2px var(--our-orange);
   transform: scale(0.95);
 }
+

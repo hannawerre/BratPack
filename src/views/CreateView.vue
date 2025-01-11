@@ -8,7 +8,7 @@
 
     <div>
       <h2>{{ uiLabels.enterDetails }}</h2>
-      <div class="textBox wrapper"> <!-- fungerar ej:(( -->
+      <div class="textBox-wrapper"> 
         <input class="textBox input"
         type="text"
         v-model="userName"
