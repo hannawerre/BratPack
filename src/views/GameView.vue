@@ -26,7 +26,7 @@
     </div>
 
     <!--Game Components-->
-    <div v-else> 
+    <div v-else-if="activeGame && isPlaying"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
@@ -69,7 +69,8 @@
                 gameData: {},
                 activeGame: '',
                 uiLabels: {},
-                isAdmin: false
+                isAdmin: false,
+                isPlaying: true
             }
         },
         created: function() {
@@ -99,9 +100,11 @@
             },
 
             determineAdminStatus () {
-                const user = this.gameData.participants?.find(p=> p.name === this.userName)
+                const user = this.gameData.participants?.find(p=> p.name === this.userName) // används user? /sebbe
                 this.isAdmin = sessionStorage.getItem("isAdmin") === "true" || false;
-                console.log("Davids Log: Admin status: ", this.isAdmin);    
+                // If admin, and a userName exists in sessionStorage, the admin is playing.
+                if(this.isAdmin) this.isPlaying = sessionStorage.getItem("userName") !== null; 
+                console.log("Davids Log: Admin status: ", this.isAdmin);
             },
 
             playMiniGame: function(game){

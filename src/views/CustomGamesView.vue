@@ -346,6 +346,12 @@ methods: {
       this.participants.unshift(adminName);
       sessionStorage.setItem('userName', this.userName); 
     }
+    else {
+      // Ensure there is no name left in session storage. This is what determines if admin is playing in later views.
+      if (sessionStorage.getItem('userName')) {
+          sessionStorage.removeItem('userName');
+      }
+    }
     sessionStorage.setItem('isAdmin', true);
     
     let gameData = {  // borde den inte vara const? /theo

@@ -201,15 +201,26 @@ Data.prototype.answer_ThisOrThat = function(gamePin, userName, answerId) {
 };
 Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
   try{
-    const participantsArray = Object.values(this.customGames[gamePin].participants); //just nu är det totala antalet participants, även de som loggat in efter att spelet startat /sebbe
-    const randomNumber = Math.floor(Math.random() * participantsArray.length);
-    const newChosenParticipant = participantsArray[randomNumber].name;
-  
-    // On setup we just want it returned. This is because the method is called before the object is initiated.
-    // All other times we just want it updated in Data.js
-    if(!isSetup_flag) {
+    let participantsArray = [];
+    let newChosenParticipant = '';
+    let randomNumber = 0;
+    // On setup it takes participants from the global participants.
+    if(isSetup_flag){
+      participantsArray = Object.values(this.customGames[gamePin].participants); 
+      console.log("--> if: ", participantsArray)
+      randomNumber = Math.floor(Math.random() * participantsArray.length);
+      newChosenParticipant = participantsArray[randomNumber].name;
+    }
+    // Then it picks from the game-local participants. This ensures players who join mid game are not candidates.
+    else{
+      participantsArray = Object.keys(this.customGames[gamePin].ThisOrThat.participants) 
+      console.log("--> else: ", participantsArray)
+      randomNumber = Math.floor(Math.random() * participantsArray.length);
+      newChosenParticipant = participantsArray[randomNumber];
       this.customGames[gamePin].ThisOrThat.chosenParticipant = newChosenParticipant;
-    }; 
+    }
+    // On setup we just want it returned. This is because the method is called before the object is initiated.
+    // All other times we also want it updated in Data.js
     return newChosenParticipant
   }
   catch {
