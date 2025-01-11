@@ -146,6 +146,9 @@
         alternatives.value = [{ text: "", isCorrect: false }];
      };
     };
+    const removeQuestion = (index) => {
+      savedQuestions.value.splice(index, 1);
+    }
     const closeModal = () => {
 
         if(!useStandardQuestions.value && !useOwnQuestions.value){

@@ -83,13 +83,11 @@ socket.on('requestGameTime', (gamePin, callback) => {
 });
 // ---------------------------------------------------------------------------------
 
-  socket.on('createPoll', function(d) {
-    data.createPoll(d.pollId, d.lang)
-    socket.emit('pollData', data.getPoll(d.pollId));
-  });
   socket.on('createGame', function(lang) {
-    const pin = data.createCustomGame(lang);
+    const {pin, customGame} = data.createCustomGame(lang);
+    console.log("Game created with pin: ", pin); 
     socket.emit('gameCreated', pin);
+    socket.emit('updateGameData', customGame);
     // Implement error handling if game could not be created
   });
   
@@ -99,15 +97,7 @@ socket.on('requestGameTime', (gamePin, callback) => {
     console.log("hej");
     //socket emit
   });
-   socket.on('addQuestion', function(d) {
-    data.addQuestion(d.pollId, {q: d.q, a: d.a});
-    socket.emit('questionUpdate', data.getQuestion(d.pollId));
-  });
-  socket.on('joinPoll', function(pollId) {
-    socket.join(pollId);
-    socket.emit('questionUpdate', data.getQuestion(pollId))
-    socket.emit('submittedAnswersUpdate', data.getSubmittedAnswers(pollId));
-  });
+  
   socket.on('updateAllGameData', function(gamePin){
     io.to(gamePin).emit('updateGameData', data.getGameData(gamePin))
   });
@@ -117,7 +107,6 @@ socket.on('requestGameTime', (gamePin, callback) => {
   socket.on('joinCustomGame', function(gamePin) { //joins the socket room 'gamePin'
     socket.join(gamePin);
     socket.emit('updateGameData', data.getGameData(gamePin));
-    // the 'joinPoll' listener above has questionUpdate and submittecAnswersUpdate... where to put them? /sebbe
   });
   socket.on('participateInCustomGame', function(gamePin, playerObj){
     console.log("Adding participant: ", playerObj.name, " in game: ", gamePin)
@@ -136,24 +125,7 @@ socket.on('requestGameTime', (gamePin, callback) => {
     data.deleteUser(gamePin, userName);
     io.to(gamePin).emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
   });
-  socket.on('participateInPoll', function(d) {
-    data.participateInPoll(d.pollId, d.name);
-    io.to(d.pollId).emit('participantsUpdate', data.getParticipants(d.pollId));
-  });
-  socket.on('startPoll', function(pollId) {
-    io.to(pollId).emit('startPoll');
-  })
-  socket.on('runQuestion', function(d) {
-    let question = data.getQuestion(d.pollId, d.questionNumber);
-    io.to(d.pollId).emit('questionUpdate', question);
-    io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
-  });
 
-  socket.on('submitAnswer', function(d) {
-    data.submitAnswer(d.pollId, d.answer);
-    io.to(d.pollId).emit('submittedAnswersUpdate', data.getSubmittedAnswers(d.pollId));
-  }); 
-  
   socket.on("savedQuestionsToServer", function(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz) {
   data.saveQuestions(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz);
   console.log("Theo loggar quiz:", quiz);

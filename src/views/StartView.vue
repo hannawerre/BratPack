@@ -51,8 +51,15 @@
         <button @click="createGame" class="button">Create Game</button>
       </router-link>
     </div>
+<<<<<<< HEAD
   </SlideComponant>
   
+=======
+      <router-link to="/customGames/">
+        <button v-if="!isPlay" @click="createGame" id="create">Create Game</button>
+      </router-link>
+  </div>
+>>>>>>> admin-view
 </template>
 
 <script>
@@ -108,7 +115,7 @@ export default {
         this.lang = "en"
       }
       localStorage.setItem( "lang", this.lang );
-      socket.emit( "getUILabels", this.lang );
+      socket.emit( "getUILabels", this.lang, this.socketId );
     },
     toggleNav: function () {
       this.hideNav = ! this.hideNav;

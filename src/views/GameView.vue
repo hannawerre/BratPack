@@ -1,17 +1,13 @@
 <template>
     <TimerComponent :gamePin="gamePin" :selectedMinutes="gameData.selectedMinutes"></TimerComponent>
-
     <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
 
-        <ThisOrThatComponent v-if="gameData.selectedGames.includes('ThisOrThat')" :gameData="gameData" :gamePin="gamePin" :userName="userName"></ThisOrThatComponent>
-
-        <div v-for="participant in gameData.participants" :key="participant.name" class="button-container">
-            <div>
+        <div class="button-container">
+            <div v-for="participant in gameData.participants" :key="participant.name" >
                 <span>{{ participant.name }}</span> 
-                <span v-if="participant.isAdmin">(Admin)</span>
             </div>
   <!-- Visa bara knapparna om detta är den inloggade användarens namn OCH om den är admin -->
-            <div v-if="participant.name === this.userName && participant.isAdmin">
+            <div v-if="this.isAdmin">
                 <button
                     v-for="gameName in gameData.selectedGames"
                     :key="gameName"
@@ -22,10 +18,6 @@
                 </button>
             </div>
         </div>
-
-        
-
-        
     </div>
 
     <div v-else> <!--Visas bara så länge ett spel är aktiverat-->
@@ -35,23 +27,22 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
-            :isPlaying="isPlaying"
+            @gameCompleted="onGameCompleted"
+        />
+        <ThisOrThatComponent 
+            v-if="activeGame === 'ThisOrThat'" 
+            :gameData="gameData" 
+            :gamePin="gamePin" 
+            :userName="userName"
+            @gameCompleted="onGameCompleted"
         />
     </div>
-
-
-    
 </template>
 
-
-
-
 <script>
-    //import {socket} from '../socketClient.js';  // kanske behövs /sebbe 
-    
-    
+
     const socket = io("localhost:3000");
-    import io from 'socket.io-client';  // kanske behövs /sebbe 
+    import io from 'socket.io-client';
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
     import TimerComponent from '../components/TimerComponent.vue';
@@ -69,8 +60,8 @@
                 userName: '',
                 gameData: {},
                 uiLabels: {},
-                isAdmin: false,
-                isPlaying: false
+                isAdmin: false
+
             }
         },
         created: function() {
@@ -92,10 +83,13 @@
             socket.emit( "getUILabels", this.lang );
         },
         mounted: function() {
+            socket.on("onGameStart", gameName=> this.activeGame = gameName);
+            socket.on("participantsUpdate", participants => this.gameData.participants = participants)
             socket.emit('updateAllGameData', this.gamePin);
-            console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin)
-
+            console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin);
+            window.addEventListener("beforeunload", this.handleWindowClose);
         },
+        
         methods: {
             setup: function(){
                 this.gamePin = this.$route.params.gamePin;
@@ -104,8 +98,8 @@
             },
             determineAdminStatus () {
                 const user = this.gameData.participants?.find(p=> p.name === this.userName)
-                this.isAdmin = user ? user.isAdmin : false;
-                this.isPlaying = user ? user.isPlaying : false;
+                this.isAdmin = sessionStorage.getItem("isAdmin") === "true" || false;
+                console.log("Davids Log: Admin status: ", this.isAdmin);    
             },
 
             playMiniGame: function(game){
@@ -117,8 +111,19 @@
                 //socket.emit(miniGameStarted, gameid) ?? 
                 // på något sätt få varje spels komponent aktiverad
                 //theo
+            },
+            onGameCompleted() {
+                this.activeGame = '';
+            },
+            // Delete user on window close / refresh
+            handleWindowClose(event) {
+            console.log("Window closed!!! Deleting user")
+            socket.emit('deleteUser', this.gamePin, this.userName);
             }
 
+        },
+        beforeDestroy() {
+            window.removeEventListener("beforeunload", this.handleWindowClose);
         }
     }
 
