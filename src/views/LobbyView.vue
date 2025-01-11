@@ -92,10 +92,11 @@ export default {
       socket.emit("getUILabels", this.lang);
     },
     isNameTaken(userName) {
-      this.nameTaken = this.participants.includes(userName);
-      console.log("Name taken: ", this.nameTaken);
-      console.log("All participants: ", this.participants);
+        this.nameTaken = this.participants.some(participant => participant.name === userName);
+        console.log("Name taken: ", this.nameTaken);
+        console.log("All participants: ", this.participants);
     },
+
     // Delete user on window close / refresh
     handleWindowClose(event) {
       console.log("Window closed!!! Deleting user")
