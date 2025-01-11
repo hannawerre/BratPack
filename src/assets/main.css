@@ -79,20 +79,21 @@
 
 
 
-.button { /* generic rules for buttons */
-  border: 2px solid var(--border-orange);
+.button.orange { /* generic rules for buttons */
+  border: none;
   border-radius: 4px;
+  margin: 10px;
   color: white;
-  background-color: var(--our-orange);
+  background: var(--gradient-darkOrange);
   cursor: pointer;
   text-align: center;
   padding: 10px 20px;
   font-size: 20px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
-.button:hover {
-  background-color: var(--our-orange);
-  box-shadow: 0 0 5px 2px var(--border-orange);
+.button.orange:hover {
+  background: var(--gradient-lightOrange);
+  box-shadow: 0 0 15px 5px #ffaa75;
   transform: scale(1.05);
 }
 .button.small {
@@ -103,6 +104,7 @@
 .button.decrement{
   background-color: rgb(213, 8, 8);
   border: none;
+  font-size: 20px;
   border-radius: 4px;
   color: white;
   cursor: pointer;
@@ -119,6 +121,7 @@
 .button.increment{
   background-color: green;
   border: none;
+  font-size: 20px;
   padding: 0;
   border-radius: 4px;
   color: white;
@@ -133,10 +136,11 @@
   transform: scale(1.05);
 }
 
-.button.green {
-  background-color: green;
+.button.blue {
+  background: linear-gradient(45deg, #68a7b9, #5B7C99);
   border: none;
   border-radius: 6px;
+  font-size: 22px;
   color: white;
   cursor: pointer;  
   display: inline-block; 
@@ -148,19 +152,19 @@
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.button.green:hover {
-  background-color: rgb(8, 179, 8);
-  box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5);
+.button.blue:hover {
+  background: linear-gradient(45deg, #a1c3cc, #68a7b9); /* --our-lightBlue till --our-blue */
   transform: scale(1.05);
+  box-shadow: 0 0 15px 5px var(--our-lightBlue);
 }
-.button.green.small {
+.button.blue.small {
   padding: 8px 12px;
   font-size: 16px;
   height: 100%;
-  border: 2px solid rgb(0, 58, 0);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0);
+  border: 1px solid var(--border-darkBlue);
+  box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0);
   cursor: pointer;
-  margin: 0;
+  margin: 5px;
 }
 
 .join-container {
@@ -177,62 +181,39 @@
   align-items: center; 
   margin-left: 280px;
   margin-right: 280px;
-  background-color: green; 
+  background-color: var(--our-darkBlue); 
   padding: 20px;
-  border: 2px solid rgb(0, 58, 0);
+  border: 2px solid var(--border-darkBlue);
   border-radius: 6px;
   z-index: 9999;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
 }
 
 .textBox.input {
-  border: 2px solid rgb(0, 58, 0);
+  border: 2px solid var(--border-darkBlue);
   border-radius: 4px;
   padding: 10px;
   font-size: 18px;
   flex: 1;
+  box-shadow: 0 0 10px 5px var(--our-lightBlue);
 }
 .textBox.input:focus {
   outline: none;
-  border-color: green;
+  border-color: var(--border-darkBlue);
 }
 
 .textBox.click {
-  background-color: green;
+  background-color: var(--gradient-darkBlue);
   border-radius: 4px;
   font-size: 16px;
   height: 100%;
-  border: 2px solid rgb(0, 58, 0);
+  border: 2px solid var(--border-darkBlue);
+  color: white;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0);
   cursor: pointer;
   padding: 10px;
-  margin: 0;
-}
-.textBox.click:hover {
-  background-color: rgb(8, 179, 8);
+  margin: 5px;
 }
 
-/* REGLER HÄRFRÅN FÖR SPELKNAPPAR */ 
 
-.game-button {
-  border: 2px solid var(--border-orange);
-  border-radius: 4px;
-  color: white;
-  background-color: var(--our-orange);
-  cursor: pointer;
-  text-align: center;
-  padding: 10px 20px;
-  font-size: 20px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-}
-.game-button:hover {
-  background-color: var(--our-orange);
-  box-shadow: 0 0 5px 2px var(--border-orange);
-  transform: scale(1.05);
-}
-.game-button:active {
-  background-color: var(--border-orange);
-  box-shadow: 0 0 5px 2px var(--our-orange);
-  transform: scale(0.95);
-}
 

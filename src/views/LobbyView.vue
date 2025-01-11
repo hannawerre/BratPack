@@ -9,7 +9,7 @@
     <h3>Lobby ID: {{gamePin}}</h3>
     <div class="textBox-wrapper" v-if="!joined">
       <input class="textBox input" type="text" v-model="userName" @input=isNameTaken(userName) :placeholder=this.uiLabels.userName>
-      <button class="textBox click" v-if="!nameTaken" v-on:click="participateInCustomGame">
+      <button class="button blue small" v-if="!nameTaken" v-on:click="participateInCustomGame">
         {{ this.uiLabels.participateInPoll }}
       </button>
       <p v-else>
@@ -133,46 +133,13 @@ export default {
 </script>
 
 <style scoped>
-/*
-.usernameInput {
-    position: fixed;  
-    top: 50%;         
-    left: 50%;        
-    transform: translate(-50%, -50%); 
-    background-color: rgb(199, 233, 199) !important; av nån anledning blir det inte rätt färg annars... 
-    padding: 20px;
-    border: 2px solid rgb(12, 66, 1);
-    border-radius: 6px;
-    z-index: 9999;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-}
-.usernameInput input {
-  width: 200px;
-  font-size: 1.5rem;
-  outline: none;
-  border: 2px solid rgb(12, 66, 1);
-  border-radius: 6px;
-  padding: 10px;
-}
-.usernameInput button {
-  background-color: rgb(149, 235, 153);
-  font-size: 1.5rem;
-  cursor: pointer;
-  border-radius: 6px;
-  border: 2px solid rgb(12, 66, 1);
-  padding: 10px;
-  margin: 0;
-}
-button:hover {
-  background-color: rgb(126, 201, 130);
-}
-*/
+
 
 .waitingRoom div{
   /* how do i get it to be centered? */
-  background-color: var(--our-orange);
+  background-color: lightblue;
   border-radius: 15px;
-  border: 4px solid #da6822;
+  border: 2px solid var(--our-darkBlue);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
   width: 40%;
   margin: 5% 0% 0% 30%

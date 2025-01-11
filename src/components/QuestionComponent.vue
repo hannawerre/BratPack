@@ -80,7 +80,7 @@ li.answer-option:nth-child(4n-3) {
 button {
   color: white;
   font-size: 18px;
-  background: linear-gradient(45deg, #28a745, #218838); 
+  background: linear-gradient(45deg, #ff8c42, #da6822); /* --our-orange till --border-orange */
   border: none;
   border-radius: 10px; 
   padding: 10px 20px;
@@ -90,7 +90,7 @@ button {
 }
 
 button:hover {
-  background: linear-gradient(45deg, #34ce57, #28a745);
+  background: linear-gradient(45deg, #ffad66, #ff8c42); /* Ljusare orange till --our-orange */
   transform: translateY(-3px);
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
@@ -101,14 +101,14 @@ button:active {
 }
 
 .selected button {
-  background: linear-gradient(45deg, #218838, #1e7e34);
+  background: linear-gradient(45deg, #da6822, #b5511a); /* --border-orange till en mörkare nyans */
   transform: scale(1.1);
   color: white;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
 
 .dimmed button {
-  background: linear-gradient(45deg, #6c757d, #495057);
+  background: linear-gradient(45deg, #ff8c42, #b5511a); /* --our-orange till en mörkare nyans */
   opacity: 0.6;
   pointer-events: none;
 }

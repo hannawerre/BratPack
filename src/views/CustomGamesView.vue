@@ -23,16 +23,16 @@
         type="text"
         v-model="userName"
         placeholder="Admin"
-        class="input-field"
+        class="textBox input"
       />
     </div>
 </div>
   <div>
       <p>Choose the time in minutes:</p>
       <div class="button-container">
-          <button class="decrement-button" @click="decrementMinutes">-</button>
+          <button class="button decrement" @click="decrementMinutes">-</button>
           {{ selectedMinutes }}
-          <button class="increment-button" @click="incrementMinutes">+</button>
+          <button class="button increment" @click="incrementMinutes">+</button>
       </div>
   </div>
 
@@ -76,10 +76,10 @@
   />
 
   <div class="startbutton-container">
-      <button class="startbutton" @click="startGame">Start Game</button>
-      <button class="startbutton" @click="unactiveGame">Unactive Game</button>
-      <button class="startbutton" @click="updateSettings">Update Info</button>
-      <button class="startbutton" @click="logGameData">logGameData</button>
+      <button class="button orange" @click="startGame">Start Game</button>
+      <button class="button orange" @click="unactiveGame">Unactive Game</button>
+      <button class="button orange" @click="updateSettings">Update Info</button>
+      <button class="button orange" @click="logGameData">logGameData</button>
   </div>
 
 </div>
@@ -544,91 +544,7 @@ beforeDestroy() {
   gap: 10px;
 }
 
-.input-field {
-  width: 100%;
-  max-width: 250px;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
 
-.input-field:focus {
-  border-color: #4caf50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-  outline: none;
-}
-
-.action-button {
-  background-color: #4caf50;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.action-button:hover {
-  background-color: rgb(8, 179, 8);
-  box-shadow: 0 0 10px 3px rgba(8, 179, 8, 0.5);
-  transform: scale(1.05);
-}
-
-.decrement-button{
-  background-color: rgb(213, 8, 8);
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  height: 30px;
-  width: 30px;
-}
-
-.decrement-button:hover{
-  background-color: rgb(247, 44, 44);
-  box-shadow: 0 0 5px 2px rgba(245, 37, 37, 0.5);
-  transform: scale(1.05);
-}
-.increment-button{
-  background-color: green;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  height: 30px;
-  width: 30px;
-}
-
-.increment-button:hover{
-  background-color: rgb(8, 179, 8);
-  box-shadow: 0 0 5px 2px rgba(8, 179, 8, 0.5);
-  transform: scale(1.05);
-}
-
-.startbutton{
-  background-color: green;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;  
-  display: inline-block;
-  font-size: 16px;
-  margin: 30px 4px;
-  padding: 15px;
-  text-align: center;
-  text-decoration: none;  
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.startbutton:hover{
-  background-color: rgb(8, 179, 8);
-  box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5); 
-  transform: scale(1.05);
-}
 
 .game-item {
 display: flex;
@@ -703,6 +619,6 @@ input[type="checkbox"] {
 
   .participants li{
     padding: 5px 0;
-    border-bottom: 1px solid var(--border-orange);
+    border-bottom: 1px solid var(--our-darkBlue);
   }
   </style>

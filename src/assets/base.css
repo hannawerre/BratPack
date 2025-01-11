@@ -1,10 +1,15 @@
 :root {
-  --foreground-color: red;
-  --background-color: green;
   --our-orange: #ff8c42;
   --border-orange: #da6822;
   --our-lightBlue: #CFE8EF;
   --our-darkBlue: #5B7C99;
+  --border-darkBlue: #182733;
+  --our-blue: #68a7b9;
+  --gardient-darkBlue: linear-gradient(45deg, #68a7b9, #5B7C99);
+  --gardient-lightBlue: linear-gradient(45deg, #a1c3cc, #68a7b9);
+  --gradient-darkOrange: linear-gradient(45deg, #ff8c42, #da6822);
+  --gradient-lightOrange: linear-gradient(45deg, #ffad66, #ff8c42)
+  
 }
 body {
   margin: 0;

@@ -4,7 +4,7 @@
       <div v-if="currentPhase === 'startPhase'">
         <h1> {{ uiLabels.generalTrivia }}</h1>
         <div v-if="isAdmin">
-          <button @click="startQuiz"> {{ uiLabels.startQuiz }}</button>
+          <button class="button blue small" @click="startQuiz"> {{ uiLabels.startQuiz }}</button>
         </div>
         <div v-else> {{ uiLabels.waitingOnAdmin }}</div>
       </div>
@@ -69,8 +69,8 @@
         </div>
   
         <div v-if="isAdmin">
-          <button v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
-          <button v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
+          <button class="button blue small" v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
+          <button class="button blue small" v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
         </div>
       
       </div>

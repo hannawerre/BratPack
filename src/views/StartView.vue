@@ -23,11 +23,10 @@
   </ResponsiveNav>
 
   
-  <SlideComponant @slideChanged="handleSlideChange">
-    <!-- Slide 1: Join Game -->
+ 
     <div class="items">
       <div class="join-container" v-if="!isPlay">
-        <button class="button green" @click="togglePlay">Join Game</button>
+        <button class="button blue" @click="togglePlay" style="width: 300px;">Join Game</button>
       </div>
       <div class="join-container" v-if="isPlay">
         <div class="textBox-wrapper">
@@ -39,41 +38,27 @@
             :placeholder="'Game PIN'"
           />
           <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + gamePin">
-            <button class="button green small" @click="nextSlide">Join</button>
+            <button class="button blue small">Join</button>
           </router-link>
         </div>
       </div>
     
-
-    <!-- Slide 2: Create Game -->
-    
-      <router-link to="/create/">
-        <button @click="createGame" class="button">Create Game</button>
+      <router-link to="/customgames/">
+        <button class="button orange">Create Game</button>
       </router-link>
     </div>
-<<<<<<< HEAD
-  </SlideComponant>
-  
-=======
-      <router-link to="/customGames/">
-        <button v-if="!isPlay" @click="createGame" id="create">Create Game</button>
-      </router-link>
-  </div>
->>>>>>> admin-view
 </template>
 
 <script>
 import ResponsiveNav from '@/components/ResponsiveNav.vue';
 //import {socket} from '../socketClient.js';
-import SlideComponant from '../components/SlideComponant.vue';
 const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
 
 export default {
   name: 'StartView',
   components: {
-    ResponsiveNav,
-    SlideComponant
+    ResponsiveNav
   },
   data: function () {
     return {
@@ -95,6 +80,7 @@ export default {
     socket.on("gameExists", exists => this.gameExists = exists);
   },
   methods: {
+
     // method currently not used.
   createGame: function(){
       console.log("Requesting to create game...");
@@ -131,17 +117,6 @@ export default {
       this.isPlay = !this.isPlay;
       event.stopPropagation(); // Stops the event listener when the input box isn't up.
     },
-
-    prevSlide() {
-      this.$refs.slideComponent.slide('prev');
-    },
-    nextSlide() {
-      this.$refs.slideComponent.slide('next');
-    },
-    handleSlideChange(index) {
-      console.log("Active slide index:", index);
-    },
-
     closeOnClickOutside: function(event) {
       console.log("closeOnClickOutside")
       const modal = this.$refs.modal;
@@ -193,25 +168,4 @@ border: #ff8c42 10px double;
   margin: 15% 0 15% 0;
   position: relative; 
   }
-  
- 
-
-
-/* Inte säker att nedan behövs
-@media screen and (max-width:50em) {
-  .logo {
-    font-size: 5vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .close::before {
-    content: "✕";
-  }
-  .hide {
-    left:-12em;
-  }
-}
-  */
 </style>
