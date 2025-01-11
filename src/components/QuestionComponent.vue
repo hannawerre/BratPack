@@ -3,10 +3,11 @@
     <h3>{{ question.question }}</h3>
     <ul>
       <li
-        v-for="answerObj in question.answers"
-        :key="answerObj.id"
-        :class="{ selected: selectedAnswer === answerObj.id, dimmed: selectedAnswer && selectedAnswer !== answerObj.id }"
-      >
+      class="answer-option"
+    v-for="answerObj in question.answers"
+    :key="answerObj.id"
+    :class="{ selected: selectedAnswer === answerObj.id, dimmed: selectedAnswer && selectedAnswer !== answerObj.id }"
+  >
         <button
           :disabled="!!selectedAnswer" 
           @click="selectAnswer(question.id, answerObj)"
@@ -56,25 +57,45 @@ export default {
 
 <style scoped>
 ul {
-  list-style: none; 
-  padding: 0; 
+  list-style: none;
+  padding: 0;
   display: flex;
-  flex-wrap: wrap; 
-  justify-content: center; 
-  gap: 10px; 
+  flex-wrap: wrap;
+  justify-content: center; /* Centrerar elementen horisontellt */
+  gap: 10px; /* Mellanrum mellan knapparna */
+  max-width: 400px; /* Begränsar bredden så att innehållet hålls centrerat */
+  margin: 0 auto; /* Centrerar hela listan i mitten av sin container */
 }
 
 li.answer-option {
-  flex: 1 1 calc(33.333% - 20px); 
+  flex: 1 1 calc(50% - 20px); /* Två knappar per rad */
+  max-width: calc(50% - 20px); /* Begränsar bredden för att hålla dem bredvid varandra */
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Centrerar knappen i varje <li> */
 }
 
-li.answer-option:nth-child(4n), 
-li.answer-option:nth-child(4n-1),
-li.answer-option:nth-child(4n-2),
-li.answer-option:nth-child(4n-3) {
-  flex: 1 1 calc(50% - 20px);
+/* Anpassning för exakt fyra knappar */
+ul:has(li:nth-child(4)) li.answer-option {
+  flex: 1 1 calc(50% - 20px); /* Två knappar per rad */
+  max-width: calc(50% - 20px);
+}
+
+/* Anpassning för färre än fyra knappar */
+ul:not(:has(li:nth-child(4))) li.answer-option {
+  flex: 1 1 calc(50% - 20px); /* Även här två knappar per rad */
+  max-width: calc(50% - 20px);
+}
+
+/* Anpassning för små skärmar */
+@media (max-width: 480px) {
+  ul {
+    max-width: 100%; /* Tillåt full bredd på små skärmar */
+  }
+
+  li.answer-option {
+    flex: 1 1 100%; /* En knapp per rad på små skärmar */
+    max-width: 100%;
+  }
 }
 
 button {
