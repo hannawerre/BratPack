@@ -86,7 +86,7 @@
   <div class="participants">
     <h2>Participants</h2>
       <ul>
-        <li v-if="userRole === 'play'"><strong>{{ userName ? userName : "Admin" }}</strong></li>
+        <li v-if="userRole === 'play' && gameStarted=== false"><strong>{{ userName ? userName : "Admin" }}</strong></li>
         <li v-for="(participant, index) in participants" :key="index">
           <strong>{{ participant.name }}</strong> 
         </li>
@@ -137,7 +137,8 @@ data: function() {
     useStandardQuestions: true,
     useOwnQuestions: false,
     userName:'',
-    userRole: 'host'
+    userRole: 'host',
+    gameStarted: false,
 
   };
 },
@@ -289,17 +290,32 @@ methods: {
     }
   },
 
+  isNameTaken: function(userName) {
+        this.nameTaken = this.participants.some(participant => participant.name === userName);
+        console.log("Name taken: ", this.nameTaken);
+        console.log("All participants: ", this.participants);
+    return this.nameTaken;
+  },
+
   startGame: function () {
     console.log("playerRole: ", this.playerRole);
 
+    if(this.isNameTaken(this.userName)){
+      alert("Name is taken, please choose another one");
+      return;
+    }
 
     if (this.selectedGames.length === 0) {
       alert("Please select at least one game.");
       return;
     }
 
-    if (this.participants.length === 0) {
+    if (this.participants.length === 0 && this.userRole === 'play') {
       alert("No players have joined yet.");
+      return;
+    }
+    if(this.participants.length < 2 && this.userRole === 'host'){
+      alert("Only one player has joined. At least two players are required to start the game.");
       return;
     }
 
@@ -318,10 +334,11 @@ methods: {
       }
       console.log("adminName: ", adminName);
       // socket.emit( "participateInCustomGame", this.gamePin,  adminName);
-      this.participants.push(adminName);
+      this.gameStarted = true;
+      this.participants.unshift(adminName);
       sessionStorage.setItem('userName', this.userName); 
-      sessionStorage.setItem('isAdmin', true);
     }
+    sessionStorage.setItem('isAdmin', true);
     
     let gameData = {  // borde den inte vara const? /theo
       gamePin: this.gamePin,
