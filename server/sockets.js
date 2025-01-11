@@ -40,14 +40,8 @@ function sockets(io, socket, data) {
     socket.emit('setup_ThisOrThat', data.setup_ThisOrThat(gamePin));
     socket.emit("getQuestions_ThisOrThat", data.getQuestions_ThisOrThat(lang));
   });
-  socket.on('newChosenParticipant', function(gamePin) {
-    io.to(gamePin).emit('newChosenParticipant', data.newChosenParticipant(gamePin));
-  });
   socket.on('answer_ThisOrThat', function(gamePin, userName, answerId){
     data.answer_ThisOrThat(gamePin, userName, answerId);
-  });
-  socket.on("chosenParticipantAnswer", function(answer, gamePin){
-    io.to(gamePin).emit('chosenParticipantAnswer', answer);
   });
   socket.on('correctQuestion_ThisOrThat', function(gamePin, questionId){
     data.correctQuestion_ThisOrThat(gamePin, questionId);
@@ -61,13 +55,13 @@ function sockets(io, socket, data) {
 
       setTimeout(() => {
         data.correctQuestion_ThisOrThat(gamePin); // Correct the answers and add points
-        data.newChosenParticipant(gamePin);       // Get new chosenParticipant
-        data.nextQuestion_ThisOrThat(gamePin);    // Get next questionId
         io.to(gamePin).emit("roundUpdate", data.getGameData(gamePin).ThisOrThat);
       }, 20000) // 20 seconds is just after the question time ends.
 
       setTimeout(() => {
-        io.to(gamePin).emit("nextRound");
+        const chosenParticipant = data.newChosenParticipant(gamePin);       // Get new chosenParticipant
+        const nextQuestion = data.nextQuestion_ThisOrThat(gamePin);         // Get next questionId
+        io.to(gamePin).emit("nextRound", nextQuestion, chosenParticipant);
         data.roundInProgress(gamePin, false); // Set to false
       }, 30000) // 10 seconds later
   }

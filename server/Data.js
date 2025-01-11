@@ -200,17 +200,21 @@ Data.prototype.answer_ThisOrThat = function(gamePin, userName, answerId) {
   };
 };
 Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
-
-  const participantsArray = Object.values(this.customGames[gamePin].participants); //just nu är det totala antalet participants, även de som loggat in efter att spelet startat /sebbe
-  const randomNumber = Math.floor(Math.random() * participantsArray.length);
-  const newChosenParticipant = participantsArray[randomNumber].name;
-
-  // On setup we just want it returned. This is because the method is called before the object is initiated.
-  // All other times we just want it updated in Data.js
-  if(isSetup_flag) {
-    return newChosenParticipant;
-  }; 
-  this.customGames[gamePin].ThisOrThat.chosenParticipant = newChosenParticipant
+  try{
+    const participantsArray = Object.values(this.customGames[gamePin].participants); //just nu är det totala antalet participants, även de som loggat in efter att spelet startat /sebbe
+    const randomNumber = Math.floor(Math.random() * participantsArray.length);
+    const newChosenParticipant = participantsArray[randomNumber].name;
+  
+    // On setup we just want it returned. This is because the method is called before the object is initiated.
+    // All other times we just want it updated in Data.js
+    if(!isSetup_flag) {
+      this.customGames[gamePin].ThisOrThat.chosenParticipant = newChosenParticipant;
+    }; 
+    return newChosenParticipant
+  }
+  catch {
+    console.log("ERROR! -> could not get newChosenParticipant in Data.js")
+  }
 };
 Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
   
@@ -268,9 +272,14 @@ Data.prototype.startCountDown = function() {
 }, 1000);
 };
 Data.prototype.getGameTime = function (gamePin) { 
-  console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin])
-  console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin)
-  return this.customGames[gamePin].remainingTime;
+  try {
+    console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin]);
+    console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin);
+    return this.customGames[gamePin].remainingTime;
+  } catch (error) {
+    console.error("Error accessing game data for gamePin:", gamePin, "Error details:", error);
+    return null; 
+  }
 };
 // -------------------------------------------------------------------------------------------------
 

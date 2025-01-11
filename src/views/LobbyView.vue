@@ -96,7 +96,7 @@ export default {
         this.nameTaken = this.participants.some(participant => participant.name === userName);
         console.log("Name taken: ", this.nameTaken);
         console.log("All participants: ", this.participants);
-},
+    },
 
     // Delete user on window close / refresh
     handleWindowClose(event) {
