@@ -33,28 +33,38 @@
     </div>
 
     <!-- Game Phase 3: Display Correct Answer -->
-    <div v-if="currentPhase === 'showAnswer'">
-        <!-- If chosenParticipant didn't answer -->
-        <h2 v-if="showChosenParticipantNoAnswer">Chosen Participant {{ this.chosenParticipant }} didn't answer</h2>
-        <h2 v-else>Correct Answer: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}</h2>
+  <div v-if="currentPhase === 'showAnswer'">
+    <!-- If chosenParticipant didn't answer -->
+    <h2 v-if="showChosenParticipantNoAnswer" class="no-answer-message">
+      Chosen Participant {{ this.chosenParticipant }} didn't answer
+    </h2>
+    <h2 v-else class="correct-answer-message">
+      Correct Answer: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
+    </h2>
 
-      <!-- Display all participants and highlight those who got it right -->
-      <div v-for="[key,value] in Object.entries(participants)" :key="key">
-        <p v-if="correctParticipants.includes(key)" class="correctParticipant">Correct!: {{ key }}: {{ value.points }}</p>
-        <p v-else>{{ key }}: {{ value.points }}</p>
-      </div>
-      <div class="countdown-bar">
-        <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
-      </div>
+    <!-- Display all participants and highlight those who got it right -->
+    <div v-for="[key,value] in Object.entries(participants)" :key="key">
+      <p v-if="correctParticipants.includes(key)">
+        <span class="correctParticipant">{{ key }}</span>: {{ value.points }}
+      </p>
+      <p v-else>
+        {{ key }}: {{ value.points }}
+      </p>
     </div>
 
-    <!-- Game Phase 4: Display Final Results -->
-    <div v-if="currentPhase === 'showFinalResults'">
-        <h2>Final results</h2>
-        <div v-for="[key,value] in Object.entries(participants)" :key="key">
-        <p>{{ key }}: {{ value.points }}</p>
-      </div>
+    <!-- Countdown Bar -->
+    <div class="countdown-bar">
+      <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
     </div>
+  </div>
+
+  <!-- Game Phase 4: Display Final Results -->
+  <div v-if="currentPhase === 'showFinalResults'" class="final-results">
+    <h2>Final Results</h2>
+    <div v-for="[key,value] in Object.entries(participants)" :key="key" class="leaderboard-item">
+      <p>{{ key }}: {{ value.points }}</p>
+    </div>
+  </div>
     
   </div>
 </template>
@@ -77,6 +87,10 @@ export default {
         },
         gamePin: {
             type: String, 
+            required: true
+        },
+        uiLabels: {
+            type: Object,
             required: true
         },
         userName: {
@@ -220,24 +234,42 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
+/* Countdown Bar */
 .countdown-bar {
   width: 100%;
-  height: 20px;
+  height: 8px;
   background-color: #ddd;
   position: relative;
-  margin-top: 10px;
+  margin-top: 15px;
+  border-radius: 5px;
 }
 
 .progress {
   height: 100%;
   background-color: #4caf50;
   transition: width 0.2s ease;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
-/* Doesn't work at the moment */
+/* No Answer Message */
+h2.no-answer-message {
+  font-size: 1.25rem;
+  color: rgb(132, 0, 0);
+  font-weight: bold;
+}
+
+/* Highlighted Correct Participant */
 .correctParticipant {
-    text-decoration: underline;
-    text-decoration-color: green;
+  font-weight: bold;
+  color: #2d6a4f; /* Green color for correct participants */
+}
+
+/* General text styling */
+p {
+  font-size: 1rem;
+  color: #333;
 }
 </style>
+

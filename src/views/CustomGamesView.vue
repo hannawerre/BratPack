@@ -1,4 +1,11 @@
 <template>
+  <Nav :hideNav="false"
+  :uiLabels="uiLabels"
+  :lang="lang"
+  :showLangSwitch="true"
+  @language-changed="handleLanguageChange">
+  </Nav>
+
 <div class="container">
   <div class="main-content">
   <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
@@ -100,16 +107,16 @@
 //import {socket} from '../socketClient.js';
 const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
+import Nav from '@/components/ResponsiveNav.vue'
 import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';
 import EditQuiz4Component from '../components/EditQuiz4Component.vue';
 
-
-
 export default {
 name: 'CustomGames',
 components: {
+  Nav,
   EditQuiz1Component,
   EditQuiz2Component,
   EditQuiz3Component,
@@ -117,7 +124,7 @@ components: {
 },
 data: function() {
   return {
-    lang:'en',
+    lang: localStorage.getItem("lang") || "en",
     selectedMinutes: 60,
     games: [
       // { id: 'General Quiz', name: 'Quiz 1'} ,
@@ -144,6 +151,7 @@ data: function() {
 },
 
 created: function () {
+  socket.on( "uiLabels", labels => this.uiLabels = labels );
   socket.on("updateGameData", (gameData) => {
         
         console.log("Game data received: ", gameData);
@@ -450,7 +458,12 @@ methods: {
       console.log("Pressed log game data button");
       socket.emit('requestGameData', this.gamePin);
       console.log("Game data: ", this.gamePin, this.selectedGames, this.participants, this.selectedMinutes, this.customQuestions, this.useStandardQuestions, this.useOwnQuestions, this.active);
-    }
+    },
+    handleLanguageChange(newLang) {
+      this.lang = newLang;
+      localStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+    },
   },
 mounted() {
   // console.log(this.participants.length > 0,"participants >0")

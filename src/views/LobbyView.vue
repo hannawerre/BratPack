@@ -2,6 +2,7 @@
   <Nav :hideNav="false"
   :uiLabels="uiLabels"
   :lang="lang"
+  :showLangSwitch="true"
   @language-changed="handleLanguageChange">
   </Nav>
   
