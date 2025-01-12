@@ -41,6 +41,7 @@
           <div class="icon-circle icon-correct">✔</div>
           <p> {{ uiLabels.youAnsweredRight }}</p>
           <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
+          <p>Hej hej!</p>
         </div>
 
         <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
