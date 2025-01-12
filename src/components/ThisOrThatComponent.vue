@@ -135,7 +135,7 @@ export default {
     },
     methods: {
         setupGame: function() {
-            this.socket.on('getQuestions_ThisOrThat', questions => this.questions = questions);
+            this.socket.on('getQuestions', questions => this.questions = questions);
             this.socket.on('setup_ThisOrThat', (ThisOrThat) => {
                 this.participants = ThisOrThat.participants;
                 this.chosenParticipant = ThisOrThat.chosenParticipant;
