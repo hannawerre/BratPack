@@ -43,6 +43,15 @@
             :userName="userName"
             @gameCompleted="onGameCompleted"
         />
+
+        <WhosMostLikelyToComponent  
+            v-if="activeGame === 'whosMostLikelyTo'"
+            :gameData="gameData"
+            :gamePin="gamePin"
+            :uiLabels="uiLabels"
+            :userName="userName"
+            :isAdmin="isAdmin" />
+
     </div>
 </template>
 
@@ -52,6 +61,8 @@
     import io from 'socket.io-client';
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
+    import TimerComponent from '../components/TimerComponent.vue';
+    import WhosMostLikelyToComponent from '../components/WhosMostLikelyToComponent.vue';
     import ResponsiveNav from '../components/ResponsiveNav.vue';
 
     export default{
@@ -59,7 +70,9 @@
         components: {
             GeneralQuizComponent,
             ThisOrThatComponent,
-            ResponsiveNav
+            ResponsiveNav,
+            TimerComponent,
+            WhosMostLikelyToComponent
         },
         data: function(){
             return {
@@ -70,7 +83,9 @@
                 activeGame: '',
                 uiLabels: {},
                 isAdmin: false,
-                isPlaying: true
+                isPlaying: false,
+                lang: localStorage.getItem("lang") || "en"
+
             }
         },
         created: function() {

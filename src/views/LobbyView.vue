@@ -44,7 +44,7 @@ export default {
       gamePin: "inactive game",
       uiLabels: {},
       joined: false,
-      lang: localStorage.getItem("lang") || "en",
+      lang: sessionStorage.getItem("lang") || "en",
       participants: [],
       uiLabels: {}
     }
@@ -63,7 +63,7 @@ export default {
     });
     socket.on( "startGame", () => this.$router.push("/game/" + this.gamePin) );
     socket.emit( "joinCustomGame", this.gamePin );
-    socket.emit( "getUILabels", this.lang );
+    socket.emit( "getUILabels", this.lang);
   },
   methods: {
     participateInCustomGame: function () {
@@ -90,7 +90,7 @@ export default {
     },
     handleLanguageChange(newLang) {
       this.lang = newLang;
-      localStorage.setItem("lang", newLang);
+      sessionStorage.setItem("lang", newLang);
       socket.emit("getUILabels", this.lang);
     },
     isNameTaken(userName) {

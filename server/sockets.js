@@ -1,9 +1,13 @@
 function sockets(io, socket, data) {
   
   
-  socket.on("startingQuizQuestion", function(data){
+  socket.on("startingQuestion", function(data){
     console.log(`startQuizForAll received for gamePin = ${data.gamePin}`)
-    io.to(data.gamePin).emit("startGeneralQuizQuestion", data.currentQuestionIndex)
+    io.to(data.gamePin).emit("startQuestion", data.currentQuestionIndex)
+  })
+
+  socket.on("setUpGame", function(data){
+
   })
 
   // Check if game exists
@@ -31,8 +35,41 @@ function sockets(io, socket, data) {
     console.log("hämtar quiz frågor");
     console.log("Lang:", lang, "GamePin:", gamePin, "GameName:", gameName);
     console.log("Theo loggar Getquestions:", data.getQuestions(lang, gamePin, gameName))
-    socket.emit('generalQuestions', data.getQuestions(lang, gamePin, gameName))
+    socket.emit('sendingQuestions', data.getQuestions(lang, gamePin, gameName))
   });
+
+  //WhosMostLikelyTo---------------------------------------------------------------
+  socket.on("settingUpWhosMostLikelyTo", function(gamePin){
+    const whosMostLikelyGameData = data.setUpWhosMostLikely(gamePin);
+    console.log("Datan för whos most likely to", whosMostLikelyGameData)
+    socket.emit("setUpWhosMostLikelyTo", whosMostLikelyGameData)
+    
+  })
+  socket.on("getQuestionsWho", function(lang, gamePin, participants){
+    let questions= data.getQuestions(lang, gamePin, "whosMostLikelyTo")
+    let questionsWithAnswers = data.addAnswerAlternatives(questions, participants);
+    console.log("Theo o dennis äter en häst", questionsWithAnswers);
+    io.to(gamePin).emit("sendingQuestionsWho", questionsWithAnswers);
+
+  })
+
+  socket.on("playerAnswers", function(payload){
+    data.storeAnswer(payload.gamePin, payload.userName, payload.answerObj)
+  });
+
+  socket.on("calculateCorrectAnswer", function(gamePin) {
+    const correctAnswer = data.calculateCorrectAnswer(gamePin);
+    io.to(gamePin).emit("correctAnswerCalculated", correctAnswer);
+  })
+
+  socket.on("nextQuestionWhosMostLikelyTo", function(gamePin){
+    const currentQuestionIndex = data.nextQuestionWhosMostLikelyTo(gamePin);
+    io.to(gamePin).emit("increasingCurrentQuestionIndex", currentQuestionIndex);
+  })
+
+
+  
+  
 
   // ThisOrThat -------------------------------------------------------------------
   socket.on('setup_ThisOrThat', function(gamePin, lang) {

@@ -1,6 +1,7 @@
 'use strict';
 import {readFileSync} from "fs";
 
+
 // Store data in an object to keep the global namespace clean. In an actual implementation this would be interfacing a database...
 function Data() {
   // TODO: Uppdatera customgames['test'] så att den ser exakt ut som ett äkta spel
@@ -8,7 +9,7 @@ function Data() {
   this.countDown = null;
   this.customGames = {};
   this.customGames['test'] = {
-    lang: "en",
+ 
     participants: [],
     selectedGames: [],
     selectedMinutes: 60,
@@ -21,7 +22,6 @@ function Data() {
   // Poll
   this.polls = {};
   this.polls['test'] = {
-    lang: "en",
     questions: [
       {q: "How old are you?", 
        a: ["0-13", "14-18", "19-25", "26-35", "36-45","45-"]
@@ -56,11 +56,11 @@ Data.prototype.generateGamePin = function () {
   return pin;
 };
 
-Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
+Data.prototype.createCustomGame = function () { // lang = "en" ???
   const pin = this.generateGamePin(); 
   // TODO: If there currently is a game with the same pin. The older game will be overwritten. This issue should probably be solved in CustomGamesView.vue /sebbe
   let customGame = {};
-  customGame.lang = lang;  
+ 
   customGame.participants = [];
   customGame.selectedGames = [];
   customGame.selectedMinutes = 60; // 60 minutes default
@@ -148,7 +148,7 @@ Data.prototype.getQuestions = function (lang, gamePin, gameName) {
   //check if lang is valid before trying to load the dictionary file
   if (!["en", "sv"].some( el => el === lang))
     lang = "en";
-  const standardQuestions = JSON.parse(readFileSync("./server/data/questions-" + lang + ".json"));
+  const standardQuestions = JSON.parse(readFileSync("./server/data/questions-"+ gameName + "-" + lang + ".json"));
  
 
   if (this.customGameExists(gamePin)) {
@@ -185,7 +185,7 @@ Data.prototype.setup_ThisOrThat = function(gamePin) {
   return ThisOrThat;
 };
 Data.prototype.getQuestions_ThisOrThat = function(lang) {
-  if (!["en", "sv"].some( el => el === lang)) 
+  if (!["en", "sv"].some( el => el === lang))  
     lang = "en";
   const questions = readFileSync("./server/data/questionsThisOrThat-" + lang + ".json");
   return JSON.parse(questions);
@@ -270,6 +270,126 @@ Data.prototype.startGame_ThisOrThat = function(gamePin) {
   }, 1000); 
 };
 // -------------------------------------------------------------------------------------------------
+
+//WhosMostLikely------------------------------------------------------------------------------------
+
+Data.prototype.setUpWhosMostLikely = function (gamePin) {
+  if(this.customGames[gamePin].whosMostLikely) return this.customGames[gamePin].whosMostLikely;
+
+  let whosMostLikely = {};
+  let participants = {};
+
+  for( const participant of this.customGames[gamePin].participants) {
+    participants[participant.name] = {answers: {}, points: 0}
+  }
+  whosMostLikely.participants = participants;
+  whosMostLikely.correctAnswers = {};
+  whosMostLikely.currentQuestionIndex = 0;
+  this.customGames[gamePin].whosMostLikely = whosMostLikely;
+  return whosMostLikely;
+};
+
+Data.prototype.generateAnswerAlternatives = function(participants){
+  const listOfParticipantsNames = [];
+  const namesOfParticipant = Object.keys(participants);
+  
+  namesOfParticipant.forEach(participant => {
+    listOfParticipantsNames.push(participant)
+  });
+
+  if(listOfParticipantsNames.length > 4) {
+    for (let i =listOfParticipantsNames.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [listOfParticipantsNames[i], listOfParticipantsNames[j] = listOfParticipantsNames[j], listOfParticipantsNames[i]];
+    }
+
+    return listOfParticipantsNames.slice(0, 4);
+  }else {
+    return listOfParticipantsNames;
+  }
+};
+
+ 
+Data.prototype.addAnswerAlternatives = function(questionObj, participants) {
+  if (!questionObj || !Array.isArray(questionObj.questions)) {
+    console.error("Expected an object with a 'questions' array, but got:", questionObj);
+    return [];
+  }
+  questionObj.questions.forEach(question => {
+      const answers = this.generateAnswerAlternatives(participants);
+      question.answers = answers.map((name, index) => ({
+          id: index + 1,
+          answer: name,
+      }));
+  });
+  return questionObj.questions
+}
+
+Data.prototype.storeAnswer = function(gamePin, userName, answerObj) {
+  const game = this.customGames[gamePin];
+  if (!game || !game.whosMostLikely) {
+    console.error(`Spelet med PIN ${gamePin} existerar inte eller är inte konfigurerat för "WhosMostLikely".`);
+    return null;
+  }
+
+  const questionId = answerObj.questionId -1;
+  game.whosMostLikely.participants[userName].answers[questionId] = answerObj;
+  console.log(game.whosMostLikely.participants[userName].answers[questionId])
+
+}
+
+Data.prototype.calculateCorrectAnswer = function(gamePin ){
+  const game = this.customGames[gamePin];
+  const currentQuestionIndex = game.whosMostLikely.currentQuestionIndex;
+
+  const participants = game.whosMostLikely.participants;
+
+  const answers = Object.values(participants).map(participant => participant.answers[currentQuestionIndex]?.answerText);
+  
+  const answerCounts = answers.reduce((counts, answer) =>{
+    if (answer) {
+      counts[answer] = (counts[answer] || 0) + 1;
+    }
+    return counts
+  }, {})
+
+  const maxCount = Math.max(...Object.values(answerCounts));
+  const winningAnswers = Object.entries(answerCounts)
+    .filter(([_, count]) => count === maxCount)
+    .map(([answer]) => answer);
+  game.whosMostLikely.correctAnswers[currentQuestionIndex] = winningAnswers
+
+  console.log("Rätta svaren är,:", game.whosMostLikely.correctAnswers[currentQuestionIndex])
+
+  console.log(`Det mest valda svaret för fråga ${currentQuestionIndex} är "${winningAnswers}" med ${maxCount} röster.`);
+  
+  // Spara det korrekta svaret
+
+  return winningAnswers
+}
+
+Data.prototype.nextQuestionWhosMostLikelyTo = function (gamePin) {
+  const game = this.customGames[gamePin];
+  game.whosMostLikely.currentQuestionIndex++;
+  return game.whosMostLikely.currentQuestionIndex
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//--------------------------------------------------------------------------------------------------
 // Timer -------------------------------------------------------------------------------------------
 Data.prototype.startCountDown = function() {
   // Loop through all games and decrease remainingTime each second.

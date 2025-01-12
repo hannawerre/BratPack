@@ -55,7 +55,7 @@ export default {
 
   data: function () {
     return {
-      lang: localStorage.getItem("lang") || "en",
+      lang: sessionStorage.getItem("lang") || "en",
       uiLabels: {},
       userName: "",
       userRole: "play",
@@ -83,7 +83,7 @@ export default {
         return;
       }
       sessionStorage.setItem('userName', this.userName); 
-      socket.emit("createGame", this.lang);
+      socket.emit("createGame");
       
     },
 
@@ -117,7 +117,7 @@ export default {
    
     handleLanguageChange(newLang) {
       this.lang = newLang;
-      localStorage.setItem("lang", newLang);
+      sessionStorage.setItem("lang", newLang);
       socket.emit("getUILabels", this.lang);
   }
   }

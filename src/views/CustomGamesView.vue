@@ -1,12 +1,13 @@
 <template>
+<div>
   <Nav :hideNav="false"
   :uiLabels="uiLabels"
   :lang="lang"
-  :showLangSwitch="true"
   @language-changed="handleLanguageChange">
-  </Nav>
+</Nav>
 
 <div class="container">
+
   <div class="main-content">
   <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
   <h1 v-else>Loading Game PIN...</h1>
@@ -99,19 +100,23 @@
         </li>
       </ul>
 
+
   </div>
   </div>
+</div>
 </template>
 
 <script>
 //import {socket} from '../socketClient.js';
 const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
-import Nav from '@/components/ResponsiveNav.vue'
 import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';
 import EditQuiz4Component from '../components/EditQuiz4Component.vue';
+import Nav from '@/components/ResponsiveNav.vue';
+
+
 
 export default {
 name: 'CustomGames',
@@ -120,11 +125,12 @@ components: {
   EditQuiz1Component,
   EditQuiz2Component,
   EditQuiz3Component,
-  EditQuiz4Component
+  EditQuiz4Component,
+  Nav
 },
 data: function() {
   return {
-    lang: localStorage.getItem("lang") || "en",
+    lang: sessionStorage.getItem("lang") || "en",
     selectedMinutes: 60,
     games: [
       // { id: 'General Quiz', name: 'Quiz 1'} ,
@@ -132,7 +138,7 @@ data: function() {
       // { id: 'Music quiz', name: 'Quiz 3'},
       // { id: 'This or that', name: 'Quiz 4'}
       { id: 'generalQuiz', name: 'General Quiz'} ,
-      { id: 'Quiz2', name: 'Who´s most likely'},
+      { id: 'whosMostLikelyTo', name: 'whosMostLikelyTo'},
       { id: 'Quiz3', name: 'Music quiz'},
       { id: 'ThisOrThat', name: 'This or that'}
     ],
@@ -143,21 +149,21 @@ data: function() {
     customQuestions:{},
     useStandardQuestions: true,
     useOwnQuestions: false,
-    userName:'',
-    userRole: 'host',
-    gameStarted: false,
+    active: true, // Används denna? /sebbe
+    userName: '',
+    uiLabels: {}
 
   };
 },
 
 created: function () {
   socket.on( "uiLabels", labels => this.uiLabels = labels );
+  socket.emit( "getUILabels", this.lang );
+  this.gamePin = this.$route.params.gamePin;
+  console.log("GamePin: ", this.gamePin);
+  socket.emit("joinCustomGame",this.gamePin);
   socket.on("updateGameData", (gameData) => {
-        
-        console.log("Game data received: ", gameData);
-        // this.customQuestions = gameData.customQuestions;
-        // this.useStandardQuestions = gameData.useStandardQuestions;
-        // this.useOwnQuestions = gameData.useOwnQuestions;
+    if (gameData.selectedGames && gameData.selectedGames.length > 0) {
         this.selectedGames = gameData.selectedGames;
         this.participants = gameData.participants;
         this.selectedMinutes = gameData.selectedMinutes;
@@ -287,6 +293,12 @@ socket.on('participantsUpdate', participants => {
 },
 methods: {
 
+  handleLanguageChange(newLang) {
+      this.lang = newLang;
+      sessionStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+  }, 
+  
   incrementMinutes: function() {
     this.selectedMinutes += 10;
     console.log(this.participants);
@@ -499,7 +511,8 @@ mounted() {
   },
 beforeDestroy() {
     window.removeEventListener("beforeunload", this.handleWindowClose);
-  },
+  }
+  
 }
 </script>
 
