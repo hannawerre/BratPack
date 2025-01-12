@@ -141,7 +141,10 @@
       
     },
     created() {
-      socket.emit("joinSocketRoom", this.gamePin);
+      socket.on("participantsUpdate", (participants) => {
+        this.participants = participants;
+      })
+      
       this.setUpGame();
       
       socket.on("sendingQuestionsWho", questions =>{
@@ -158,6 +161,7 @@
         this.correctAnswer = correctAnswer;
       
       })
+      socket.emit("joinSocketRoom", this.gamePin);
     },
    
     methods: {
