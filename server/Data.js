@@ -266,24 +266,49 @@ Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
   }
 };
 Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
-  
-  const participantsArray = Object.entries(this.customGames[gamePin].ThisOrThat.participants);
-  const correctAnswers = this.customGames[gamePin].ThisOrThat.correctAnswers;
-  const questionId = this.customGames[gamePin].ThisOrThat.currentQuestion;
-  console.log("-------> Inside correctQuestion_ThisOrThat", participantsArray, this.customGames[gamePin].ThisOrThat)
-  // Add 10 points if answer is correct
-  for(let [name, data] of participantsArray){
-    if (data.answers[questionId] && data.answers[questionId] === correctAnswers[questionId]){
-      this.customGames[gamePin].ThisOrThat.participants[name].points += 10;
-      // Find corresponding name in the general participants array and add points there as well.
-      const generalParticipants = this.customGames[gamePin].participants;
-      const matchingParticipant = generalParticipants.find((participant) => participant.name === name);
-      if (matchingParticipant) {
-        matchingParticipant.scoreGame4 += 10;
-      }
+  const game = this.customGames[gamePin];
+  const questionId = game.ThisOrThat.currentQuestion;
+  const correctAnswer = game.ThisOrThat.correctAnswers[questionId];
+  const chosenParticipant = game.ThisOrThat.chosenParticipant;
+
+  // 1) Räkna hur många som har svarat "rätt"
+  let correctPlayers = [];
+  for (let [playerName, data] of Object.entries(game.ThisOrThat.participants)) {
+    if (data.answers[questionId] && data.answers[questionId] === correctAnswer) {
+      correctPlayers.push(playerName);
     }
   }
+
+  if (correctPlayers.includes(chosenParticipant)) {
+    correctPlayers = correctPlayers.filter((name) => name !== chosenParticipant);
+  }
+
+  // 2) Räkna ut hur stor potten är
+  const numberOfPlayers = Object.keys(game.ThisOrThat.participants).length;
+  const pot = 200 * numberOfPlayers;
+
+  // 3) Om ingen eller chosenParticipant själv inte klickade → ingen får poäng
+  if (correctPlayers.length === 0) {
+    return;
+  }
+
+  // 4) Annars dela ut potten / antalet som svarade rätt
+  const share = Math.floor(pot / correctPlayers.length);
+
+  // 5) Uppdatera ThisOrThat-participants
+  correctPlayers.forEach(playerName => {
+    game.ThisOrThat.participants[playerName].points += share;
+  });
+
+  // 6) Uppdatera de "vanliga" participants också, så scoreboarden uppdateras globalt
+  correctPlayers.forEach(playerName => {
+    const generalParticipant = game.participants.find(p => p.name === playerName);
+    if (generalParticipant) {
+      generalParticipant.scoreGame4 += share;
+    }
+  });
 };
+
 Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
   return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
 };
