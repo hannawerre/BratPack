@@ -26,9 +26,9 @@
           <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
         </div> -->
         <!-- Ta bort v-if -->
-        <ul v-if="isListVisible"> 
+        <!-- <ul v-if="isListVisible">  -->
         <p v-for="participant in participants">{{ participant.name }}</p>
-        </ul>
+        <!-- </ul> -->
       </div>
   </div>
   </div>

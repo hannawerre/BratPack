@@ -156,14 +156,29 @@ Data.prototype.participateInCustomGame = function (gamePin, playerObj) {
 
 Data.prototype.deleteUser = function (gamePin, userName) {
   if (this.customGameExists(gamePin)) {
-    const participants = this.customGames[gamePin].participants;
-    this.customGames[gamePin].participants = participants.filter(
+    const gameData = this.customGames[gamePin];
+
+    // Delete from participants array
+    const participants = gameData.participants;
+    gameData.participants = participants.filter(
       (participant) => participant.name !== userName
     );
-    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", this.customGames[gamePin].participants)
+    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", gameData.participants);
+
+    // Delete from ThisOrThat participants if exists
+    if (gameData.ThisOrThat && gameData.ThisOrThat.participants) {
+      if (gameData.ThisOrThat.participants[userName]) {
+        delete gameData.ThisOrThat.participants[userName];
+        console.log("Deleted user: ", userName, " from ThisOrThat participants of gamePin: ", gamePin, "   Current ThisOrThat participants: ", gameData.ThisOrThat.participants);
+      }
+    }
+  } else {
+    console.log(
+      "ERROR, could not delete user because gamePin does not exist!"
+    );
   }
-  else console.log("ERROR, could not delete user because gamePin does not exist!");
 };
+
 
 
 Data.prototype.getUILabels = function (lang) {
@@ -277,7 +292,6 @@ Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
     if (data.answers[questionId] && data.answers[questionId] === correctAnswer) {
       correctPlayers.push(playerName);
     }
-    
   }
 
   if (correctPlayers.includes(chosenParticipant)) {
