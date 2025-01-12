@@ -1,13 +1,10 @@
 <template>
     <div>
     <!-- Rules -->
-    <div v-if="showRules">
+    <div v-if="currentPhase === 'showRules'">
         <!-- TODO: Fixa så regler syns i rätt språk. -->
-         <h2>Rules</h2>
-         <br>
          <h3>One participant will be chosen for each round</h3>
          <h3>The task is to pick the same answer as the chosen one</h3>
-         <br>
          <h3>How well do you know your fellow mates?</h3>
         <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
@@ -15,7 +12,7 @@
     </div>
 
     <!-- Game Phase 1: Display Chosen Participant -->
-    <div v-if="showChosenParticipant">
+    <div v-if="currentPhase === 'showChosenParticipant'">
       <h2>Chosen participant: {{ chosenParticipant }}</h2>
       <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
@@ -23,7 +20,7 @@
     </div>
 
     <!-- Game Phase 2: Display Question -->
-    <div v-if="showQuestion">
+    <div v-if="currentPhase === 'showQuestion'">
         <h2>Chosen participant: {{ chosenParticipant }}</h2>
       <QuestionComponent
         v-if="questions?.questions?.[currentQuestion]"
@@ -36,28 +33,38 @@
     </div>
 
     <!-- Game Phase 3: Display Correct Answer -->
-    <div v-if="showAnswer">
-        <!-- If chosenParticipant didn't answer -->
-        <h2 v-if="showChosenParticipantNoAnswer">Chosen Participant {{ this.chosenParticipant }} didn't answer</h2>
-        <h2 v-else>Correct Answer: {{ questions.questions[currentQuestion-1].answers[correctAnswer-1].answer }}</h2>
+  <div v-if="currentPhase === 'showAnswer'">
+    <!-- If chosenParticipant didn't answer -->
+    <h2 v-if="showChosenParticipantNoAnswer" class="no-answer-message">
+      Chosen Participant {{ this.chosenParticipant }} didn't answer
+    </h2>
+    <h2 v-else class="correct-answer-message">
+      Correct Answer: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
+    </h2>
 
-      <!-- Display all participants and highlight those who got it right -->
-      <div v-for="[key,value] in Object.entries(participants)" :key="key">
-        <p v-if="correctParticipants.includes(key)" class="correctParticipant">Correct!: {{ key }}: {{ value.points }}</p>
-        <p v-else>{{ key }}: {{ value.points }}</p>
-      </div>
-      <div class="countdown-bar">
-        <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
-      </div>
+    <!-- Display all participants and highlight those who got it right -->
+    <div v-for="[key,value] in Object.entries(participants)" :key="key">
+      <p v-if="correctParticipants.includes(key)">
+        <span class="correctParticipant">{{ key }}</span>: {{ value.points }}
+      </p>
+      <p v-else>
+        {{ key }}: {{ value.points }}
+      </p>
     </div>
 
-    <!-- Game Phase 4: Display Final Results -->
-    <div v-if="showFinalResults">
-        <h2>Final results</h2>
-        <div v-for="[key,value] in Object.entries(participants)" :key="key">
-        <p>{{ key }}: {{ value.points }}</p>
-      </div>
+    <!-- Countdown Bar -->
+    <div class="countdown-bar">
+      <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
     </div>
+  </div>
+
+  <!-- Game Phase 4: Display Final Results -->
+  <div v-if="currentPhase === 'showFinalResults'" class="final-results">
+    <h2>Final Results</h2>
+    <div v-for="[key,value] in Object.entries(participants)" :key="key" class="leaderboard-item">
+      <p>{{ key }}: {{ value.points }}</p>
+    </div>
+  </div>
     
   </div>
 </template>
@@ -82,6 +89,10 @@ export default {
             type: String, 
             required: true
         },
+        uiLabels: {
+            type: Object,
+            required: true
+        },
         userName: {
             type: String,
             required: true
@@ -90,19 +101,16 @@ export default {
 
     data: function(){
         return {
-            showRules: true,
-            showChosenParticipant: false,
-            showQuestion: false,
-            showAnswer: false,
+            currentPhase: 'showRules',
             showChosenParticipantNoAnswer: false,
-            showFinalResults: false,
 
-            lang: localStorage.getItem("lang") || "en",
+            lang: sessionStorage.getItem("lang") || "en",
             questions: [],
+            countdown:null,
             countdownProgress: 100,
             currentQuestion: 0,
+
             participants: {}, 
-            myAnswers: [],
             chosenParticipant: null,
             correctAnswer: null,
             correctParticipants: []
@@ -111,11 +119,12 @@ export default {
     created: function() {
         socket.emit('joinSocketRoom', this.gamePin);
 
-        socket.on("chosenParticipantAnswer", answer => this.correctAnswer = answer);
-        socket.on("newChosenParticipant", participant => this.chosenParticipant = participant)
-
         socket.on('roundUpdate', (ThisOrThat) => this.roundUpdate(ThisOrThat));
-        socket.on("nextRound", ()=> this.startRound());
+        socket.on("nextRound", (nextQuestion, chosenParticipant) => {
+            console.log("--> socket.on(nextRound) with nextQuestion:", nextQuestion, " and chosenParticipant:", chosenParticipant)
+            this.startRound(nextQuestion, chosenParticipant)
+        });
+            
         this.setupGame();
     },
     methods: {
@@ -130,19 +139,25 @@ export default {
         displayRules() {
             this.startCountdown(30, "rules")
         },
-        startRound() {
-            this.showQuestion = false;
-            this.showAnswer = false;
+        startRound(nextQuestion, chosenParticipant) {
+            console.log("--> startRound with nextQuestion:", nextQuestion, " and chosenParticipant:", chosenParticipant)
+            // If out of sync, this will clear the old progress bar.
+            clearInterval(this.countdown);
+
             this.showChosenParticipantNoAnswer = false;
+            this.chosenParticipant = chosenParticipant;
+            this.currentQuestion = nextQuestion;
             console.log("--> inside startRound with this.questions.questions=", this.questions.questions)
+
             if(this.currentQuestion < this.questions.questions.length){
+                
                 socket.emit("startRound", this.gamePin);
-                this.showChosenParticipant = true;
+                this.currentPhase = 'showChosenParticipant'
                 this.startCountdown(5, "participant");
             }
             else{
                 this.startCountdown(30, "finalResults")
-                this.showFinalResults = true;
+                this.currentPhase = 'showFinalResults'
             };
         },
         roundUpdate(ThisOrThat){
@@ -158,11 +173,6 @@ export default {
                 this.correctAnswer = ThisOrThat.correctAnswers[this.currentQuestion]; 
                 this.setCorrectParticipants();
             };
-            // Slight delay to prevent it from being displayed too early.
-            setTimeout(() => {
-                this.chosenParticipant = ThisOrThat.chosenParticipant;
-                this.currentQuestion = ThisOrThat.currentQuestion; 
-            }, 300)
             console.log("roundUpdate: ", ThisOrThat);
         },
         startCountdown(duration, phase) {
@@ -170,11 +180,12 @@ export default {
             let remainingTime = duration * 1000; 
             const totalTime = remainingTime; 
 
-            const interval = setInterval(() => {
+            this.countdown = setInterval(() => {
                 const progress = (remainingTime / totalTime) * 100;
                 this.countdownProgress = progress;
+                
                 if (remainingTime <= 0) {
-                    clearInterval(interval);
+                    clearInterval(this.countdown);
                     this.transitionPhase(phase); 
                 }
                 remainingTime -= updateInterval; 
@@ -183,50 +194,25 @@ export default {
         transitionPhase(currentPhase) {
             if (currentPhase === "rules"){
                 this.showRules = false;
-                this.startRound()
+                this.startRound(this.currentQuestion, this.chosenParticipant)
             }
             else if (currentPhase === "participant") {
-                this.showChosenParticipant = false;
-                this.showQuestion = true;
+                this.currentPhase = 'showQuestion';
                 this.startCountdown(15, "question");
             } 
             else if (currentPhase === "question") {
-                this.showQuestion = false;
-                this.showAnswer = true;
+                console.log("About to show answers with this.questions.questions =", this.questions.questions)
+                this.currentPhase = 'showAnswer';
                 this.startCountdown(10, "answer");
             }
             else if (currentPhase === "finalResults"){
                 this.$emit('gameCompleted');
             }
         },
-        revealCorrectAnswer() {
-            this.correctAnswer = "Pizza"; 
-            this.numCorrect = 69; 
-        },
-        newChosenParticipant: function() {
-            // Returns a random number between 0 and the amount of players-1. 
-            // Since the participants array is the same for everyone, the same participant will be chosen for everyone.
-            socket.emit("newChosenParticipant", this.gamePin);
-        },
-        startGame: function(){
-            socket.emit("startGame_ThisOrThat", this.gamePin)
-        },
-        updateGame: function(){ //test
-            socket.emit('requestGameData', this.gamePin)
-        },
         onAnswer(answerData) { 
             // TODO: Just nu används inte questionId! /sebbe
             socket.emit('answer_ThisOrThat', this.gamePin, this.userName, answerData.answerId)
             console.log("User: ", this.userName, "just answered");
-        },
-        // TODO: Denna används inte
-        correctQuestion(){
-            socket.emit("correctQuestion_ThisOrThat", this.gamePin, this.currentQuestion);
-            this.currentQuestion+=1;
-        },
-        // TODO: Denna används inte
-        chosenParticipantAnswer: function(answer) {
-            socket.emit("chosenParticipantAnswer", answer, this.gamePin);
         },
         setCorrectParticipants: function() {
             const correctParticipants = [];
@@ -248,24 +234,42 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
+/* Countdown Bar */
 .countdown-bar {
   width: 100%;
-  height: 20px;
+  height: 8px;
   background-color: #ddd;
   position: relative;
-  margin-top: 10px;
+  margin-top: 15px;
+  border-radius: 5px;
 }
 
 .progress {
   height: 100%;
   background-color: #4caf50;
   transition: width 0.2s ease;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
-/* Doesn't work at the moment */
+/* No Answer Message */
+h2.no-answer-message {
+  font-size: 1.25rem;
+  color: rgb(132, 0, 0);
+  font-weight: bold;
+}
+
+/* Highlighted Correct Participant */
 .correctParticipant {
-    text-decoration: underline;
-    text-decoration-color: green;
+  font-weight: bold;
+  color: #2d6a4f; /* Green color for correct participants */
+}
+
+/* General text styling */
+p {
+  font-size: 1rem;
+  color: #333;
 }
 </style>
+

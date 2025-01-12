@@ -1,12 +1,17 @@
 <template>
-    <TimerComponent :gamePin="gamePin" :selectedMinutes="gameData.selectedMinutes"></TimerComponent>
-    <div v-if="!activeGame"> <!--Visas bara så länge inget spel är aktiverat-->
+    <ResponsiveNav
+    :gamePin="gamePin"
+    :userName="userName"
+    :gameActive="true"
+    />
+    <!--Visas när inget spel är aktiverat-->
+    <div v-if="!activeGame"> 
 
         <div class="button-container">
-            <div v-for="participant in gameData.participants" :key="participant.name" >
-                <span>{{ participant.name }}</span> 
-            </div>
-  <!-- Visa bara knapparna om detta är den inloggade användarens namn OCH om den är admin -->
+            
+            <!-- TODO: Scoreboard -->
+
+            <!-- Buttons only visible to admin -->
             <div v-if="this.isAdmin">
                 <button
                     v-for="gameName in gameData.selectedGames"
@@ -20,7 +25,8 @@
         </div>
     </div>
 
-    <div v-else> <!--Visas bara så länge ett spel är aktiverat-->
+    <!--Game Components-->
+    <div v-else-if="activeGame && isPlaying"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
@@ -33,9 +39,19 @@
             v-if="activeGame === 'ThisOrThat'" 
             :gameData="gameData" 
             :gamePin="gamePin" 
+            :uiLabels="uiLabels"
             :userName="userName"
             @gameCompleted="onGameCompleted"
         />
+
+        <WhosMostLikelyToComponent  
+            v-if="activeGame === 'whosMostLikelyTo'"
+            :gameData="gameData"
+            :gamePin="gamePin"
+            :uiLabels="uiLabels"
+            :userName="userName"
+            :isAdmin="isAdmin" />
+
     </div>
 </template>
 
@@ -46,22 +62,29 @@
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
     import TimerComponent from '../components/TimerComponent.vue';
+    import WhosMostLikelyToComponent from '../components/WhosMostLikelyToComponent.vue';
+    import ResponsiveNav from '../components/ResponsiveNav.vue';
 
     export default{
         name: 'GameView',
         components: {
             GeneralQuizComponent,
             ThisOrThatComponent,
-            TimerComponent
+            ResponsiveNav,
+            TimerComponent,
+            WhosMostLikelyToComponent
         },
         data: function(){
             return {
+                lang: localStorage.getItem("lang") || "en",
                 gamePin: '',
                 userName: '',
                 gameData: {},
                 activeGame: '',
                 uiLabels: {},
-                isAdmin: false
+                isAdmin: false,
+                isPlaying: false,
+                lang: localStorage.getItem("lang") || "en"
 
             }
         },
@@ -71,12 +94,11 @@
                 this.gameData = gameData;
                 this.determineAdminStatus();
             });
-            
             this.setup();
-            // This will ensure the client will listen to messages emitted to the socket room. :)
-            console.log(this.gamePin)
             socket.emit('joinSocketRoom', this.gamePin);
             socket.emit( "getUILabels", this.lang );
+
+            
         },
         mounted: function() {
             socket.on("onGameStart", gameName=> this.activeGame = gameName);
@@ -85,7 +107,6 @@
             console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin);
             window.addEventListener("beforeunload", this.handleWindowClose);
         },
-        
         methods: {
             setup: function(){
                 this.gamePin = this.$route.params.gamePin;
@@ -94,20 +115,20 @@
             },
 
             determineAdminStatus () {
-                const user = this.gameData.participants?.find(p=> p.name === this.userName)
+                const user = this.gameData.participants?.find(p=> p.name === this.userName) // används user? /sebbe
                 this.isAdmin = sessionStorage.getItem("isAdmin") === "true" || false;
-                console.log("Davids Log: Admin status: ", this.isAdmin);    
+                // If admin, and a userName exists in sessionStorage, the admin is playing.
+                if(this.isAdmin) this.isPlaying = sessionStorage.getItem("userName") !== null; 
+                console.log("Davids Log: Admin status: ", this.isAdmin);
             },
 
             playMiniGame: function(game){
+                console.log("playMiniGame with this.activeGame =", this.activeGame, " and this.isAdmin = ", this.isAdmin)
                 if(this.isAdmin){
                     socket.emit("startMiniGame", {
                         gameName: game, 
                         gamePin: this.gamePin
                 })}
-                //socket.emit(miniGameStarted, gameid) ?? 
-                // på något sätt få varje spels komponent aktiverad
-                //theo
             },
             onGameCompleted() {
                 this.activeGame = '';
@@ -116,7 +137,7 @@
             handleWindowClose(event) {
             console.log("Window closed!!! Deleting user")
             socket.emit('deleteUser', this.gamePin, this.userName);
-            }
+            },
 
         },
         beforeDestroy() {

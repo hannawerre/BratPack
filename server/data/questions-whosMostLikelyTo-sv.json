@@ -1,0 +1,364 @@
+{
+    "questions": [
+        {
+            "id": 1,
+            "question": "Vem är mest flirtig?"
+          },
+          {
+            "id": 2,
+            "question": "Vem har haft den snyggaste partnern?"
+          },
+          {
+            "id": 3,
+            "question": "Vem flirtar mest i vardagen?"
+          },
+          {
+            "id": 4,
+            "question": "Vem gillar att mingla med flest personer?"
+          },
+          {
+            "id": 5,
+            "question": "Vem är mest självsäker?"
+          },
+          {
+            "id": 6,
+            "question": "Vem kommer bli den coolaste föräldern?"
+          },
+          {
+            "id": 7,
+            "question": "Vem är mest populär?"
+          },
+          {
+            "id": 8,
+            "question": "Vem får mest uppmärksamhet?"
+          },
+          {
+            "id": 9,
+            "question": "Vem säger nej oftast?"
+          },
+          {
+            "id": 10,
+            "question": "Vem gillar yngre personer?"
+          },
+          {
+            "id": 11,
+            "question": "Vem är mest självsäker?"
+          },
+          {
+            "id": 12,
+            "question": "Vem kan dricka snabbast?"
+          },
+          {
+            "id": 13,
+            "question": "Vem är bäst på att dölja saker för sina föräldrar?"
+          },
+          {
+            "id": 14,
+            "question": "Vem gillar att testa nya saker?"
+          },
+          {
+            "id": 15,
+            "question": "Vem är mest social ikväll?"
+          },
+          {
+            "id": 16,
+            "question": "Vem kommer skratta mest åt detta imorgon?"
+          },
+          {
+            "id": 17,
+            "question": "Vem är trevligast i gruppen?"
+          },
+          {
+            "id": 18,
+            "question": "Vem är alltid förberedd?"
+          },
+          {
+            "id": 19,
+            "question": "Vem använder mest snus?"
+          },
+          {
+            "id": 20,
+            "question": "Vem är mest kreativ?"
+          },
+          {
+            "id": 21,
+            "question": "Vem är bäst på att ge komplimanger?"
+          },
+          {
+            "id": 22,
+            "question": "Vem gillar lyxig livsstil mest?"
+          },
+          {
+            "id": 23,
+            "question": "Vem är mest rastlös?"
+          },
+          {
+            "id": 24,
+            "question": "Vem hittar en partner i år?"
+          },
+          {
+            "id": 25,
+            "question": "Vem tränar mest?"
+          },
+          {
+            "id": 26,
+            "question": "Vem är bäst på att hantera vänskap?"
+          },
+          {
+            "id": 27,
+            "question": "Vem dricker mest alkohol?"
+          },
+          {
+            "id": 28,
+            "question": "Vem är mest nöjd med sig själv?"
+          },
+          {
+            "id": 29,
+            "question": "Vem har det bästa leendet?"
+          },
+          {
+            "id": 30,
+            "question": "Vem har bäst klädstil?"
+          },
+          {
+            "id": 31,
+            "question": "Vem kommer bli känd?"
+          },
+          {
+            "id": 32,
+            "question": "Vem är mest mån om sitt utseende?"
+          },
+          {
+            "id": 33,
+            "question": "Vem är mest spontan?"
+          },
+          {
+            "id": 34,
+            "question": "Vem är bäst på att underhålla andra?"
+          },
+          {
+            "id": 35,
+            "question": "Vem är mest oskyldig?"
+          },
+          {
+            "id": 36,
+            "question": "Vem gör roligast ljud när de är glada?"
+          },
+          {
+            "id": 37,
+            "question": "Vem är festens stjärna?"
+          },
+          {
+            "id": 38,
+            "question": "Vem är mest generös?"
+          },
+          {
+            "id": 39,
+            "question": "Vem har du spanat in ikväll?"
+          },
+          {
+            "id": 40,
+            "question": "Vem har mest gemensamt med dig?"
+          },
+          {
+            "id": 41,
+            "question": "Vem dansar bäst?"
+          },
+          {
+            "id": 42,
+            "question": "Vem har bäst musiksmak?"
+          },
+          {
+            "id": 43,
+            "question": "Vem har flest internationella vänner?"
+          },
+          {
+            "id": 44,
+            "question": "Vem är bäst på att lösa konflikter?"
+          },
+          {
+            "id": 45,
+            "question": "Vem är bäst på att hitta intressanta saker om andra?"
+          },
+          {
+            "id": 46,
+            "question": "Vem dricker flest koppar kaffe?"
+          },
+          {
+            "id": 47,
+            "question": "Vem är mest äventyrlig?"
+          },
+          {
+            "id": 48,
+            "question": "Vem gillar att vara spontan?"
+          },
+          {
+            "id": 49,
+            "question": "Vem är bäst på att hitta annorlunda platser att besöka?"
+          },
+          {
+            "id": 50,
+            "question": "Vem är bäst på att hålla kontakt med gamla vänner?"
+          },
+          {
+            "id": 51,
+            "question": "Vem gillar att testa nya saker?"
+          },
+          {
+            "id": 52,
+            "question": "Vem gillar äldre människor?"
+          },
+          {
+            "id": 53,
+            "question": "Vem har flest internationella kontakter?"
+          },
+          {
+            "id": 54,
+            "question": "Vem är mest känslig?"
+          },
+          {
+            "id": 55,
+            "question": "Vem har kortast tålamod?"
+          },
+          {
+            "id": 56,
+            "question": "Vem har mest intressanta mål för framtiden?"
+          },
+          {
+            "id": 57,
+            "question": "Vem gillar att resa mest?"
+          },
+          {
+            "id": 58,
+            "question": "Vem spenderar mest tid hemma?"
+          },
+          {
+            "id": 59,
+            "question": "Vem har mest ovanliga intressen?"
+          },
+          {
+            "id": 60,
+            "question": "Vem har varit mest kreativ nyligen?"
+          },
+          {
+            "id": 61,
+            "question": "Vem blir lättast arg?"
+          },
+          {
+            "id": 62,
+            "question": "Vem var senast på en rolig resa?"
+          },
+          {
+            "id": 63,
+            "question": "Vem känner flest kända personer?"
+          },
+          {
+            "id": 64,
+            "question": "Vem kommer leva längst?"
+          },
+          {
+            "id": 65,
+            "question": "Vem är mest äventyrlig?"
+          },
+          {
+            "id": 66,
+            "question": "Vem kommer ha flest historier att berätta?"
+          },
+          {
+            "id": 67,
+            "question": "Vem är den du gillar mest i gruppen?"
+          },
+          {
+            "id": 68,
+            "question": "Vem är mest avslappnad?"
+          },
+          {
+            "id": 69,
+            "question": "Vem är mest självsäker ikväll?"
+          },
+          {
+            "id": 70,
+            "question": "Vem är mest elegant?"
+          },
+        {
+            "id": 71,
+            "question": "Vem är bäst på problemlösning?"
+        },
+        {
+            "id": 72,
+            "question": "Vem lär sig nya saker snabbast?"
+        },
+        {
+            "id": 73,
+            "question": "Vem kommer bli en framgångsrik entreprenör?"
+        },
+        {
+            "id": 74,
+            "question": "Vem kan flest programmeringsspråk?"
+        },
+        {
+            "id": 75,
+            "question": "Vem är bäst på att skriva snygg kod?"
+        },
+        {
+            "id": 76,
+            "question": "Vem är mest kreativ i sitt arbete?"
+        },
+        {
+            "id": 77,
+            "question": "Vem skulle bli bäst på att hålla en TED Talk?"
+        },
+        {
+            "id": 78,
+            "question": "Vem har mest potential att bli chef?"
+        },
+        {
+            "id": 79,
+            "question": "Vem gör bäst PowerPoint-presentationer?"
+        },
+        {
+            "id": 80,
+            "question": "Vem jobbar hårdast?"
+        },
+        {
+            "id": 91,
+            "question": "Vem är bäst på att nätverka?"
+        },
+        {
+            "id": 92,
+            "question": "Vem har det mest spännande CV:t?"
+        },
+        {
+            "id": 93,
+            "question": "Vem är bäst på att multitaska?"
+        },
+        {
+            "id": 94,
+            "question": "Vem skulle passa bäst som mentor?"
+        },
+        {
+            "id": 95,
+            "question": "Vem har störst chans att jobba utomlands?"
+        },
+        {
+            "id": 96,
+            "question": "Vem är bäst på att tänka utanför boxen?"
+        },
+        {
+            "id": 97,
+            "question": "Vem skulle vara mest framgångsrik inom tech-branschen?"
+        },
+        {
+            "id": 98,
+            "question": "Vem är bäst på att hålla deadlines?"
+        },
+        {
+            "id": 99,
+            "question": "Vem skulle starta en startup?"
+        },
+        {
+            "id": 100,
+            "question": "Vem har flest LinkedIn-kontakter?"
+        }
+    ]
+}

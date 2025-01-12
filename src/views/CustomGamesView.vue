@@ -7,6 +7,7 @@
       </div>
 </div>
 <div class="container">
+
   <div class="main-content">
   <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
   <h1 v-else>Loading Game PIN...</h1>
@@ -97,8 +98,10 @@
         </li>
       </ul>
 
+
   </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -108,12 +111,15 @@ import io from 'socket.io-client';
 import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';
+import EditQuiz4Component from '../components/EditQuiz4Component.vue';
+import Nav from '@/components/ResponsiveNav.vue';
 
 
 
 export default {
 name: 'CustomGames',
 components: {
+  Nav,
   EditQuiz1Component,
   EditQuiz2Component,
   EditQuiz3Component,
@@ -121,7 +127,7 @@ components: {
 },
 data: function() {
   return {
-    lang:'en',
+    lang: sessionStorage.getItem("lang") || "en",
     selectedMinutes: 60,
     games: [
       // { id: 'General Quiz', name: 'Quiz 1'} ,
@@ -138,9 +144,9 @@ data: function() {
     currentGame: null, // Används denna? /sebbe
     customQuestions: {},
     // useCustomQuestions: false,
-    userName:'',
-    userRole: 'host',
-    gameStarted: false,
+    active: true, // Används denna? /sebbe
+    userName: '',
+    uiLabels: {}
     showGameExistsPopup: false,
     shouldRestoreState: false,
   };
@@ -243,6 +249,13 @@ methods: {
     this.$router.push("/");
   },
 
+
+  handleLanguageChange(newLang) {
+      this.lang = newLang;
+      sessionStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+  }, 
+  
   incrementMinutes: function() {
     this.selectedMinutes += 10;
     console.log(this.participants);
@@ -301,6 +314,12 @@ methods: {
       this.gameStarted = true;
       this.participants.unshift(adminName);
       sessionStorage.setItem('userName', this.userName); 
+    }
+    else {
+      // Ensure there is no name left in session storage. This is what determines if admin is playing in later views.
+      if (sessionStorage.getItem('userName')) {
+          sessionStorage.removeItem('userName');
+      }
     }
     sessionStorage.setItem('isAdmin', true);
     
