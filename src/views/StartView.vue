@@ -55,7 +55,7 @@ export default {
     return {
       uiLabels: {},
       gamePin: "",
-      lang: localStorage.getItem( "lang") || "en",
+      lang: sessionStorage.getItem( "lang") || "en",
       hideNav: true,
       isPlay: false,
       gameExists: false,
@@ -91,8 +91,8 @@ export default {
       else {
         this.lang = "en"
       }
-      localStorage.setItem( "lang", this.lang );
-      socket.emit( "getUILabels", this.lang, this.socketId );
+      sessionStorage.setItem( "lang", this.lang );
+      socket.emit( "getUILabels", this.lang );
     },
     toggleNav: function () {
       this.hideNav = ! this.hideNav;

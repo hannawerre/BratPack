@@ -107,7 +107,7 @@ export default {
             currentPhase: 'showRules',
             showChosenParticipantNoAnswer: false,
 
-            lang: localStorage.getItem("lang") || "en",
+            lang: sessionStorage.getItem("lang") || "en",
             questions: [],
             countdown:null,
             countdownProgress: 100,
