@@ -1,4 +1,5 @@
 <template>
+  
   <div>
       <!-- Start Phase -->
       <div v-if="currentPhase === 'startPhase'">
@@ -92,6 +93,15 @@
 </template>
 
 <script>
+/* 
+
+GLÖM EJ ATT ÄNDRA SPRÅKET TILL LOCALSTORAGE
+
+
+
+
+
+*/
 
 import QuestionComponent from './QuestionComponent.vue';
 import Nav from './ResponsiveNav.vue';
@@ -114,7 +124,7 @@ export default {
 
   data() {
     return {
-      lang: localStorage.getItem("lang") || "en",
+      lang: sessionStorage.getItem("lang") || "en",
       questions: [],
       currentQuestionIndex: 0,
       currentPhase: 'startPhase',
@@ -142,11 +152,11 @@ export default {
     socket.emit("joinSocketRoom", this.gamePin);
       
     // När servern skickar frågorna, sätt dem i `questions`
-    socket.on('generalQuestions', quizQuestions => {
+    socket.on('sendingQuestions', quizQuestions => {
       this.questions = quizQuestions.questions;
     });
       
-    socket.on("startGeneralQuizQuestion", (currentQuestionIndex) =>{
+    socket.on("startQuestion", (currentQuestionIndex) =>{
       this.currentQuestionIndex = currentQuestionIndex
       this.goToNextPhase();
     })
@@ -156,7 +166,7 @@ export default {
  
   methods: {
     startQuiz(){
-      socket.emit("startingQuizQuestion", {
+      socket.emit("startingQuestion", {
           gamePin: this.gamePin, 
           currentQuestionIndex: this.currentQuestionIndex
         })
@@ -165,7 +175,7 @@ export default {
       const participant = this.gameData.participants.find(
         (p) => p.name === this.userName
       );
-      if (!participant?.isPlaying) return;
+      
 
       this.currentAnswer = answerData;
       this.currentPhase = "answeredPhase";
@@ -186,7 +196,7 @@ export default {
     },
     nextQuestion() {
       this.currentQuestionIndex++;
-      socket.emit("startingQuizQuestion", {
+      socket.emit("startingQuestion", {
         gamePin: this.gamePin,
         currentQuestionIndex: this.currentQuestionIndex,
       });
@@ -304,6 +314,26 @@ export default {
 </script>
 
 <style scoped>
+.start-button{
+  background-color: green;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;  
+  display: inline-block;
+  font-size: 16px;
+  margin: 30px 4px;
+  padding: 15px;
+  text-align: center;
+  text-decoration: none;  
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.startbutton:hover{
+  background-color: rgb(8, 179, 8);
+  box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5); 
+  transform: scale(1.05);
+}
 .intro-wrapper {
   display: flex;
   justify-content: center;
@@ -384,6 +414,7 @@ export default {
   font-weight: bold;
   color: gold;
 }
+
 </style>
 
 

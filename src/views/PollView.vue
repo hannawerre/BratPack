@@ -106,7 +106,7 @@
         pollId: "inactive poll",
         submittedAnswers: {},
         uiLabels: {},
-        lang: localStorage.getItem("lang") || "en",
+        lang: sessionStorage.getItem("lang") || "en",
       }
     },
     created: function () {
@@ -123,7 +123,7 @@
       },
       handleLanguageChange(newLang) {
         this.lang = newLang;
-        localStorage.setItem("lang", newLang);
+        sessionStorage.setItem("lang", newLang);
         socket.emit("getUILabels", this.lang);
       }
     }

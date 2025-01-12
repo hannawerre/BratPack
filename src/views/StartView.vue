@@ -65,7 +65,7 @@ export default {
     return {
       uiLabels: {},
       gamePin: "",
-      lang: localStorage.getItem( "lang") || "en",
+      lang: sessionStorage.getItem( "lang") || "en",
       hideNav: true,
       isPlay: false,
       gameExists: false,
@@ -101,8 +101,8 @@ export default {
       else {
         this.lang = "en"
       }
-      localStorage.setItem( "lang", this.lang );
-      socket.emit( "getUILabels", this.lang, this.socketId );
+      sessionStorage.setItem( "lang", this.lang );
+      socket.emit( "getUILabels", this.lang );
     },
     toggleNav: function () {
       this.hideNav = ! this.hideNav;
@@ -129,9 +129,14 @@ export default {
   mounted: function() {
     document.addEventListener('click', this.closeOnClickOutside);
   },
-  beforeDestroy: function() {
+  beforeDestroy() {
     document.removeEventListener('click', this.closeOnClickOutside);
-  }
+    // if (this.socket) {
+    //             this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
+    //             this.socket.disconnect(); // Disconnect the socket
+    //             this.socket = null;
+    //         }
+    }
 }
 </script>
 <style scoped>

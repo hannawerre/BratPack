@@ -40,22 +40,24 @@
           <h1>Edit {{ GameName }}</h1>
           <p>Here you can add questions to the game</p>
           <br />
-          <div class="checkboxes-container">
+          <div class="radio-buttons-container">
             <label>
-              <input 
-                type="checkbox"
-                v-model="useStandardQuestions"
-              />
-              Use standard questions
+                <input 
+                type="radio"
+                :value="false"
+                v-model="useCustomQuestions"
+                />
+                Use standard questions
             </label>
             <label>
-              <input 
-                type="checkbox"
-                v-model="useOwnQuestions"
-              />
-              Use own questions
+                <input 
+                type="radio"
+                :value="true"
+                v-model="useCustomQuestions"
+                />
+                Use own questions
             </label>
-          </div>
+            </div>
           <br />
   
           <p>Add question</p>
@@ -104,7 +106,7 @@
     "modal-closed",
     "questions-saved-generalQuiz"
 ]);
-
+    
     const isModalOpen = ref(false);
 
     const isListVisible = ref(false);
@@ -114,14 +116,20 @@
     const useOwnQuestions = ref(false);
 
     const question = ref("");
-    const alternatives = ref([{ text: "", isCorrect: false }]);
+    const alternatives = ref([
+  { text: "", isCorrect: false },
+  { text: "", isCorrect: false },
+]);
 
     const savedQuestions = ref([]);
 
     const addAlternative = () => {
-        console.log("Adding alternative");
-        alternatives.value.push({ text: "", isCorrect: false }); 
-    };
+    if (alternatives.value.length >= 4) {
+        return;
+    }
+    console.log("Adding alternative");
+    alternatives.value.push({ text: "", isCorrect: false });
+  };
 
     const openModal = () => {
         isModalOpen.value = true;
@@ -134,14 +142,28 @@
     };
 
     const saveQuestion = () => {
-        if (question.value.trim() !== "") {
 
-            const hasCorrectAnswer = alternatives.value.some(alt => alt.isCorrect);
-        if (!hasCorrectAnswer) {
-            console.error("At least one alternative must be marked as correct.");
-            alert("Please mark at least one alternative as correct.");
-            return;
+        if (question.value.trim() !== "") {
+        const hasCorrectAnswer = alternatives.value.some((alt) => alt.isCorrect);
+
+        // Check if at least two alternatives have text
+        const nonEmptyAlternatives = alternatives.value.filter((alt) => alt.text.trim() !== "");
+
+        if (nonEmptyAlternatives.length < 2) {
+          console.error("At least two alternatives must have text.");
+          alert("Please provide at least two alternatives with text.");
+          return;
         }
+
+        if (!hasCorrectAnswer) {
+          console.error("At least one alternative must be marked as correct.");
+          alert("Please mark at least one alternative as correct.");
+          return;
+        }
+
+      
+        
+        
             const newQuestionId = savedQuestions.value.length + 1;
             
             const newQuestionObj = {
@@ -158,33 +180,36 @@
         console.log("Currently saved questions:", savedQuestions.value);
 
         question.value = "";
-        alternatives.value = [{ text: "", isCorrect: false }];
-     };
+        alternatives.value = [
+            { text: "", isCorrect: false },
+            { text: "", isCorrect: false },
+            ];
+    };
     };
     const removeQuestion = (index) => {
       savedQuestions.value.splice(index, 1);
     }
     const closeModal = () => {
-
-        if(!useStandardQuestions.value && !useOwnQuestions.value){
-            alert("Please select at least one option: 'Use standard questions' or 'Use own questions'.");
-            return;
-        }
+        console.log("useCustomQuestions", useCustomQuestions.value);
+        console.log("savedquestions", savedQuestions.value);
 
         isModalOpen.value = false;
         emit(
             "questions-saved-generalQuiz",
             savedQuestions.value,
-            useStandardQuestions.value,
-            useOwnQuestions.value,
-            "generalQuiz"
-
+            useCustomQuestions.value
         );
-        
+        console.log("useCustomQuestions", useCustomQuestions.value);
+        console.log("savedquestions", savedQuestions);
+
         emit('modal-closed');
+
         alternatives.value = alternatives.value.filter((alt, index) => {
         return index === 0 || alt.text.trim() !== "";
         });
+        while (alternatives.value.length < 2) {
+        alternatives.value.push({ text: "", isCorrect: false });
+  }
     };
 
     defineExpose({
@@ -268,17 +293,26 @@
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.checkboxes-container {
+.radio-buttons-container {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 20px;
   margin-bottom: 15px;
 }
-.checkboxes-container label {
+
+.radio-buttons-container label {
   display: flex;
   gap: 6px;
   align-items: center;
+}
+
+input[type="radio"] {
+  accent-color: #4caf50;
+  margin: 0;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
 }
 
 .question {

@@ -2,6 +2,7 @@
   <Nav :hideNav="false"
   :uiLabels="uiLabels"
   :lang="lang"
+  :showLangSwitch="true"
   @language-changed="handleLanguageChange">
   </Nav>
   
@@ -48,7 +49,7 @@ export default {
       gamePin: "inactive game",
       uiLabels: {},
       joined: false,
-      lang: localStorage.getItem("lang") || "en",
+      lang: sessionStorage.getItem("lang") || "en",
       participants: [],
       uiLabels: {},
       isListVisible: false,
@@ -69,7 +70,7 @@ export default {
     });
     socket.on( "startGame", () => this.$router.push("/game/" + this.gamePin) );
     socket.emit( "joinCustomGame", this.gamePin );
-    socket.emit( "getUILabels", this.lang );
+    socket.emit( "getUILabels", this.lang);
   },
   methods: {
     participateInCustomGame: function () {
@@ -96,7 +97,7 @@ export default {
     },
     handleLanguageChange(newLang) {
       this.lang = newLang;
-      localStorage.setItem("lang", newLang);
+      sessionStorage.setItem("lang", newLang);
       socket.emit("getUILabels", this.lang);
     },
     isNameTaken(userName) {
@@ -139,10 +140,15 @@ export default {
   mounted() {
     window.addEventListener("beforeunload", this.handleWindowClose);
     //this.checkIfRefreshPage();
-  },
+  },  
   beforeDestroy() {
     window.removeEventListener("beforeunload", this.handleWindowClose);
-  }
+    // if (this.socket) {
+    //             this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
+    //             this.socket.disconnect(); // Disconnect the socket
+    //             this.socket = null;
+    //         }
+    },
 }
 </script>
 

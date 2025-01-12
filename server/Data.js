@@ -9,7 +9,7 @@ function Data() {
   this.countDown = null;
   this.customGames = {};
   this.customGames['test'] = {
-    lang: "en",
+ 
     participants: [],
     selectedGames: [],
     selectedMinutes: 60,
@@ -20,22 +20,21 @@ function Data() {
 
 
 
- // Poll
- this.polls = {};
- this.polls['test'] = {
-   lang: "en",
-   questions: [
-     {q: "How old are you?",
-      a: ["0-13", "14-18", "19-25", "26-35", "36-45","45-"]
-     },
-     {q: "How much do you enjoy coding?",
-      a: ["1", "2", "3", "4", "5"]
-     }
-   ],
-   answers: [],
-   currentQuestion: 0,
-   participants: []
- }
+  // Poll
+  this.polls = {};
+  this.polls['test'] = {
+    questions: [
+      {q: "How old are you?", 
+       a: ["0-13", "14-18", "19-25", "26-35", "36-45","45-"]
+      },
+      {q: "How much do you enjoy coding?", 
+       a: ["1", "2", "3", "4", "5"]
+      }
+    ],
+    answers: [],
+    currentQuestion: 0,
+    participants: []
+  }
 }
 
 
@@ -62,16 +61,18 @@ Data.prototype.generateGamePin = function () {
  return pin;
 };
 
-Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
+Data.prototype.createCustomGame = function () { // lang = "en" ???
   const pin = this.generateGamePin(); 
   // TODO: If there currently is a game with the same pin. The older game will be overwritten. This issue should probably be solved in CustomGamesView.vue /sebbe
   let customGame = {};
-  customGame.lang = lang;  
+ 
   customGame.participants = [];
   customGame.selectedGames = [];
   customGame.selectedMinutes = 60; // 60 minutes default
   customGame.remainingTime = 3600; //
   customGame.gameStarted = false;
+  customGame.customQuestions = {};
+  customGame.useCustomQuestions = false;
 
   
 
@@ -82,7 +83,23 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
 };
 
 
+Data.prototype.createCustomGameAlt = function (pin, lang) { // lang = "en" ???
+  // TODO: If there currently is a game with the same pin. The older game will be overwritten. This issue should probably be solved in CustomGamesView.vue /sebbe
+  let customGame = {};
+  customGame.lang = lang;  
+  customGame.participants = [];
+  customGame.selectedGames = [];
+  customGame.selectedMinutes = 60; // 60 minutes default
+  customGame.remainingTime = 3600; //
+  customGame.gameStarted = false;
+  // customGame.customQuestions = {};
+  // customGame.useCustomQuestions = false;
 
+  this.customGames[pin] = customGame;
+  
+  console.log("Custom Game created", pin, customGame);
+  return { customGame };
+};
 
 Data.prototype.storeGameDataAndStart = function (gameData){
   // Update the gameData and set gameStarted = true
@@ -124,7 +141,7 @@ Data.prototype.participateInCustomGame = function (gamePin, playerObj) {
   if (this.customGameExists(gamePin)) {
     const game = this.customGames[gamePin];
     game.participants.push({
-      name: playerObj.name || "Anonymous",
+      name: playerObj.name || "Anonymous", // Anonymous??? ta bort eller?
       scoreGame1: playerObj.scoreGame1 || 0,
       scoreGame2: playerObj.scoreGame2 || 0,
       scoreGame3: playerObj.scoreGame3 || 0,
@@ -157,31 +174,44 @@ Data.prototype.getUILabels = function (lang) {
   return JSON.parse(labels);
 };
 
-Data.prototype.getQuestions = function (lang, gamePin, gameName) {
-  //check if lang is valid before trying to load the dictionary file
-  if (!["en", "sv"].some( el => el === lang))
+Data.prototype.getQuestions = function (lang, gamePin, whichQuiz) {
+  // Kontrollera om språket är giltigt, annars standard till engelska
+  if (!["en", "sv"].includes(lang)) {
     lang = "en";
-  const standardQuestions = JSON.parse(readFileSync("./server/data/questions-" + lang + ".json"));
- 
+  }
 
+  // Läs in standardfrågor från den lokala filen baserat på språk
+  const standardQuestions = JSON.parse(readFileSync(`./server/data/questions-${whichQuiz}-${lang}.json`));
+  console.log(`./server/data/questions-${whichQuiz}-${lang}.json`)
+  // Kontrollera om spelet existerar
   if (this.customGameExists(gamePin)) {
     const gameData = this.customGames[gamePin];
-    const allQuestions = gameData?.allCustomQuestions;
-    const customQuestions = allQuestions?.[gameName]?.customQuestions;
-    
-    
-    if(customQuestions && Array.isArray(customQuestions)){
-      const questionObj = {
+    const quizData = gameData?.allCustomQuestions?.[whichQuiz]; // Hämtar data för det specifika quizet
+
+    const customQuestions = quizData?.customQuestions; // Anpassade frågor
+    const useCustomQuestions = quizData?.useCustomQuestions; // Flagga för att använda anpassade frågor
+  
+    // Kontrollera om vi ska använda anpassade frågor
+    if (useCustomQuestions && customQuestions && Array.isArray(customQuestions)) {
+      return {
         questions: customQuestions
-      }
-      return questionObj
-    } else{
-    return standardQuestions
+      };
     }
+  } else {
+    console.error(`Game with pin ${gamePin} does not exist.`);
   }
+
+  return standardQuestions;
 };
 
 // ThisOrThat -------------------------------------------------------------------------------------
+Data.prototype.getQuestions_ThisOrThat = function(lang) {
+  if (!["en", "sv"].some( el => el === lang)) 
+    lang = "en";
+  const questions = JSON.parse(readFileSync("./server/data/questionsThisOrThat-" + lang + ".json"));
+  return questions;
+};
+
 Data.prototype.setup_ThisOrThat = function(gamePin) {
   if(this.customGames[gamePin].ThisOrThat) return this.customGames[gamePin].ThisOrThat; // If it already exists
   let ThisOrThat = {};
@@ -197,12 +227,7 @@ Data.prototype.setup_ThisOrThat = function(gamePin) {
   this.customGames[gamePin].ThisOrThat = ThisOrThat;
   return ThisOrThat;
 };
-Data.prototype.getQuestions_ThisOrThat = function(lang) {
-  if (!["en", "sv"].some( el => el === lang)) 
-    lang = "en";
-  const questions = readFileSync("./server/data/questionsThisOrThat-" + lang + ".json");
-  return JSON.parse(questions);
-};
+
 Data.prototype.answer_ThisOrThat = function(gamePin, userName, answerId) {
   // Add the answer to the given participant.
   const currentQuestion = this.customGames[gamePin].ThisOrThat.currentQuestion
@@ -214,15 +239,26 @@ Data.prototype.answer_ThisOrThat = function(gamePin, userName, answerId) {
 };
 Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
   try{
-    const participantsArray = Object.values(this.customGames[gamePin].participants); //just nu är det totala antalet participants, även de som loggat in efter att spelet startat /sebbe
-    const randomNumber = Math.floor(Math.random() * participantsArray.length);
-    const newChosenParticipant = participantsArray[randomNumber].name;
-  
-    // On setup we just want it returned. This is because the method is called before the object is initiated.
-    // All other times we just want it updated in Data.js
-    if(!isSetup_flag) {
+    let participantsArray = [];
+    let newChosenParticipant = '';
+    let randomNumber = 0;
+    // On setup it takes participants from the global participants.
+    if(isSetup_flag){
+      participantsArray = Object.values(this.customGames[gamePin].participants); 
+      console.log("--> if: ", participantsArray)
+      randomNumber = Math.floor(Math.random() * participantsArray.length);
+      newChosenParticipant = participantsArray[randomNumber].name;
+    }
+    // Then it picks from the game-local participants. This ensures players who join mid game are not candidates.
+    else{
+      participantsArray = Object.keys(this.customGames[gamePin].ThisOrThat.participants) 
+      console.log("--> else: ", participantsArray)
+      randomNumber = Math.floor(Math.random() * participantsArray.length);
+      newChosenParticipant = participantsArray[randomNumber];
       this.customGames[gamePin].ThisOrThat.chosenParticipant = newChosenParticipant;
-    }; 
+    }
+    // On setup we just want it returned. This is because the method is called before the object is initiated.
+    // All other times we also want it updated in Data.js
     return newChosenParticipant
   }
   catch {
@@ -239,6 +275,12 @@ Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
   for(let [name, data] of participantsArray){
     if (data.answers[questionId] && data.answers[questionId] === correctAnswers[questionId]){
       this.customGames[gamePin].ThisOrThat.participants[name].points += 10;
+      // Find corresponding name in the general participants array and add points there as well.
+      const generalParticipants = this.customGames[gamePin].participants;
+      const matchingParticipant = generalParticipants.find((participant) => participant.name === name);
+      if (matchingParticipant) {
+        matchingParticipant.scoreGame4 += 10;
+      }
     }
   }
 };
@@ -272,6 +314,126 @@ Data.prototype.startGame_ThisOrThat = function(gamePin) {
   }, 1000); 
 };
 // -------------------------------------------------------------------------------------------------
+
+//WhosMostLikely------------------------------------------------------------------------------------
+
+Data.prototype.setUpWhosMostLikely = function (gamePin) {
+  if(this.customGames[gamePin].whosMostLikely) return this.customGames[gamePin].whosMostLikely;
+
+  let whosMostLikely = {};
+  let participants = {};
+
+  for( const participant of this.customGames[gamePin].participants) {
+    participants[participant.name] = {answers: {}, points: 0}
+  }
+  whosMostLikely.participants = participants;
+  whosMostLikely.correctAnswers = {};
+  whosMostLikely.currentQuestionIndex = 0;
+  this.customGames[gamePin].whosMostLikely = whosMostLikely;
+  return whosMostLikely;
+};
+
+Data.prototype.generateAnswerAlternatives = function(participants){
+  const listOfParticipantsNames = [];
+  const namesOfParticipant = Object.keys(participants);
+  
+  namesOfParticipant.forEach(participant => {
+    listOfParticipantsNames.push(participant)
+  });
+
+  if(listOfParticipantsNames.length > 4) {
+    for (let i =listOfParticipantsNames.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [listOfParticipantsNames[i], listOfParticipantsNames[j] = listOfParticipantsNames[j], listOfParticipantsNames[i]];
+    }
+
+    return listOfParticipantsNames.slice(0, 4);
+  }else {
+    return listOfParticipantsNames;
+  }
+};
+
+ 
+Data.prototype.addAnswerAlternatives = function(questionObj, participants) {
+  if (!questionObj || !Array.isArray(questionObj.questions)) {
+    console.error("Expected an object with a 'questions' array, but got:", questionObj);
+    return [];
+  }
+  questionObj.questions.forEach(question => {
+      const answers = this.generateAnswerAlternatives(participants);
+      question.answers = answers.map((name, index) => ({
+          id: index + 1,
+          answer: name,
+      }));
+  });
+  return questionObj.questions
+}
+
+Data.prototype.storeAnswer = function(gamePin, userName, answerObj) {
+  const game = this.customGames[gamePin];
+  if (!game || !game.whosMostLikely) {
+    console.error(`Spelet med PIN ${gamePin} existerar inte eller är inte konfigurerat för "WhosMostLikely".`);
+    return null;
+  }
+
+  const questionId = answerObj.questionId -1;
+  game.whosMostLikely.participants[userName].answers[questionId] = answerObj;
+  console.log(game.whosMostLikely.participants[userName].answers[questionId])
+
+}
+
+Data.prototype.calculateCorrectAnswer = function(gamePin ){
+  const game = this.customGames[gamePin];
+  const currentQuestionIndex = game.whosMostLikely.currentQuestionIndex;
+
+  const participants = game.whosMostLikely.participants;
+
+  const answers = Object.values(participants).map(participant => participant.answers[currentQuestionIndex]?.answerText);
+  
+  const answerCounts = answers.reduce((counts, answer) =>{
+    if (answer) {
+      counts[answer] = (counts[answer] || 0) + 1;
+    }
+    return counts
+  }, {})
+
+  const maxCount = Math.max(...Object.values(answerCounts));
+  const winningAnswers = Object.entries(answerCounts)
+    .filter(([_, count]) => count === maxCount)
+    .map(([answer]) => answer);
+  game.whosMostLikely.correctAnswers[currentQuestionIndex] = winningAnswers
+
+  console.log("Rätta svaren är,:", game.whosMostLikely.correctAnswers[currentQuestionIndex])
+
+  console.log(`Det mest valda svaret för fråga ${currentQuestionIndex} är "${winningAnswers}" med ${maxCount} röster.`);
+  
+  // Spara det korrekta svaret
+
+  return winningAnswers
+}
+
+Data.prototype.nextQuestionWhosMostLikelyTo = function (gamePin) {
+  const game = this.customGames[gamePin];
+  game.whosMostLikely.currentQuestionIndex++;
+  return game.whosMostLikely.currentQuestionIndex
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//--------------------------------------------------------------------------------------------------
 // Timer -------------------------------------------------------------------------------------------
 Data.prototype.startCountDown = function() {
   // Loop through all games and decrease remainingTime each second.
@@ -286,8 +448,8 @@ Data.prototype.startCountDown = function() {
 };
 Data.prototype.getGameTime = function (gamePin) { 
   try {
-    console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin]);
-    console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin);
+    // console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin]);
+    // console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin);
     return this.customGames[gamePin].remainingTime;
   } catch (error) {
     console.error("Error accessing game data for gamePin:", gamePin, "Error details:", error);
@@ -309,10 +471,7 @@ Data.prototype.setScore = function(gamePin, userName, newScore){
   console.log("spelet efter uppdaterad poäng:", this.customGames[gamePin])
 };
 
-Data.prototype.saveQuestions = function(gamePin, allCustomQuestions, whichQuiz) {
-  console.log("Saving questions for pin: ", gamePin);
-  console.log("Saved questions: ", allCustomQuestions);
-  console.log("Which quiz: ", whichQuiz);
+Data.prototype.saveQuestions = function(gamePin, customQuestions, useCustomQuestions, whichQuiz) {
 
   if (!this.customGameExists(gamePin)) {
     console.error(`Cannot save questions. Game with pin ${gamePin} does not exist.`);
@@ -324,16 +483,17 @@ Data.prototype.saveQuestions = function(gamePin, allCustomQuestions, whichQuiz) 
   if (!this.customGames[gamePin].allCustomQuestions[whichQuiz]) {
     this.customGames[gamePin].allCustomQuestions[whichQuiz] = {};
   }
-  this.customGames[gamePin].allCustomQuestions = allCustomQuestions;
+  this.customGames[gamePin].allCustomQuestions[whichQuiz] = {
+    customQuestions,
+    useCustomQuestions
+  };
+
+  console.log("Saved questions: ", this.customGames[gamePin].allCustomQuestions[whichQuiz]);
  
+  console.log("SNälla fungera", this.customGames[gamePin])
+  console.log("original getquestions", this.getQuestions("en", gamePin, whichQuiz));
 
-  console.log("Saved questions for pin: ", gamePin, " are: ", this.customGames[gamePin].allCustomQuestions[whichQuiz]);
-
-  // this.customGames[gamePin].selectedGames[whichQuiz].saveQuestions = savedQuestions;
-  // this.customGames[gamePin].selectedGames[whichQuiz].useStandardQuestions = useStandardQuestions;
-  // this.customGames[gamePin].selectedGames[whichQuiz].useOwnQuestions = useOwnQuestions;
-
-  // Save
+  //console.log("seb getquestions", this.getQuestions_ThisOrThat("en", gamePin, whichQuiz));
 };
 Data.prototype.deleteGame = function(gamePin) {
   console.log("Deleting game with pin: ", gamePin);

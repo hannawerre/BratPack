@@ -33,35 +33,45 @@
     </div>
 
     <!-- Game Phase 3: Display Correct Answer -->
-    <div v-if="currentPhase === 'showAnswer'">
-        <!-- If chosenParticipant didn't answer -->
-        <h2 v-if="showChosenParticipantNoAnswer">Chosen Participant {{ this.chosenParticipant }} didn't answer</h2>
-        <h2 v-else>Correct Answer: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}</h2>
+  <div v-if="currentPhase === 'showAnswer'">
+    <!-- If chosenParticipant didn't answer -->
+    <h2 v-if="showChosenParticipantNoAnswer" class="no-answer-message">
+      Chosen Participant {{ this.chosenParticipant }} didn't answer
+    </h2>
+    <h2 v-else class="correct-answer-message">
+      Correct Answer: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
+    </h2>
 
-      <!-- Display all participants and highlight those who got it right -->
-      <div v-for="[key,value] in Object.entries(participants)" :key="key">
-        <p v-if="correctParticipants.includes(key)" class="correctParticipant">Correct!: {{ key }}: {{ value.points }}</p>
-        <p v-else>{{ key }}: {{ value.points }}</p>
-      </div>
-      <div class="countdown-bar">
-        <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
-      </div>
+    <!-- Display all participants and highlight those who got it right -->
+    <div v-for="[key,value] in Object.entries(participants)" :key="key">
+      <p v-if="correctParticipants.includes(key)">
+        <span class="correctParticipant">{{ key }}</span>: {{ value.points }}
+      </p>
+      <p v-else>
+        {{ key }}: {{ value.points }}
+      </p>
     </div>
 
-    <!-- Game Phase 4: Display Final Results -->
-    <div v-if="currentPhase === 'showFinalResults'">
-        <h2>Final results</h2>
-        <div v-for="[key,value] in Object.entries(participants)" :key="key">
-        <p>{{ key }}: {{ value.points }}</p>
-      </div>
+    <!-- Countdown Bar -->
+    <div class="countdown-bar">
+      <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
     </div>
+  </div>
+
+  <!-- Game Phase 4: Display Final Results -->
+  <div v-if="currentPhase === 'showFinalResults'" class="final-results">
+    <h2>Final Results</h2>
+    <div v-for="[key,value] in Object.entries(participants)" :key="key" class="leaderboard-item">
+      <p>{{ key }}: {{ value.points }}</p>
+    </div>
+  </div>
     
   </div>
 </template>
 
 <script>
 import QuestionComponent from './QuestionComponent.vue';
-const socket = io("localhost:3000");
+//const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
 
 export default {
@@ -71,12 +81,19 @@ export default {
     },
 
     props: {
+        socket: {
+            type: Object
+        },
         gameData: {
             type: Object,
             required: true
         },
         gamePin: {
             type: String, 
+            required: true
+        },
+        uiLabels: {
+            type: Object,
             required: true
         },
         userName: {
@@ -90,7 +107,7 @@ export default {
             currentPhase: 'showRules',
             showChosenParticipantNoAnswer: false,
 
-            lang: localStorage.getItem("lang") || "en",
+            lang: sessionStorage.getItem("lang") || "en",
             questions: [],
             countdown:null,
             countdownProgress: 100,
@@ -103,10 +120,13 @@ export default {
         }
     },
     created: function() {
-        socket.emit('joinSocketRoom', this.gamePin);
+        //this.socket = io("localhost:3000"); // Initialize component-specific socket
+        this.socket.emit('joinSocketRoom', this.gamePin);
 
-        socket.on('roundUpdate', (ThisOrThat) => this.roundUpdate(ThisOrThat));
-        socket.on("nextRound", (nextQuestion, chosenParticipant) => {
+        this.socket.on('roundUpdate', (ThisOrThat) => {
+            // console.log("XXXXX Recieving roundUpdate in gamePin: ", this.gamePin, " with ThisOrThat: ", ThisOrThat)
+            this.roundUpdate(ThisOrThat)});
+            this.socket.on("nextRound", (nextQuestion, chosenParticipant) => {
             console.log("--> socket.on(nextRound) with nextQuestion:", nextQuestion, " and chosenParticipant:", chosenParticipant)
             this.startRound(nextQuestion, chosenParticipant)
         });
@@ -115,12 +135,12 @@ export default {
     },
     methods: {
         setupGame: function() {
-            socket.on('getQuestions_ThisOrThat', questions => this.questions = questions);
-            socket.on('setup_ThisOrThat', (ThisOrThat) => {
+            this.socket.on('getQuestions_ThisOrThat', questions => this.questions = questions);
+            this.socket.on('setup_ThisOrThat', (ThisOrThat) => {
                 this.participants = ThisOrThat.participants;
                 this.chosenParticipant = ThisOrThat.chosenParticipant;
             });
-            socket.emit('setup_ThisOrThat', this.gamePin, this.lang);
+            this.socket.emit('setup_ThisOrThat', this.gamePin, this.lang);
         },
         displayRules() {
             this.startCountdown(30, "rules")
@@ -137,7 +157,7 @@ export default {
 
             if(this.currentQuestion < this.questions.questions.length){
                 
-                socket.emit("startRound", this.gamePin);
+                this.socket.emit("startRound", this.gamePin);
                 this.currentPhase = 'showChosenParticipant'
                 this.startCountdown(5, "participant");
             }
@@ -197,7 +217,7 @@ export default {
         },
         onAnswer(answerData) { 
             // TODO: Just nu används inte questionId! /sebbe
-            socket.emit('answer_ThisOrThat', this.gamePin, this.userName, answerData.answerId)
+            this.socket.emit('answer_ThisOrThat', this.gamePin, this.userName, answerData.answerId)
             console.log("User: ", this.userName, "just answered");
         },
         setCorrectParticipants: function() {
@@ -211,33 +231,79 @@ export default {
                 }
             }
             this.correctParticipants = correctParticipants;
-        }
+        },
+        // dismantleSocket(){
+        //     console.log("-->before if-statement in dismantleSocket in ThisOrThatComponent")
+        //     if (this.socket) {
+        //         console.log("--> Cleaning up socket in ThisOrThatComponent");
+
+        //         // Remove listeners
+        //         this.socket.off("roundUpdate");
+        //         this.socket.off("nextRound");
+        //         this.socket.off("getQuestions_ThisOrThat");
+        //         this.socket.off("setup_ThisOrThat");
+
+        //         // Emit leave and disconnect
+        //         this.socket.emit("leaveSocketRoom", this.gamePin);
+        //         this.socket.disconnect();
+        //         this.socket = null;
+        //     }else console.log("this.socket does not exist in ThisOrThatComponent")
+        // }
     },
     mounted() {
         this.displayRules();
-    }
+    },
+    // beforeDestroy() {
+    // this.dismantleSocket();
+    // },
+    // beforeRouteLeave(to, from, next) {
+    // this.dismantleSocket()
+    // next();
+    // },
+    // deactivated() {
+    //     console.log("Component deactivated... Cleaning up!");
+    //     this.dismantleSocket();
+    // },
 }
 
 </script>
 
-<style>
+<style scoped>
+/* Countdown Bar */
 .countdown-bar {
   width: 100%;
-  height: 20px;
+  height: 8px;
   background-color: #ddd;
   position: relative;
-  margin-top: 10px;
+  margin-top: 15px;
+  border-radius: 5px;
 }
 
 .progress {
   height: 100%;
   background-color: #4caf50;
   transition: width 0.2s ease;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
-/* Doesn't work at the moment */
+/* No Answer Message */
+h2.no-answer-message {
+  font-size: 1.25rem;
+  color: rgb(132, 0, 0);
+  font-weight: bold;
+}
+
+/* Highlighted Correct Participant */
 .correctParticipant {
-    text-decoration: underline;
-    text-decoration-color: green;
+  font-weight: bold;
+  color: #2d6a4f; /* Green color for correct participants */
+}
+
+/* General text styling */
+p {
+  font-size: 1rem;
+  color: #333;
 }
 </style>
+

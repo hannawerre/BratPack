@@ -42,6 +42,7 @@ export default {
       const answerEvent = {
         questionId: questionId,
         answerId: answerObj.id,
+        answerText: answerObj.answer
       };
       if (answerObj.hasOwnProperty('isCorrect')) {
         answerEvent.isCorrect = answerObj.isCorrect;

@@ -1,88 +1,375 @@
 <template>
+  <div>
+    <!-- Från denna sparning så funkar allt förutom att få svarsalternativ -->
+      <!-- Start Phase -->
+      <div v-if="currentPhase === 'startPhase'">
+        <h1> {{ uiLabels.generalTrivia }}</h1>
+        <div v-if="isAdmin">
+          <button @click="startQuiz" class="button orange"> {{ uiLabels.startQuiz }}</button>
+        </div>
+        <div v-else> {{ uiLabels.waitingOnAdmin }}</div>
+      </div>
 
-<div>
-  <h2>{{ currentStatement }}</h2>
-  <p>Rösta på den deltagare som bäst passar:</p>
-  <div v-for="(participant, name) in participants" :key="name">
-    <button @click="vote(name)">
-      {{ name }}
-    </button>
-  </div>
-  <p v-if="showResults">Resultat:</p>
-  <ul v-if="showResults">
-    <li v-for="(data, name) in participants" :key="name">
-      {{ name }}: {{ calculatePercentage(data.votes) }}%
-    </li>
-  </ul>
-</div>
+      <!-- Intro Phase  -->
+      <div v-else-if="currentPhase === 'introPhase'" class="intro-wrapper">
+        <transition name="countdown-flash" mode="out-in">
+          <h1 v-if="countDownNumber >= 0" :key="countDownNumber" class="countdown-number">
+            {{ countDownNumber }}
+          </h1>
+        </transition>
+      </div>
+      
+      <!-- Question Phase-->
+      <div v-else-if="currentPhase === 'questionPhase'">
+        <QuestionComponent
+          v-if="questions.length > 0"
+          :question="questions[currentQuestionIndex]"
+          :isAdmin="isAdmin"
+          @answer="onAnswer"
+         
+        />
+        <div class="countdown-bar">
+            <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
+        </div>
+      </div>
+
+      <!-- Answered Phase-->
+      <div v-else-if="currentPhase === 'answeredPhase'">
+        <p> answer phase</p>
+      </div>
+      
+      <!-- Feedback Phase -->
+      <div v-else-if="currentPhase === 'feedbackPhase'">
+        
+        <div v-if="checkCorrectAnswer" class="feedback-icon-wrapper">
+          <div class="icon-circle icon-correct">✔</div>
+          <p> {{ uiLabels.youAnsweredRight }}</p>
+          
+         </div>
+        <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
+          <div class="icon-circle icon-wrong">✖</div>
+          <p> {{ uiLabels.youWereWrong }}</p>
+          </div>
+
+        <!-- Om användaren inte hann svara -->
+        <div v-else class="feedback-icon-wrapper">
+          <div class="icon-circle icon-wrong">✖</div>
+          <p> {{ uiLabels.tooSlow }}</p>
+          
+        </div>
+  
+        <div v-if="isAdmin">
+          <button v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
+          <button v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
+        </div>
+      
+      </div>
+      
+
+ <!-- Score board--> 
+      <div v-else-if="currentPhase === 'scoreBoard'">
+            <p>scoreBoard</p>
+      </div>
+  </div> 
 </template>
+  
+  <script>
+  /* 
+  
+  GLÖM EJ ATT ÄNDRA SPRÅKET TILL LOCALSTORAGE
+  
+  
+  
+  
+  
+  */
+  
+  import QuestionComponent from './QuestionComponent.vue';
+  import Nav from './ResponsiveNav.vue';
+  const socket = io("localhost:3000");
+  import io from 'socket.io-client'; 
+  
+  export default {
+    name: 'WhosMostLikelyToComponent',
+    components: {
+      QuestionComponent,
+      Nav
+    },
+    props: {
+      gameData: { type: Object, required: true },
+      gamePin: { type: String, required: true },
+      uiLabels: { type: Object, required: true },
+      userName: { type: String, required: true},
+      isAdmin: { type: Boolean, required: true },
+      
+    },
+  
+    data() {
+      return {
+        participants: {},
+        currentPhase: "startPhase",
+        lang: localStorage.getItem("lang") || "en",
+        questions: [], 
+        currentQuestionIndex: 0,
+        countdownProgress: 100,
+        currentAnswer: null,
+        countDownNumber: 3, 
+        pointsTime: 0, 
+        correctAnswer: null
 
-<script>
-import io from "socket.io-client";
-const socket = io("localhost:3000");
 
-export default {
-name: "WhosMostLikelyToComponent",
-props: {
-  gamePin: {
-    type: String,
-    required: true,
-  },
-},
-data() {
-  return {
-    currentStatement: "",
-    participants: {},
-    showResults: false,
-    hasVoted: false, 
-  };
-},
-methods: {
-  vote(name) {
-    if (this.hasVoted) {
-      alert("Du har redan röstat!");
-      return;
+      
+      };
+    },
+  
+    
+  
+    computed:  {
+      checkCorrectAnswer() {
+  // 1) Om correctAnswer saknas, avbryt
+        if (!Array.isArray(this.correctAnswer)) {
+          return false
+        }
+
+        // 2) Kolla ifall currentAnswer matchar nån av elementen
+        return this.correctAnswer.includes(this.currentAnswer)
+      },
+
+      isLastQuestion() {
+      return this.currentQuestionIndex >= this.questions.length - 1;
     }
-    this.hasVoted = true; 
-    socket.emit("vote_WhosMostLikelyTo", this.gamePin, this.$parent.userName, name);
-  },
-  resetVotingState() {
-    this.hasVoted = false; 
-  },
+      
+    },
+    created() {
+      socket.emit("joinSocketRoom", this.gamePin);
+      this.setUpGame();
+      
+      socket.on("sendingQuestionsWho", questions =>{
+        this.questions = questions
+      })
+        
+      socket.on("startQuestion", (currentQuestionIndex) =>{
+        this.currentQuestionIndex = currentQuestionIndex
+        this.goToNextPhase();
+      })
+      // Be om frågorna från servern
+      socket.on("correctAnswerCalculated", (correctAnswer) => {
+        console.log("correct answer:", correctAnswer)
+        this.correctAnswer = correctAnswer;
+      
+      })
+    },
+   
+    methods: {
+      setUpGame: function (){
+        socket.on("setUpWhosMostLikelyTo", (whosMostLikelyTo) => {
+          this.participants = whosMostLikelyTo.participants; //De som spelar är de som deltar i whosMostLikely
+          this.currentQuestionIndex = whosMostLikelyTo.currentQuestionIndex;
+          console.log("Detta är participants:", this.participants)
+          socket.emit("getQuestionsWho", this.lang, this.gamePin, this.participants);
+        })
+        socket.emit("settingUpWhosMostLikelyTo", this.gamePin);
+      },
 
+    
+      startQuiz(){
+        socket.emit("startingQuestion", {
+            gamePin: this.gamePin, 
+            currentQuestionIndex: this.currentQuestionIndex
+          })
+        },
+        nextQuestion() {
+          this.currentQuestionIndex++;
+          socket.emit("startingQuestion", {
+            gamePin: this.gamePin,
+            currentQuestionIndex: this.currentQuestionIndex,
+            
+        });
+        socket.emit("nextQuestionWhosMostLikelyTo", this.gamePin);
+          
+        console.log("Nu är index", this.currentQuestionIndex)
+    
+        console.log("Current answer:", this.currentAnswer, "Correct answer:", this.correctAnswer)
+      },
+    
+    
+      
+      goToNextPhase(){
+          switch (this.currentPhase) {
+            case "startPhase":
+              this.currentPhase = 'introPhase';
+              this.startCountdown(3)
+              break;
+  
+            case "introPhase":
+              this.currentPhase = "questionPhase";
+              this.startCountdown(10)
+              break;
+            
+            case "questionPhase":
+              if(this.currentAnswer!=null){
+                this.currentPhase = "answeredPhase"}
+              else{
+                  this.currentPhase="feedbackPhase";
+                }
+              break;
+  
+            case "answeredPhase":
+              socket.emit("calculateCorrectAnswer", this.gamePin);  
+              this.currentPhase = "feedbackPhase";            
+              break;
+              
+            case "feedbackPhase":
+              if(this.currentQuestionIndex > this.questions.length - 1) {
+                this.currentPhase = "scoreBoard"
+              }
+              else{
+                this.currentAnswer = null;
+                this.currentPhase = "introPhase";
+                this.startCountdown(3)
+              } 
+              break;
+          }
+        },
+        startCountdown(duration) {
+          const updateInterval = 100; 
+          const startTime = Date.now();
+          const endTime = startTime + duration * 1000 
+          const totalTime = duration * 1000; 
+          this.pointsTime = totalTime;
+  
+          this.timeIsUp = false;
+  
+          this.countDownNumber = duration;
+  
+  
+          const interval = setInterval(() => {
+              const now = Date.now();
+              let remainingTime = endTime - now;
+              
+              if (remainingTime < 0) remainingTime = 0;
+  
+              const progress = (remainingTime / totalTime) * 100;
+              this.countdownProgress = progress;
+  
+              const timeLeftInMilliSeconds = remainingTime;
+              this.timeLeftOnAnswer = timeLeftInMilliSeconds;
+              const timeLeftInSeconds = Math.ceil(remainingTime/1000);
+              this.countDownNumber = timeLeftInSeconds
+  
+              if (remainingTime <= 0) {
+                  clearInterval(interval);
+                  this.countdownProgress = 0;
+                  this.timeIsUp = true;
+                  console.log(this.currentPhase);
+  
+                  setTimeout(() => {
+                    this.goToNextPhase(); 
+                  }, 200)    
+              }
+          }, 
+          updateInterval); 
+          },
+          onAnswer(answerObj) {
+            this.currentAnswer = answerObj.answerText;
+            console.log(this.currentAnswer)
+            socket.emit("playerAnswers", {
+              gamePin: this.gamePin,
+              answerObj: answerObj,
+              userName: this.userName
+            },
 
-  calculatePercentage(votes) {
-    const totalVotes = Object.values(this.participants).reduce((sum, p) => sum + p.votes, 0);
-    return totalVotes === 0 ? 0 : Math.round((votes / totalVotes) * 100);
-  },
-},
-created() {
-  socket.on("setup_WhosMostLikelyTo", (game) => {
-    this.participants = game.participants;
-    this.currentStatement = game.statements[game.currentStatement];
-  });
+            this.currentPhase = "answeredPhase"
+              
+            )
+       
+          },
+         
+    }
 
-  socket.on("newStatement", (newStatement) => {
-  this.showResults = false; // Dölj resultat
-  this.currentStatement = newStatement.statement; // Uppdatera till nästa fråga
-});
-// tog bort detta : this.resetVotingState(); 
-
-
-socket.on("votesUpdated", (updatedParticipants) => {
-  this.participants = updatedParticipants; 
-  this.showResults = true; // Visa resultat i gränssnittet
-});
-
-
-
-socket.on("gameOver", () => {
-alert("Spelet är över!");
-this.$router.push("/"); // Navigera tillbaka till startsidan
-});
-
-
-  socket.emit("setup_WhosMostLikelyTo", this.gamePin);
-},
-};
-</script>
+    }
+  </script>
+  
+  <style scoped>
+  .intro-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px; /* Sätt höjd så att siffran är centrerad */
+    background: black; /* Kanske bakgrundsfärg för "filmisk" känsla */
+  }
+  
+  .countdown-number {
+    color: white;
+    font-size: 8rem;
+    font-weight: bold;
+  }
+  
+  /* Övergångsklasser för namnet "countdown-flash" */
+  .countdown-flash-enter-active,
+  .countdown-flash-leave-active {
+    transition: opacity 0.5s, transform 0.5s;
+  }
+  
+  .countdown-flash-enter {
+    opacity: 0;
+    transform: scale(2);
+  }
+  
+  .countdown-flash-leave-to {
+    opacity: 0;
+    transform: scale(0.1);
+  }
+  
+  .countdown-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #ddd;
+    position: relative;
+    margin-top: 10px;
+  }
+  
+  .progress {
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.2s ease;
+  }
+  
+  .feedback-icon-wrapper {
+    display: flex;
+    flex-direction: column; /* Ikon överst, text under */
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  /* Själva cirkeln */
+  .icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;     /* Storlek på bocken/krysset */
+    width: 100px;        /* Bredd/höjd på cirkeln */
+    height: 100px;
+    border-radius: 50%;  /* Gör den rund */
+    color: #fff;         /* Vit text */
+    margin-bottom: 10px; /* Liten space under cirkeln */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Grön cirkel (rätt) */
+  .icon-correct {
+    background-color: #4caf50; /* Grön */
+  }
+  
+  /* Röd cirkel (fel) */
+  .icon-wrong {
+    background-color: #f44336; /* Röd */
+  }
+  
+  .top-player {
+    font-weight: bold;
+    color: gold;
+  }
+  
+  </style>

@@ -29,7 +29,7 @@ export default {
   },
   data: function () {
     return {
-      lang: localStorage.getItem("lang") || "en",
+      lang: sessionStorage.getItem("lang") || "en",
       pollId: "",
       question: "",
       submittedAnswers: {},
@@ -48,7 +48,7 @@ export default {
   methods: {
     handleLanguageChange(newLang) {
       this.lang = newLang;
-      localStorage.setItem("lang", newLang);
+      sessionStorage.setItem("lang", newLang);
       socket.emit("getUILabels", this.lang);
     }
   }

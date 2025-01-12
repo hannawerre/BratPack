@@ -22,7 +22,16 @@ let data = new Data();
 
 io.on('connection', function (socket) {
   sockets(this, socket, data);
+  // Print all active socket connections
+  // console.log("Active socket connections:");
+  // console.log(Array.from(io.sockets.sockets.keys()));
 });
+
+// io.on("disconnect", () => {
+//   console.log(`Socket disconnected: ${socket.id}`);
+//   console.log("Remaining active socket connections:");
+//   console.log(Array.from(io.sockets.sockets.keys()));
+// });
 
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, function() {
