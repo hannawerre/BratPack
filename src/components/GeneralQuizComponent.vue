@@ -104,15 +104,13 @@ GLÖM EJ ATT ÄNDRA SPRÅKET TILL LOCALSTORAGE
 */
 
 import QuestionComponent from './QuestionComponent.vue';
-import Nav from './ResponsiveNav.vue';
 const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
 
 export default {
   name: 'GeneralQuizComponent',
   components: {
-    QuestionComponent,
-    Nav
+    QuestionComponent
   },
   props: {
     gameData: { type: Object, required: true },
