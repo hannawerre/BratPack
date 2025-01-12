@@ -16,25 +16,6 @@ function Data() {
     gameStarted: false,
     playerAnswers: {},
   };
-
-
-
-
-  // Poll
-  this.polls = {};
-  this.polls['test'] = {
-    questions: [
-      {q: "How old are you?", 
-       a: ["0-13", "14-18", "19-25", "26-35", "36-45","45-"]
-      },
-      {q: "How much do you enjoy coding?", 
-       a: ["1", "2", "3", "4", "5"]
-      }
-    ],
-    answers: [],
-    currentQuestion: 0,
-    participants: []
-  }
 }
 
 
@@ -417,22 +398,6 @@ Data.prototype.nextQuestionWhosMostLikelyTo = function (gamePin) {
   game.whosMostLikely.currentQuestionIndex++;
   return game.whosMostLikely.currentQuestionIndex
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //--------------------------------------------------------------------------------------------------
 // Timer -------------------------------------------------------------------------------------------
 Data.prototype.startCountDown = function() {

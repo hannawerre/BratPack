@@ -20,9 +20,6 @@
       </div>
     </div>
     <div id="Language">
-      <LanguageSwitcher
-        :lang="lang"/>
-        <!-- Language Switcher (Top Right) -->
     
     <div v-if="showLangSwitch" id="Language">
       <LanguageSwitcher 
@@ -86,6 +83,7 @@ export default {
 </script>
 
 <style scoped>
+
 nav {
   position: relative;
   top: 0;
@@ -98,34 +96,15 @@ nav {
   height: 70px; /* Adjust the height of the navbar */
   padding: 0 1rem;
   box-sizing: border-box;
-  
  }
- 
- 
- nav > div:nth-child(2) {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.5rem;
-  border: double 9px #5b7C99;
-  padding: 2px;
- }
- 
- 
  #Logo img {
    margin-top: 5px;
   height: 90px;
 }
-
 #Logo img {
-  height: 50px; /* Adjust logo size */
+  height: 50px;
   cursor: pointer;
-  }
- 
- 
- #Links {
 }
-
 #Timer {
   flex-grow: 1;
   text-align: center;
@@ -134,9 +113,9 @@ nav {
 #UserInfo {
   text-align: right;
   display: flex;
-  gap: 1.5rem;
+  flex-direction:column;
+  align-items: flex-end;
  }
- 
  
  #Links a {
   color: black;
