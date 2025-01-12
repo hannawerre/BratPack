@@ -631,7 +631,7 @@ input[type="checkbox"] {
     border-bottom: 1px solid var(--our-darkBlue);
   }
 
-  @media (max-width: 783px) {
+  @media (max-width: 700px) {
   .container {
     flex-direction: column;
     padding: 10px;
