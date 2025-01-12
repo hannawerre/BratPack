@@ -266,25 +266,50 @@ Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
   }
 };
 Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
-  
-  const participantsArray = Object.entries(this.customGames[gamePin].ThisOrThat.participants);
-  const correctAnswers = this.customGames[gamePin].ThisOrThat.correctAnswers;
-  const questionId = this.customGames[gamePin].ThisOrThat.currentQuestion;
-  console.log("-------> Inside correctQuestion_ThisOrThat", participantsArray, this.customGames[gamePin].ThisOrThat)
-  // Add 10 points if answer is correct
-  for(let [name, data] of participantsArray){
-    if (data.answers[questionId] && data.answers[questionId] === correctAnswers[questionId]){
-      this.customGames[gamePin].ThisOrThat.participants[name].points += 10;
-      // Find corresponding name in the general participants array and add points there as well.
-      const generalParticipants = this.customGames[gamePin].participants;
-      const matchingParticipant = generalParticipants.find((participant) => participant.name === name);
-      if (matchingParticipant) {
-        matchingParticipant.scoreGame4 += 10;
-      }
+  const game = this.customGames[gamePin];
+  const questionId = game.ThisOrThat.currentQuestion;
+  const correctAnswer = game.ThisOrThat.correctAnswers[questionId];
+  const chosenParticipant = game.ThisOrThat.chosenParticipant;
+
+  // 1) Räkna hur många som har svarat "rätt"
+  let correctPlayers = [];
+  for (let [playerName, data] of Object.entries(game.ThisOrThat.participants)) {
+    if (data.answers[questionId] && data.answers[questionId] === correctAnswer) {
+      correctPlayers.push(playerName);
     }
     
   }
+
+  if (correctPlayers.includes(chosenParticipant)) {
+    correctPlayers = correctPlayers.filter((name) => name !== chosenParticipant);
+  }
+
+  // 2) Räkna ut hur stor potten är
+  const numberOfPlayers = Object.keys(game.ThisOrThat.participants).length;
+  const pot = 200 * numberOfPlayers;
+
+  // 3) Om ingen eller chosenParticipant själv inte klickade → ingen får poäng
+  if (correctPlayers.length === 0) {
+    return;
+  }
+
+  // 4) Annars dela ut potten / antalet som svarade rätt
+  const share = Math.floor(pot / correctPlayers.length);
+
+  // 5) Uppdatera ThisOrThat-participants
+  correctPlayers.forEach(playerName => {
+    game.ThisOrThat.participants[playerName].points += share;
+  });
+
+  // 6) Uppdatera de "vanliga" participants också, så scoreboarden uppdateras globalt
+  correctPlayers.forEach(playerName => {
+    const generalParticipant = game.participants.find(p => p.name === playerName);
+    if (generalParticipant) {
+      generalParticipant.scoreGame4 += share;
+    }
+  });
 };
+
 Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
   return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
 };
@@ -335,26 +360,28 @@ Data.prototype.setUpWhosMostLikely = function (gamePin) {
 };
 
 Data.prototype.generateAnswerAlternatives = function(participants){
-  const listOfParticipantsNames = [];
   const namesOfParticipant = Object.keys(participants);
-  
-  namesOfParticipant.forEach(participant => {
-    listOfParticipantsNames.push(participant)
-  });
+  // Skapa en kopia av arrayen (om du vill undvika att påverka 'namesOfParticipant')
+  const listOfParticipantsNames = [...namesOfParticipant]; 
 
-  if(listOfParticipantsNames.length > 4) {
-    for (let i =listOfParticipantsNames.length - 1; i > 0; i--){
+  // Om fler än 4 deltagare, shuffla och ta ut 4 av dem:
+  if (listOfParticipantsNames.length > 4) {
+    for (let i = listOfParticipantsNames.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [listOfParticipantsNames[i], listOfParticipantsNames[j] = listOfParticipantsNames[j], listOfParticipantsNames[i]];
+      // Korrekt sätt att byta plats på två element
+      [listOfParticipantsNames[i], listOfParticipantsNames[j]] 
+        = [listOfParticipantsNames[j], listOfParticipantsNames[i]];
     }
-
+    // Returnera 4 slumpmässiga deltagare
     return listOfParticipantsNames.slice(0, 4);
-  }else {
+  } else {
+    // Om färre än 4 deltagare
     return listOfParticipantsNames;
   }
 };
 
- 
+
+ //12 jan
 Data.prototype.addAnswerAlternatives = function(questionObj, participants) {
   if (!questionObj || !Array.isArray(questionObj.questions)) {
     console.error("Expected an object with a 'questions' array, but got:", questionObj);
