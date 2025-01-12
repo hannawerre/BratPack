@@ -175,7 +175,7 @@ export default {
       const participant = this.gameData.participants.find(
         (p) => p.name === this.userName
       );
-      if (!participant?.isPlaying) return;
+      
 
       this.currentAnswer = answerData;
       this.currentPhase = "answeredPhase";
