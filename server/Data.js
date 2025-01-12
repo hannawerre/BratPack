@@ -280,49 +280,63 @@ Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
     console.log("ERROR! -> could not get newChosenParticipant in Data.js")
   }
 };
-Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
-  const game = this.customGames[gamePin];
-  const questionId = game.ThisOrThat.currentQuestion;
-  const correctAnswer = game.ThisOrThat.correctAnswers[questionId];
-  const chosenParticipant = game.ThisOrThat.chosenParticipant;
-
-  // 1) Räkna hur många som har svarat "rätt"
+// ----- 1) Hjälpfunktioner -----
+Data.prototype._getCorrectPlayersExcludingChosen = function(game, questionId, correctAnswer) {
   let correctPlayers = [];
-  for (let [playerName, data] of Object.entries(game.ThisOrThat.participants)) {
-    if (data.answers[questionId] && data.answers[questionId] === correctAnswer) {
+  for (const [playerName, data] of Object.entries(game.ThisOrThat.participants)) {
+    // Skippa chosenParticipant
+    if (playerName === game.ThisOrThat.chosenParticipant) continue;
+    // Om svaret matchar correctAnswer → lägg till
+    if (data.answers[questionId] === correctAnswer) {
       correctPlayers.push(playerName);
     }
   }
+  return correctPlayers;
+};
 
-  if (correctPlayers.includes(chosenParticipant)) {
-    correctPlayers = correctPlayers.filter((name) => name !== chosenParticipant);
-  }
-
-  // 2) Räkna ut hur stor potten är
-  const numberOfPlayers = Object.keys(game.ThisOrThat.participants).length;
-  const pot = 200 * numberOfPlayers;
-
-  // 3) Om ingen eller chosenParticipant själv inte klickade → ingen får poäng
-  if (correctPlayers.length === 0) {
-    return;
-  }
-
-  // 4) Annars dela ut potten / antalet som svarade rätt
+Data.prototype._distributePoints_ThisOrThat = function(game, correctPlayers) {
+  // Är det inga rätta spelare → avbryt
+  if (correctPlayers.length === 0) return;
+  
+  const totalPlayers = Object.keys(game.ThisOrThat.participants).length;
+  const pot = 200 * totalPlayers;  
   const share = Math.floor(pot / correctPlayers.length);
 
-  // 5) Uppdatera ThisOrThat-participants
-  correctPlayers.forEach(playerName => {
-    game.ThisOrThat.participants[playerName].points += share;
-  });
-
-  // 6) Uppdatera de "vanliga" participants också, så scoreboarden uppdateras globalt
-  correctPlayers.forEach(playerName => {
-    const generalParticipant = game.participants.find(p => p.name === playerName);
+  correctPlayers.forEach(name => {
+    // Uppdatera ThisOrThat-poäng
+    //game.ThisOrThat.participants[name].points += share;
+    // Uppdatera "ordinarie" scoreboard
+    const generalParticipant = game.participants.find(p => p.name === name);
     if (generalParticipant) {
       generalParticipant.scoreGame4 += share;
     }
   });
 };
+
+// ----- 2) Själva huvudetoden -----
+Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
+  const game = this.customGames[gamePin];
+  const qId = game.ThisOrThat.currentQuestion;
+  const chosen = game.ThisOrThat.chosenParticipant;
+  const correctAnswer = game.ThisOrThat.correctAnswers[qId];
+  
+  // Kolla om chosenParticipant har svarat
+  const chosenAnswer = game.ThisOrThat.participants[chosen].answers[qId];
+  if (!chosenAnswer) {
+    // Om chosenParticipant inte svarat -> minus 1000 poäng
+    console.log(`ChosenParticipant (${chosen}) svarade inte – ger -1000 poäng.`);
+    const generalParticipant = game.participants.find(p => p.name === chosen);
+    if (generalParticipant) {
+      generalParticipant.scoreGame4 -= 1000;
+    }
+    return;
+  }
+
+  // Om chosenParticipant svarade -> hitta vilka andra som matchar
+  const correctPlayers = this._getCorrectPlayersExcludingChosen(game, qId, correctAnswer);
+  this._distributePoints_ThisOrThat(game, correctPlayers);
+};
+
 
 Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
   return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
