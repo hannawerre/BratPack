@@ -6,7 +6,7 @@
 
     <div class="questions-list" @click.stop>
       <h2>Questions</h2>
-      <div class="toggle-button" @click="toggleListVisibility">
+      <div class="toggle-button" style="background: var(--border-orange)" @click="toggleListVisibility">
         <span>{{ isListVisible ? 'Hide Questions &#9650;' : 'Show Questions &#9660;' }}</span>
         <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
     </div>

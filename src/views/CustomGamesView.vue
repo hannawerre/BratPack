@@ -77,9 +77,6 @@
 
   <div class="startbutton-container">
       <button class="button orange" @click="startGame">Start Game</button>
-      <button class="button orange" @click="unactiveGame">Unactive Game</button>
-      <button class="button orange" @click="updateSettings">Update Info</button>
-      <button class="button orange" @click="logGameData">logGameData</button>
   </div>
 
 </div>
