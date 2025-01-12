@@ -282,6 +282,7 @@ Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
         matchingParticipant.scoreGame4 += 10;
       }
     }
+    
   }
 };
 Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
