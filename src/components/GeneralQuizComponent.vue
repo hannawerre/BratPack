@@ -161,7 +161,7 @@ export default {
       this.goToNextPhase();
     })
     // Be om frågorna från servern
-    socket.emit('getQuestions', this.lang, this.gamePin, "sendingQuiz");
+    socket.emit('getQuestions', this.lang, this.gamePin, "generalQuiz");
   },
  
   methods: {

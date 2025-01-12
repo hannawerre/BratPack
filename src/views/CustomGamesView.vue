@@ -145,9 +145,11 @@ data: function() {
     // useCustomQuestions: false,
     active: true, // Används denna? /sebbe
     userName: '',
+    userRole: 'host',
     uiLabels: {},
     showGameExistsPopup: false,
     shouldRestoreState: false,
+    gameStarted: false,
   };
 },
 
