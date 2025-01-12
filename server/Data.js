@@ -325,26 +325,28 @@ Data.prototype.setUpWhosMostLikely = function (gamePin) {
 };
 
 Data.prototype.generateAnswerAlternatives = function(participants){
-  const listOfParticipantsNames = [];
   const namesOfParticipant = Object.keys(participants);
-  
-  namesOfParticipant.forEach(participant => {
-    listOfParticipantsNames.push(participant)
-  });
+  // Skapa en kopia av arrayen (om du vill undvika att påverka 'namesOfParticipant')
+  const listOfParticipantsNames = [...namesOfParticipant]; 
 
-  if(listOfParticipantsNames.length > 4) {
-    for (let i =listOfParticipantsNames.length - 1; i > 0; i--){
+  // Om fler än 4 deltagare, shuffla och ta ut 4 av dem:
+  if (listOfParticipantsNames.length > 4) {
+    for (let i = listOfParticipantsNames.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [listOfParticipantsNames[i], listOfParticipantsNames[j] = listOfParticipantsNames[j], listOfParticipantsNames[i]];
+      // Korrekt sätt att byta plats på två element
+      [listOfParticipantsNames[i], listOfParticipantsNames[j]] 
+        = [listOfParticipantsNames[j], listOfParticipantsNames[i]];
     }
-
+    // Returnera 4 slumpmässiga deltagare
     return listOfParticipantsNames.slice(0, 4);
-  }else {
+  } else {
+    // Om färre än 4 deltagare
     return listOfParticipantsNames;
   }
 };
 
- 
+
+ //12 jan
 Data.prototype.addAnswerAlternatives = function(questionObj, participants) {
   if (!questionObj || !Array.isArray(questionObj.questions)) {
     console.error("Expected an object with a 'questions' array, but got:", questionObj);

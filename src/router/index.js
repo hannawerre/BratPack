@@ -9,11 +9,11 @@ const router = createRouter({
       name: 'Start',
       component: StartView
     },
-      {
-      path: '/poll/:id',
-      name: 'PollView',
-      component: () => import('../views/PollView.vue')
-    },
+    //  {
+     // path: '/poll/:id',
+    //  name: 'PollView',
+    //  component: () => import('../views/PollView.vue')
+   // },
     {
       path: '/lobby/:id',
       name: 'LobbyView',
@@ -24,11 +24,11 @@ const router = createRouter({
       name: 'CreateView',
       component: () => import('../views/CreateView.vue')
     },
-    {
-      path: '/result/:id',
-      name: 'ResultView',
-      component: () => import('../views/ResultView.vue')
-    },
+    //{
+     // path: '/result/:id',
+      //name: 'ResultView',
+     // component: () => import('../views/ResultView.vue')
+    //}
     {
       path: '/edit/:gameId',
       name: 'EditView',
