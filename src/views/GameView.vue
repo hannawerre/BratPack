@@ -26,7 +26,7 @@
     </div>
 
     <!--Game Components-->
-    <div v-else-if="activeGame && isPlaying"> 
+    <div v-else-if="activeGame"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
