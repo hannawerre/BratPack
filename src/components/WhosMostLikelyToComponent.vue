@@ -33,10 +33,8 @@
         </div>
       </div>
 
-      <!-- Answered Phase-->
-      <div v-else-if="currentPhase === 'answeredPhase'">
-        <p> answer phase</p>
-      </div>
+
+      
       
       <!-- Feedback Phase -->
       <div v-else-if="currentPhase === 'feedbackPhase'">
@@ -142,7 +140,7 @@
     },
     created() {
       socket.on("participantsUpdate", (participants) => {
-        this.participants = participants;
+        this.participants = participants
       })
       
       this.setUpGame();
@@ -211,17 +209,11 @@
               break;
             
             case "questionPhase":
-              if(this.currentAnswer!=null){
-                this.currentPhase = "answeredPhase"}
-              else{
-                  this.currentPhase="feedbackPhase";
-                }
-              break;
-  
-            case "answeredPhase":
               socket.emit("calculateCorrectAnswer", this.gamePin);  
-              this.currentPhase = "feedbackPhase";            
-              break;
+                this.currentPhase="feedbackPhase";s
+                break;
+  
+  
               
             case "feedbackPhase":
               if(this.currentQuestionIndex > this.questions.length - 1) {
@@ -283,7 +275,8 @@
               userName: this.userName
             },
 
-            this.currentPhase = "answeredPhase"
+           
+            
               
             )
        

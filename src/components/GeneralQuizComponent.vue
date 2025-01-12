@@ -107,7 +107,8 @@ export default {
     gamePin: { type: String, required: true },
     uiLabels: { type: Object, required: true },
     isAdmin: { type: Boolean, required: true },
-    isPlaying: { type: Boolean, required: true },
+    userName: { type: Boolean, required: true}
+  
   },
 
   data() {
@@ -117,7 +118,6 @@ export default {
       currentQuestionIndex: 0,
       currentPhase: 'startPhase',
       countdownProgress: 100,
-      userName: sessionStorage.getItem('userName'),
       currentAnswer: null,
       countDownNumber: 3,
       pointsTime: 0,
@@ -171,6 +171,7 @@ export default {
       }
     },
     updatePoints() {
+      console.log("updated points:", this.localPointsnpok)
       socket.emit("updatePlayerPoints", {
         gamePin: this.gamePin,
         userName: this.userName,
@@ -198,7 +199,7 @@ export default {
             break;
           
           case "questionPhase":
-          
+            this.updatePoints();
             this.currentPhase="feedbackPhase";
             break;
 
@@ -253,7 +254,7 @@ export default {
                 console.log(this.currentPhase);
 
                 setTimeout(() => {
-                  this.updatePoints();
+                  
                   this.goToNextPhase(); 
                 }, 200)    
             }
@@ -318,11 +319,11 @@ export default {
   justify-content: center;
   align-items: center;
   height: 300px; /* Sätt höjd så att siffran är centrerad */
-  background: black; /* Kanske bakgrundsfärg för "filmisk" känsla */
+    /* Kanske bakgrundsfärg för "filmisk" känsla */
 }
 
 .countdown-number {
-  color: white;
+  color: #1d3557;
   font-size: 8rem;
   font-weight: bold;
 }

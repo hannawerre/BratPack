@@ -29,6 +29,7 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
+            :userName="userName"
             @gameCompleted="onGameCompleted"
         />
         <ThisOrThatComponent 
