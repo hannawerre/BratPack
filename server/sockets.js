@@ -75,7 +75,7 @@ function sockets(io, socket, data) {
   socket.on('setup_ThisOrThat', function(gamePin, lang) {
     console.log("Setting up ThisOrThat game, and returning questions");
     socket.emit('setup_ThisOrThat', data.setup_ThisOrThat(gamePin));
-    socket.emit("getQuestions_ThisOrThat", data.getQuestions(lang));
+    socket.emit("getQuestions", data.getQuestions(lang, gamePin, "thisOrThat"));
   });
   socket.on('answer_ThisOrThat', function(gamePin, userName, answerId){
     data.answer_ThisOrThat(gamePin, userName, answerId);
