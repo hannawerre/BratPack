@@ -33,13 +33,6 @@
       </div>
 
       <!-- Answered Phase-->
-      <div v-else-if="currentPhase === 'answeredPhase'">
-        <h2> {{ uiLabels.youHaveAnswered }}</h2>
-        <p> {{ uiLabels.waitingForTimeToRunOut }}</p>
-        <div class="countdown-bar">
-          <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
-        </div>
-      </div>
       
       <!-- Feedback Phase -->
       <div v-else-if="currentPhase === 'feedbackPhase'">
@@ -47,16 +40,12 @@
         <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
           <p> {{ uiLabels.youAnsweredRight }}</p>
-          <p> {{ uiLabels.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p> {{ uiLabels.yourRankRightNow }} {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.youAreBehind}} {{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} poäng </p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
         </div>
 
         <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
           <p> {{ uiLabels.youWereWrong }}</p>
-          <p> {{ uiLabels.yourPointsRightNow}} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p> {{uiLabels.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
           <p v-if="getPlayerRank(userName)!=1">{{uiLabels.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
         </div>
 
@@ -172,8 +161,7 @@ export default {
       },
       onAnswer(answerData) {
       this.currentAnswer = answerData;
-      this.currentPhase = "answeredPhase";
-
+      
       if (answerData.isCorrect) {
         const points = Math.floor((this.countdownProgress / 100) * 1000);
         this.playerAnsweredRight = true;
@@ -209,16 +197,11 @@ export default {
             break;
           
           case "questionPhase":
-            if(this.currentAnswer!=null){
-              this.currentPhase = "answeredPhase"}
-            else{
-                this.currentPhase="feedbackPhase";
-              }
+          
+            this.currentPhase="feedbackPhase";
             break;
 
-          case "answeredPhase":
-            this.currentPhase="feedbackPhase"
-            break;
+        
             
           case "feedbackPhase":
             if(this.currentQuestionIndex > this.questions.length - 1) {
