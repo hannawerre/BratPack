@@ -23,7 +23,7 @@
   </ResponsiveNav>
 
   
- 
+  <div class="content-wrapper">
     <div class="items">
       <div class="join-container" v-if="!isPlay">
         <button class="button blue" @click="togglePlay" style="width: 300px;">Join Game</button>
@@ -47,6 +47,7 @@
         <button class="button orange">Create Game</button>
       </router-link>
     </div>
+  </div>
 </template>
 
 <script>
@@ -137,18 +138,23 @@ export default {
 
   
   header {
-position: relative;
+    position: relative;
     background-color: #cfe8ef;
-    width: 90%;
+    width: auto;
+    max-width: 1200px;
     display: flex;
-    justify-content: center;
-border: #ff8c42 10px double;
+    justify-content: space-around;
+    align-items: center;
+    border: #ff8c42 10px double;
     border-radius: 10px;
-    margin: 3% 5% 0% 5%;  
+    margin: 3% auto 0 auto;  
+    padding: 1em;
   }
   #header {
-    width: 500px;
-    height: fit-content;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    object-fit: contain;
   }
   .logo {
     display: flex;
@@ -156,16 +162,40 @@ border: #ff8c42 10px double;
   }
   .logo img {
     height:2.5rem;
+    width: auto;
     vertical-align: bottom;
     margin-right: 0.5rem; 
   }
   
+  .content-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 1em;
+  }
 
   .items {
-  display: flex;
+  
   flex-direction: column;
   gap: 10px;
-  margin: 15% 0 15% 0;
+  margin: 5% auto;
+  align-items: center;
   position: relative; 
+  max-width: 500px;
+  width: 90%;
   }
+
+
+@media (min-width: 768px) {
+  .items {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  header {
+    margin: 2% auto;  
+  }
+}
 </style>

@@ -180,18 +180,6 @@
   
   <style scoped>
 
-.modal-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
 
 .modal-wrapper {
   position: relative;
@@ -209,7 +197,7 @@
   max-height: 80vh;
   overflow-y: auto;
   
-  background-color: orange;
+  background-color: var(--our-orange);
   color: #000; /* Dark text for contrast on orange */
   padding: 20px;
   border-radius: 10px;
@@ -407,7 +395,7 @@ button {
 }
   
   
-  @media (max-width: 1024px) {
+  @media (max-width: 783px) {
   .modal-wrapper {
     position: fixed;
     top: 0;
@@ -426,7 +414,7 @@ button {
   .questions-list {
     position: static;
     transform: none;
-    width: 90%;
+    width: 80%;
     max-width: 600px;
     margin: 0 auto 20px auto;
     border-right: none;

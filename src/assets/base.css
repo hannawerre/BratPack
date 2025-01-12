@@ -20,3 +20,9 @@ body {
     background-attachment: fixed; /* Fixerar bakgrunden så att den inte rör sig vid scroll */
     height: 100vh; /* Säkerställer att body täcker hela viewporten */
 }
+
+@media (max-width: 768px) {
+  body {
+    background-size: contain; /* Anpassar bakgrunden till mindre skärmar */
+  }
+}

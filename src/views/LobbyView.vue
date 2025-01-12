@@ -7,7 +7,7 @@
   
   <div>
     <h3>Lobby ID: {{gamePin}}</h3>
-    <div class="textBox-wrapper" v-if="!joined">
+    <div class="textBox-wrapper" style="width: 50%;" v-if="!joined">
       <input class="textBox input" type="text" v-model="userName" @input=isNameTaken(userName) :placeholder=this.uiLabels.userName>
       <button class="button blue small" v-if="!nameTaken" v-on:click="participateInCustomGame">
         {{ this.uiLabels.participateInPoll }}
@@ -16,8 +16,8 @@
         Name taken!
       </p>
     </div>
+    <p>{{ this.uiLabels.waitingForHost }}</p>
     <div class="waitingRoom" v-if="joined">
-      <p>{{ this.uiLabels.waitingForHost }}</p>
       <div>
         <h3>{{ this.uiLabels.players }}</h3>
         <p v-for="participant in participants">{{ participant }}</p>
@@ -135,6 +135,12 @@ export default {
 
 <style scoped>
 
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 20px;
+}
 
 .waitingRoom div{
   /* how do i get it to be centered? */
@@ -142,13 +148,21 @@ export default {
   border-radius: 15px;
   border: 2px solid var(--our-darkBlue);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-  width: 40%;
-  margin: 5% 0% 0% 30%
+  width: 70%;
+  margin: 3% 0% 0% 15%;
+  box-sizing: border-box;
+  padding: 10px;
 }
 
-.waitingRoom li{ /* vill ha som i customGamesView men de fungrar ej*/
+.waitingRoom p { /* vill ha som i customGamesView men de fungrar ej*/
   padding: 5px 0;
-  border-bottom: 1px solid var(--border-orange);
+  border-bottom: 1px solid var(--our-darkBlue);
 }
 
+@media (max-width: 768px) {
+  .waitingRoom {
+    min-width: 90%;
+    margin: 5% auto;
+  }
+}
 </style>

@@ -58,28 +58,8 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
   </script>
 
 <style scoped>
-    .modal-background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
 
-    .modal-content {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 8px;
-        text-align: center;
-        max-width: 500px;
-        width: 90%;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
+ 
 
     .question {
     margin: 10px 0; 
@@ -158,6 +138,17 @@ import { ref, defineProps, defineExpose , defineEmits} from 'vue';
         align-items: center; 
         gap: 10px;
         margin: 10px 0;
+    }
+
+    @media (max-width: 480px) {
+        ul {
+            max-width: 100%; /* Tillåt full bredd på små skärmar */
+        }
+      
+        li.answer-option {
+            flex: 1 1 100%; /* En knapp per rad på små skärmar */
+            max-width: 100%;
+        }
     }
 
 

@@ -5,6 +5,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  justify-content: center;
   background: linear-gradient(to bottom right, #CFE8EF, #9eb5bc, #98c4d1);
   border: double 10px var(--our-orange);
   border-radius: 10px;
@@ -12,15 +13,9 @@
   padding: 15px;
   padding-bottom: 20px;
 }
-/* linear-gradient(to bottom right, #ff8c42, 
-    #cfe8ef,  
-     
-    #8abfce , #ff8c42, #5B7C99
-    );*/
-/* EDIT MODAL FOR EDIT QUIZ */
 
 
-/* Davids changes, remove if needed */
+/* Davids changes, remove if needed 
 .edit-modal-background {
   position: fixed;
   top: 0;
@@ -76,7 +71,7 @@
   box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5);
   transform: scale(1.05);
 }
-
+*/
 
 
 .button.orange { /* generic rules for buttons */
@@ -144,7 +139,6 @@
   color: white;
   cursor: pointer;  
   display: inline-block; 
-  /*font-size: 25px;*/
   margin: 30px 4px;
   padding: 15px;
   text-align: center;
@@ -168,34 +162,37 @@
 }
 
 .join-container {
-  /*display: flex;*/
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  transition: all 0.3s ease-in-out;
+  gap: 15px;
+  padding: 10px;
 }
 
-.textBox-wrapper { /* generic rules for text boxes PLACERINGEN ÄR FEL*/
+.textBox-wrapper {
   display: flex;
   justify-content: center;
-  position: relative;
-  align-items: center; 
-  margin-left: 280px;
-  margin-right: 280px;
-  background-color: var(--our-darkBlue); 
+  align-items: center;
+  margin: 0 auto;
   padding: 20px;
+  width: 600px;
+  background-color: var(--our-darkBlue);
   border: 2px solid var(--border-darkBlue);
   border-radius: 6px;
-  z-index: 9999;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
 }
 
 .textBox.input {
   border: 2px solid var(--border-darkBlue);
   border-radius: 4px;
-  padding: 10px;
-  font-size: 18px;
+  padding: 12px;
+  font-size: 16px;
   flex: 1;
+  width: 90%;
   box-shadow: 0 0 10px 5px var(--our-lightBlue);
+  box-sizing: border-box;
 }
 .textBox.input:focus {
   outline: none;
@@ -213,6 +210,94 @@
   cursor: pointer;
   padding: 10px;
   margin: 5px;
+}
+
+/* MODALS */
+.modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/*RESPONSIVE DESIGN*/
+@media (max-width: 768px) {
+  #app {
+    margin: 10px;
+    padding: 10px;
+    border-width: 5px;
+  }
+
+  .textBox-wrapper {
+    padding: 15px;
+    
+   min-width: 300px;
+    
+    display: flex;
+  }
+
+  .textBox.input {
+    padding: 10px;
+    font-size: 14px;
+    width: 200px;
+  }
+
+  .join-container {
+    gap: 10px;
+  }
+
+  .button.orange {
+    font-size: 16px;
+    padding: 8px 15px;
+  }
+  .modal-content {
+    padding: 1rem;
+    width: 80%;
+  }
+}
+
+@media (max-width: 480px) {
+  #app {
+    font-size: 14px;
+    margin: 5px;
+    padding: 8px;
+  }
+
+  .textBox-wrapper {
+    min-width: 300px;
+    font-size: 12px;
+    padding: 10px;
+    display: flex;
+  }
+
+  .join-container {
+    gap: 8px;
+  }
+
+  .button.orange {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+  .textBox.click {
+    font-size: 12px;
+    padding: 8px;
+  }
 }
 
 

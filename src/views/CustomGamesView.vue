@@ -489,6 +489,7 @@ beforeDestroy() {
   .container {
     align-items: flex-start;
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     justify-content: space-between;
     padding: 20px;
@@ -602,10 +603,9 @@ input[type="checkbox"] {
     background-color: lightblue;
     position: absolute;
     right: 0;
-    margin-right: 40px;
-    margin-top: 40px;
+    margin-right: 50px;
+    margin-top: 20px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
-
 }
  .participants h2{
     text-align: center;
@@ -621,4 +621,28 @@ input[type="checkbox"] {
     padding: 5px 0;
     border-bottom: 1px solid var(--our-darkBlue);
   }
+
+  @media (max-width: 783px) {
+  .container {
+    flex-direction: column;
+    padding: 10px;
+  }
+  .participants {
+    position: relative;
+    margin-top: 10px;
+    right: 0;
+    margin-right: 10px;
+    
+  }
+  .main-content {
+        font-size: 14px;
+    }
+
+    .admin-player {
+        font-size: 12px;
+    }
+    .game-item {
+        width: 100%;
+    }
+}
   </style>

@@ -56,22 +56,30 @@ export default {
 
 
 <style scoped>
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+}
+
 ul {
   list-style: none;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* Centrerar elementen horisontellt */
-  gap: 10px; /* Mellanrum mellan knapparna */
-  max-width: 400px; /* Begränsar bredden så att innehållet hålls centrerat */
-  margin: 0 auto; /* Centrerar hela listan i mitten av sin container */
+  justify-content: center; 
+  gap: 10px; 
+  max-width: 400px;  
+  margin: 0 auto; 
 }
 
 li.answer-option {
   flex: 1 1 calc(50% - 20px); /* Två knappar per rad */
-  max-width: calc(50% - 20px); /* Begränsar bredden för att hålla dem bredvid varandra */
+  max-width: calc(50% - 20px); 
   display: flex;
-  justify-content: center; /* Centrerar knappen i varje <li> */
+  justify-content: center; 
 }
 
 /* Anpassning för exakt fyra knappar */
@@ -101,7 +109,7 @@ ul:not(:has(li:nth-child(4))) li.answer-option {
 button {
   color: white;
   font-size: 18px;
-  background: linear-gradient(45deg, #ff8c42, #da6822); /* --our-orange till --border-orange */
+  background: var(--gradient-darkOrange);
   border: none;
   border-radius: 10px; 
   padding: 10px 20px;
@@ -111,7 +119,7 @@ button {
 }
 
 button:hover {
-  background: linear-gradient(45deg, #ffad66, #ff8c42); /* Ljusare orange till --our-orange */
+  background: var(--gradient-lightOrange); 
   transform: translateY(-3px);
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
@@ -132,6 +140,14 @@ button:active {
   background: linear-gradient(45deg, #ff8c42, #b5511a); /* --our-orange till en mörkare nyans */
   opacity: 0.6;
   pointer-events: none;
+}
+
+@media screen and (max-width: 768px) {
+  button {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+  
 }
 
 </style>
