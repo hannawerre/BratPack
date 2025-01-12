@@ -66,6 +66,8 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   customGame.selectedMinutes = 60; // 60 minutes default
   customGame.remainingTime = 3600; //
   customGame.gameStarted = false;
+  customGame.customQuestions = {};
+  customGame.useCustomQuestions = false;
 
   
 
@@ -73,6 +75,25 @@ Data.prototype.createCustomGame = function (lang = "en") { // lang = "en" ???
   
   console.log("Custom Game created", pin, customGame);
   return { pin, customGame };
+};
+
+
+Data.prototype.createCustomGameAlt = function (pin, lang) { // lang = "en" ???
+  // TODO: If there currently is a game with the same pin. The older game will be overwritten. This issue should probably be solved in CustomGamesView.vue /sebbe
+  let customGame = {};
+  customGame.lang = lang;  
+  customGame.participants = [];
+  customGame.selectedGames = [];
+  customGame.selectedMinutes = 60; // 60 minutes default
+  customGame.remainingTime = 3600; //
+  customGame.gameStarted = false;
+  // customGame.customQuestions = {};
+  // customGame.useCustomQuestions = false;
+
+  this.customGames[pin] = customGame;
+  
+  console.log("Custom Game created", pin, customGame);
+  return { customGame };
 };
 
 Data.prototype.storeGameDataAndStart = function (gameData){
@@ -144,31 +165,44 @@ Data.prototype.getUILabels = function (lang) {
   return JSON.parse(labels);
 };
 
-Data.prototype.getQuestions = function (lang, gamePin, gameName) {
-  //check if lang is valid before trying to load the dictionary file
-  if (!["en", "sv"].some( el => el === lang))
+Data.prototype.getQuestions = function (lang, gamePin, whichQuiz) {
+  // Kontrollera om språket är giltigt, annars standard till engelska
+  if (!["en", "sv"].includes(lang)) {
     lang = "en";
-  const standardQuestions = JSON.parse(readFileSync("./server/data/questions-" + lang + ".json"));
- 
+  }
 
+  // Läs in standardfrågor från den lokala filen baserat på språk
+  const standardQuestions = JSON.parse(readFileSync(`./server/data/questions-${whichQuiz}-${lang}.json`));
+  console.log(`./server/data/questions-${whichQuiz}-${lang}.json`)
+  // Kontrollera om spelet existerar
   if (this.customGameExists(gamePin)) {
     const gameData = this.customGames[gamePin];
-    const allQuestions = gameData?.allCustomQuestions;
-    const customQuestions = allQuestions?.[gameName]?.customQuestions;
-    
-    
-    if(customQuestions && Array.isArray(customQuestions)){
-      const questionObj = {
+    const quizData = gameData?.allCustomQuestions?.[whichQuiz]; // Hämtar data för det specifika quizet
+
+    const customQuestions = quizData?.customQuestions; // Anpassade frågor
+    const useCustomQuestions = quizData?.useCustomQuestions; // Flagga för att använda anpassade frågor
+  
+    // Kontrollera om vi ska använda anpassade frågor
+    if (useCustomQuestions && customQuestions && Array.isArray(customQuestions)) {
+      return {
         questions: customQuestions
-      }
-      return questionObj
-    } else{
-    return standardQuestions
+      };
     }
+  } else {
+    console.error(`Game with pin ${gamePin} does not exist.`);
   }
+
+  return standardQuestions;
 };
 
 // ThisOrThat -------------------------------------------------------------------------------------
+Data.prototype.getQuestions_ThisOrThat = function(lang) {
+  if (!["en", "sv"].some( el => el === lang)) 
+    lang = "en";
+  const questions = JSON.parse(readFileSync("./server/data/questionsThisOrThat-" + lang + ".json"));
+  return questions;
+};
+
 Data.prototype.setup_ThisOrThat = function(gamePin) {
   if(this.customGames[gamePin].ThisOrThat) return this.customGames[gamePin].ThisOrThat; // If it already exists
   let ThisOrThat = {};
@@ -184,12 +218,7 @@ Data.prototype.setup_ThisOrThat = function(gamePin) {
   this.customGames[gamePin].ThisOrThat = ThisOrThat;
   return ThisOrThat;
 };
-Data.prototype.getQuestions_ThisOrThat = function(lang) {
-  if (!["en", "sv"].some( el => el === lang)) 
-    lang = "en";
-  const questions = readFileSync("./server/data/questionsThisOrThat-" + lang + ".json");
-  return JSON.parse(questions);
-};
+
 Data.prototype.answer_ThisOrThat = function(gamePin, userName, answerId) {
   // Add the answer to the given participant.
   const currentQuestion = this.customGames[gamePin].ThisOrThat.currentQuestion
@@ -268,9 +297,16 @@ Data.prototype.startCountDown = function() {
 }, 1000);
 };
 Data.prototype.getGameTime = function (gamePin) { 
+  console.log("GAMEPIN: ", gamePin)
+  console.log("this.customGames[gamePin]: ", this.customGames)
+
+  try{
   console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin])
   console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin)
   return this.customGames[gamePin].remainingTime;
+  }catch(e){
+    console.log("Error in getGameTime: ", e);
+  }
 };
 // -------------------------------------------------------------------------------------------------
 
@@ -287,10 +323,7 @@ Data.prototype.setScore = function(gamePin, userName, newScore){
   console.log("spelet efter uppdaterad poäng:", this.customGames[gamePin])
 };
 
-Data.prototype.saveQuestions = function(gamePin, allCustomQuestions, whichQuiz) {
-  console.log("Saving questions for pin: ", gamePin);
-  console.log("Saved questions: ", allCustomQuestions);
-  console.log("Which quiz: ", whichQuiz);
+Data.prototype.saveQuestions = function(gamePin, customQuestions, useCustomQuestions, whichQuiz) {
 
   if (!this.customGameExists(gamePin)) {
     console.error(`Cannot save questions. Game with pin ${gamePin} does not exist.`);
@@ -302,16 +335,17 @@ Data.prototype.saveQuestions = function(gamePin, allCustomQuestions, whichQuiz) 
   if (!this.customGames[gamePin].allCustomQuestions[whichQuiz]) {
     this.customGames[gamePin].allCustomQuestions[whichQuiz] = {};
   }
-  this.customGames[gamePin].allCustomQuestions = allCustomQuestions;
+  this.customGames[gamePin].allCustomQuestions[whichQuiz] = {
+    customQuestions,
+    useCustomQuestions
+  };
+
+  console.log("Saved questions: ", this.customGames[gamePin].allCustomQuestions[whichQuiz]);
  
+  console.log("SNälla fungera", this.customGames[gamePin])
+  console.log("original getquestions", this.getQuestions("en", gamePin, whichQuiz));
 
-  console.log("Saved questions for pin: ", gamePin, " are: ", this.customGames[gamePin].allCustomQuestions[whichQuiz]);
-
-  // this.customGames[gamePin].selectedGames[whichQuiz].saveQuestions = savedQuestions;
-  // this.customGames[gamePin].selectedGames[whichQuiz].useStandardQuestions = useStandardQuestions;
-  // this.customGames[gamePin].selectedGames[whichQuiz].useOwnQuestions = useOwnQuestions;
-
-  // Save
+  //console.log("seb getquestions", this.getQuestions_ThisOrThat("en", gamePin, whichQuiz));
 };
 Data.prototype.deleteGame = function(gamePin) {
   console.log("Deleting game with pin: ", gamePin);

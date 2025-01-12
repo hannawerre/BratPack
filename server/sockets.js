@@ -38,7 +38,7 @@ function sockets(io, socket, data) {
   socket.on('setup_ThisOrThat', function(gamePin, lang) {
     console.log("Setting up ThisOrThat game, and returning questions");
     socket.emit('setup_ThisOrThat', data.setup_ThisOrThat(gamePin));
-    socket.emit("getQuestions_ThisOrThat", data.getQuestions_ThisOrThat(lang));
+    socket.emit("getQuestions_ThisOrThat", data.getQuestions(lang));
   });
   socket.on('newChosenParticipant', function(gamePin) {
     io.to(gamePin).emit('newChosenParticipant', data.newChosenParticipant(gamePin));
@@ -127,14 +127,28 @@ socket.on('requestGameTime', (gamePin, callback) => {
     io.to(gamePin).emit('participantsUpdate', data.getCustomGameParticipants(gamePin));
   });
 
-  socket.on("savedQuestionsToServer", function(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz) {
-  data.saveQuestions(gamePin, savedQuestions, useStandardQuestions, useOwnQuestions, quiz);
-  console.log("Theo loggar quiz:", quiz);
+  socket.on("savedQuestionsToServer", function(gamePin, savedQuestions, useCustomQuestions, quiz) {
+  data.saveQuestions(gamePin, savedQuestions, useCustomQuestions, quiz);
+  console.log("Theo loggar quiz:", quiz, "useCustomQuestions:", useCustomQuestions, "savedQuestions:", savedQuestions);
   });
 
-  socket.on("adminLeftGame", (gamePin, userName) => {
+  socket.on("adminLeftGame", (gamePin) => { //används inte atm
     console.log(`Admin left for gamepin: ${gamePin}`);
     data.deleteGame(gamePin);
+  });
+
+
+
+  socket.on("adminStartedWithExisitingPin", function(gamePin, lang) {
+    if(!data.customGameExists(gamePin)){
+      console.log("Admin rejoined UNEXISTING game with pin: ", gamePin);
+      const customGame = data.createCustomGameAlt(gamePin, lang);
+      socket.emit('updateGameData', customGame);
+      console.log("Game created with pin: ", gamePin);
+    }else{
+      console.log("Admin rejoined EXISTING game with pin: ", gamePin);
+      socket.emit("gameAlreadyExists", gamePin);
+    };
   });
 
 // socket.on("adminLeftGame", (gamePin, userName) => {

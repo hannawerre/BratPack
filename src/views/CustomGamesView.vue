@@ -1,4 +1,11 @@
 <template>
+<div v-if="showGameExistsPopup && !shouldRestoreState" class="popup-overlay">
+      <div class="popup-content">
+        <h2>Game Already in Session</h2>
+        <p>The game with PIN {{ gamePin }} is already active. Return to main menu</p>
+        <button @click="mainMenu">OK</button>
+      </div>
+</div>
 <div class="container">
   <div class="main-content">
   <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
@@ -56,24 +63,22 @@
   <EditQuiz1Component 
       ref="modalGeneralQuiz" 
       :GameName="currentGame ? currentGame.name : ''"
-      @modal-closed="onModalClosed"
       @questions-saved-generalQuiz="onQuestionsSaved"
+      @modal-closed="onModalClosed"
   />
   <EditQuiz2Component 
-      ref="modalQuiz2" 
+      ref="modalWhosMostLikelyTo" 
       :GameName="currentGame ? currentGame.name : ''"
+      @questions-saved-whosMostLikelyTo="onQuestionsSaved"
       @modal-closed="onModalClosed"
   />
   <EditQuiz3Component 
-      ref="modalQuiz3" 
+      ref="modalThisOrThat" 
       :GameName="currentGame ? currentGame.name : ''"
+      @questions-saved-thisOrThat="onQuestionsSaved"
       @modal-closed="onModalClosed"
   />
-  <EditQuiz4Component 
-      ref="modalQuiz4" 
-      :GameName="currentGame ? currentGame.name : ''"
-      @modal-closed="onModalClosed"
-  />
+
 
   <div class="startbutton-container">
       <button class="startbutton" @click="startGame">Start Game</button>
@@ -103,7 +108,6 @@ import io from 'socket.io-client';
 import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';
-import EditQuiz4Component from '../components/EditQuiz4Component.vue';
 
 
 
@@ -113,7 +117,7 @@ components: {
   EditQuiz1Component,
   EditQuiz2Component,
   EditQuiz3Component,
-  EditQuiz4Component
+
 },
 data: function() {
   return {
@@ -125,46 +129,81 @@ data: function() {
       // { id: 'Music quiz', name: 'Quiz 3'},
       // { id: 'This or that', name: 'Quiz 4'}
       { id: 'generalQuiz', name: 'General Quiz'} ,
-      { id: 'Quiz2', name: 'Who´s most likely'},
-      { id: 'Quiz3', name: 'Music quiz'},
-      { id: 'ThisOrThat', name: 'This or that'}
+      { id: 'whosMostLikelyTo', name: 'Who´s most likely to'},
+      { id: 'thisOrThat', name: 'This or that'}
     ],
     selectedGames: [],
     participants: [],
     gamePin: '',
     currentGame: null, // Används denna? /sebbe
-    customQuestions:{},
-    useStandardQuestions: true,
-    useOwnQuestions: false,
+    customQuestions: {},
+    // useCustomQuestions: false,
     userName:'',
     userRole: 'host',
     gameStarted: false,
-
+    showGameExistsPopup: false,
+    shouldRestoreState: false,
   };
 },
 
 created: function () {
-  socket.on("updateGameData", (gameData) => {
-        
-        console.log("Game data received: ", gameData);
-        // this.customQuestions = gameData.customQuestions;
-        // this.useStandardQuestions = gameData.useStandardQuestions;
-        // this.useOwnQuestions = gameData.useOwnQuestions;
-        this.selectedGames = gameData.selectedGames;
-        this.participants = gameData.participants;
-        this.selectedMinutes = gameData.selectedMinutes;
-        this.customQuestions = gameData.customQuestions;
-        console.log("Updated gameData, participants: ", this.participants);
-        
+  
+  const shouldRestore = sessionStorage.getItem('shouldRestoreState');
+  this.shouldRestoreState = shouldRestore;
 
-        });
+  console.log("Should restore state:", shouldRestore);
+    if (shouldRestore) {
+      const savedData = sessionStorage.getItem('savedData');
+      if (savedData) {
+      try {
+        
+        const parsedData = JSON.parse(savedData);
+        // Återställ varje egenskap från det sparade objektet
+        this.selectedGames = parsedData.selectedGames || [];
+        this.participants = parsedData.participants || [];
+        this.customQuestions = parsedData.customQuestions || {};
+        this.userName = parsedData.userName || '';
+        this.userRole = parsedData.userRole || 'host';
+        this.selectedMinutes = parsedData.selectedMinutes || 60;
+      } catch (error) {
+        console.error("Fel vid tolkning av sparad data:", error);
+      }
+    }
+    sessionStorage.removeItem('shouldRestoreState');
+    sessionStorage.removeItem('savedData');
+
+    console.log("Restored data:", this.selectedGames, this.participants, this.customQuestions, this.userName);
+  }
+
+  // socket.on("updateGameData", (gameData) => {
+        
+        // console.log("Game data received: ", gameData);
+        // // this.customQuestions = gameData.customQuestions;
+        // // this.useStandardQuestions = gameData.useStandardQuestions;
+        // // this.useOwnQuestions = gameData.useOwnQuestions;
+        // this.selectedGames = gameData.selectedGames;
+        // this.participants = gameData.participants;
+        // this.selectedMinutes = gameData.selectedMinutes;
+        // // this.customQuestions = gameData.customQuestions;
+        // // this.useCustomQuestions = gameData.useCustomQuestions;
+        // console.log("Updated gameData, participants: ", this.participants);
+        // });
   if (!this.$route.params.gamePin) { 
     socket.on('gameCreated', pin => {
       this.gamePin = pin
       console.log("GamePin created: ", this.gamePin);
       socket.emit('joinSocketRoom', pin); //joins the socket room 'gamePin'
       this.$router.replace({ path: `/customgames/${pin}` });
-
+      
+      socket.on("updateGameData", (gameData) => {
+        
+        console.log("Game data received: ", gameData);
+        this.selectedGames = gameData.selectedGames;
+        this.participants = gameData.participants;
+        this.selectedMinutes = gameData.selectedMinutes;
+        this.customQuestions = gameData.customQuestions;
+        console.log("Updated gameData, participants: ", this.participants);
+        });
       });
   console.log("Listener for 'updateGameData' in CustomGamesView.vue is active");
   socket.emit("createGame", this.lang);
@@ -172,6 +211,12 @@ created: function () {
       console.log("Insde else-statement, this means created gamepin exists");
       this.gamePin = this.$route.params.gamePin; // just nu kommer gamePin finnas kvar vid refresh, men jag tror att all game data raderas
       console.log("GamePin: ", this.gamePin);
+      socket.on("gameAlreadyExists", (gamepin)=> {
+        console.log("Game already exists, gamepin: ", gamepin);
+        this.showGameExistsPopup = true;
+
+      })
+      socket.emit("adminStartedWithExisitingPin", this.gamePin, this.lang)
       socket.emit("joinSocketRoom",this.gamePin);
       socket.emit("requestGameData", this.gamePin);
   
@@ -183,93 +228,7 @@ socket.on('participantsUpdate', participants => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /*
-
-  // this.gamePin = this.$route.params.gamePin;
-  //   console.log("GamePin: ", this.gamePin);
-  //   socket.emit("joinCustomGame",this.gamePin);
-    socket.on("updateGameData", (gameData) => {
-    //   if (gameData.selectedGames && gameData.selectedGames.length > 0) {
-    //     this.selectedGames = gameData.selectedGames;
-    // }
-    // if (gameData.customQuestions && gameData.customQuestions.length > 0) {
-    //     this.customQuestions = gameData.customQuestions;
-    // }
-    // if (gameData.useStandardQuestions) {
-    //     this.useStandardQuestions = gameData.useStandardQuestions;
-    // }
-    // if (gameData.customQuestions && gameData.customQuestions.length > 0) {
-    //     this.customQuestions = gameData.customQuestions;
-    // }
-
-    console.log("Game data received: ", gameData);
-    // this.customQuestions = gameData.customQuestions;
-    // this.useStandardQuestions = gameData.useStandardQuestions;
-    // this.useOwnQuestions = gameData.useOwnQuestions;
-    this.selectedGames = gameData.selectedGames;
-    this.participants = gameData.participants;
-    this.selectedMinutes = gameData.selectedMinutes;
-    console.log("Updated gameData, participants: ", this.participants);
-    if (this.participants && this.participants.length > 0) {
-      // Kod för att använda participants[0]
-      this.userName = this.participants[0].name;
-    }
-    console.log("Username: ", this.userName);
-  });
-  console.log("Listener for 'updateGameData' in CustomGamesView.vue is active");
-
-  if (!this.$route.params.gamePin) { 
-      socket.on('gameCreated', pin => {
-        this.gamePin = pin
-        console.log("GamePin created: ", this.gamePin);
-        socket.emit('joinCustomGame', pin); //joins the socket room 'gamePin'
-        this.$router.replace({ path: `/customgames/${pin}` });
-      });
-      console.log("Listener for 'gameCreated' in CustomGamesView.vue is active");
-      socket.emit("createGame", this.lang);
-      console.log("Emitted createGame from CustomGamesView.vue")
-    }
-    // This else-statement gets triggered if the site is refreshed.
-    else { 
-      // TODO: när sidan laddas om så tror jag att all sparad data raderas. Därför borde allt som har med spelet och göra att sparas i localStorage eller sessionStorage
-      console.log("Insde else-statement, this means created gamepin exists");
-      this.gamePin = this.$route.params.gamePin; // just nu kommer gamePin finnas kvar vid refresh, men jag tror att all game data raderas
-      console.log("GamePin: ", this.gamePin);
-      socket.emit("joinSoketRoom",this.gamePin);
-      // alltså ska vi här lägga till att vi hämtar den sparade datan relaterad till gamePin från localStorage eller sessionStorage
-    };
-    
-
-
-
-    // Lyssna på uppdateringar av deltagare, när någon joinar
-    socket.on('participantsUpdate', participants => {
-    this.participants = participants;
-    console.log("Active participants: ", this.participants);
-    
-  });
-  //Används ej
-  socket.on('lobbyUnactive',(gamePin) => {
-    console.log("Unactivating lobby", gamePin);
-
-    participants.forEach(participant => {
-    console.log(`Participant: ${participant.name}, isPlaying: ${participant.isPlaying}`);
-  });
-  });
-  socket.emit("requestParticipants", this.gamePin); // Behövs dennaP
-
 
   //Används ej
   socket.emit("adminRejoined", (this.gamePin))
@@ -278,6 +237,11 @@ socket.on('participantsUpdate', participants => {
   */
 },
 methods: {
+
+  mainMenu: function() {
+    window.removeEventListener("beforeunload", this.handleBeforeUnload);
+    this.$router.push("/");
+  },
 
   incrementMinutes: function() {
     this.selectedMinutes += 10;
@@ -349,8 +313,15 @@ methods: {
     }
     console.log("Davids och sebbes test: ", gameData);
 
+    window.removeEventListener("beforeunload", this.handleBeforeUnload);
+
     socket.emit('startGame', gameData)
-    this.$router.push("/game/" + this.gamePin)
+    this.$router.push("/game/" + this.gamePin).then(() => {
+    // Add or maintain the beforeunload listener
+    
+    console.log("--> Listener carried over to /game/");
+  });
+
     // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
     // this.$router.push({
     //   name: 'GameView',
@@ -360,57 +331,68 @@ methods: {
   },
 
   openModal(game) {
-    this.currentGame = game;
-    // Öppna rätt modal baserat på vilken quiz det är
-    if (game.id === 'generalQuiz') {
-      this.$refs.modalGeneralQuiz.openModal();
-    } else if (game.id === 'Quiz2') {
-      this.$refs.modalQuiz2.openModal();
-    } else if (game.id === 'Quiz3') {
-      this.$refs.modalQuiz3.openModal();
-    } else if (game.id === 'Quiz4') {
-      this.$refs.modalQuiz4.openModal();
-    }
+  this.currentGame = game;
 
-
-  },
+  if (game.id === 'generalQuiz') {
+    this.$refs.modalGeneralQuiz.openModal(); // Kontrollera denna rad
+  } else if (game.id === 'whosMostLikelyTo') {
+    this.$refs.modalWhosMostLikelyTo.openModal();
+  } else if (game.id === 'thisOrThat') {
+    this.$refs.modalThisOrThat.openModal();
+  }
+},
 
   onModalClosed() {
     console.log('Modalen är stängd');
-    
     this.currentGame = null;
   },
 
-  onQuestionsSaved(customQuestions, useStandardQuestions, useOwnQuestions, quiz) { // kanske kan skriva ihop denna med onModalClosed? //david
-    if (!this.customQuestions[quiz]) {
-    this.customQuestions[quiz] = {};
+  onQuestionsSaved(savedQuestions, useCustomQuestions) { // kanske kan skriva ihop denna med onModalClosed? //david
+    console.log(this.currentGame.id);
+
+    console.log("Här ska customGames vara tom", this.customQuestions);
+
+    if (!this.customQuestions[this.currentGame.id]) {
+    this.customQuestions[this.currentGame.id] = {};
   }
 
-  this.customQuestions[quiz].customQuestions = customQuestions;
-  this.customQuestions[quiz].useStandardQuestions = useStandardQuestions;
-  this.customQuestions[quiz].useOwnQuestions = useOwnQuestions;
-  console.log("Theo loggar: custom questions objektet för quiz", quiz,  this.customQuestions[quiz])
-  console.log(
-    'Questions received from child:',
-    quiz
-    
-    /*this.customQuestions[quiz].customQuestions,
-    this.customQuestions[quiz].useStandardQuestions,
-    this.customQuestions[quiz].useOwnQuestions,
-    this.customQuestions */
-  );
+  this.customQuestions[this.currentGame.id].customQuestions = savedQuestions;
+  this.customQuestions[this.currentGame.id].useCustomQuestions = useCustomQuestions;
+  // this.useCustomQuestions = useCustomQuestions;
+  // this.customQuestions = savedQuestions;
+
+
+  // console.log("Dessa ska vara lika dana:", this.customQuestions, "och", thiscustomQuestions[this.currentGame.id].customQuestions )
 
   socket.emit(
     "savedQuestionsToServer", 
     this.gamePin, 
-    this.customQuestions, 
-    quiz
+    this.customQuestions[this.currentGame.id].customQuestions,
+    this.customQuestions[this.currentGame.id].useCustomQuestions,
+    this.currentGame.id
   );
 },
 
   handleWindowClose(event) {
       console.log("Admin window closed! unactivating lobby")
       //socket.emit("adminLeftGame", this.gamePin, this.userName);
+    },
+
+  handleBeforeUnload(event) {
+      const dataToSave = {
+        selectedGames: this.selectedGames,
+        participants: this.participants,
+        customQuestions: this.customQuestions,
+        userName: this.userName,
+        userRole: this.userRole,
+        selectedMinutes: this.selectedMinutes
+      };
+
+      console.log("Saving data before unload:", dataToSave);
+
+      sessionStorage.setItem('shouldRestoreState', true);
+      sessionStorage.setItem('savedData', JSON.stringify(dataToSave));
+      // Visa standardvarning om det behövs
     },
 
   checkIfRefreshPage() {
@@ -425,63 +407,25 @@ methods: {
     console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
     },
 
-    updateSettings: function() {
-      console.log("Pressed update info button");
-      
-      let gameData = {
-        gamePin: this.gamePin,
-        selectedGames: this.selectedGames,
-        participants: this.participants,
-        selectedMinutes: this.selectedMinutes,
-        customQuestions: this.customQuestions,
-        useStandardQuestions: this.useStandardQuestions,
-        useOwnQuestions: this.useOwnQuestions
-      }
-      console.log("gameData: ", gameData);
-      socket.emit('updateSettings', gameData);
-    },
-    deleteGame: function() {
- 
-    },
-    unactiveGame: function() {
-
-    },
-    logGameData: function() {
-      console.log("Pressed log game data button");
-      socket.emit('requestGameData', this.gamePin);
-      console.log("Game data: ", this.gamePin, this.selectedGames, this.participants, this.selectedMinutes, this.customQuestions, this.useStandardQuestions, this.useOwnQuestions, this.active);
-    }
   },
+
 mounted() {
-  // console.log(this.participants.length > 0,"participants >0")
-  //   if (this.participants.length == 0) {
-  //     console.log("YES")
-  //     // If the first participant’s name is not the same as userName
-  //       socket.emit("participateInCustomGame", this.gamePin, {
-  //         name: "ADMIN",
-  //         isPlaying: false,
-  //         isAdmin: true,
-  //         scoreGame1: 0,
-  //         scoreGame2: 0,
-  //         scoreGame3: 0,
-  //         scoreGame4: 0
-  //       });
-  //       console.log("Created ADMIN")
-  //   }
 
-  //   console.log("Emitted participateInCustomGame from CustomGamesView.vue")
-  //   //Hämta gameData från servern
-  //   socket.emit("requestGameData", this.gamePin);
-  //   console.log("Emitted requestGameData from CustomGamesView.vue")
+  window.addEventListener("beforeunload", this.handleBeforeUnload);
 
-
-    window.addEventListener("beforeunload", this.handleWindowClose);
-    //this.checkIfRefreshPage();
   },
-beforeDestroy() {
-    window.removeEventListener("beforeunload", this.handleWindowClose);
-  },
-}
+  beforeUnmount() {
+    console.log("Admin left game, removed event listener");
+    
+    //socket.emit("adminLeftGame", this.gamePin);
+    window.removeEventListener("beforeunload", this.handleBeforeUnload);
+
+    sessionStorage.removeItem('shouldRestoreState');
+    sessionStorage.removeItem('savedData');
+
+  }
+
+  }
 </script>
 
 
@@ -706,4 +650,50 @@ input[type="checkbox"] {
     padding: 5px 0;
     border-bottom: 1px solid #ddd;
   }
+
+
+
+  .popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 300px;
+}
+
+.popup-content h2 {
+  margin-bottom: 10px;
+}
+
+.popup-content p {
+  margin-bottom: 20px;
+}
+
+.popup-content button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.popup-content button:hover {
+  background-color: #45a049;
+}
 </style>
