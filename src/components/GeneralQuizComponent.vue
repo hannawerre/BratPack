@@ -5,7 +5,7 @@
       <div v-if="currentPhase === 'startPhase'">
         <h1> {{ uiLabels.generalTrivia }}</h1>
         <div v-if="isAdmin">
-          <button @click="startQuiz" class="start-button"> {{ uiLabels.startQuiz }}</button>
+          <button class="button blue small" @click="startQuiz"> {{ uiLabels.startQuiz }}</button>
         </div>
         <div v-else> {{ uiLabels.waitingOnAdmin }}</div>
       </div>
@@ -70,8 +70,8 @@
         </div>
   
         <div v-if="isAdmin">
-          <button v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
-          <button v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
+          <button class="button blue small" v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
+          <button class="button blue small" v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
         </div>
       
       </div>
@@ -104,15 +104,13 @@ GLÖM EJ ATT ÄNDRA SPRÅKET TILL LOCALSTORAGE
 */
 
 import QuestionComponent from './QuestionComponent.vue';
-import Nav from './ResponsiveNav.vue';
 const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
 
 export default {
   name: 'GeneralQuizComponent',
   components: {
-    QuestionComponent,
-    Nav
+    QuestionComponent
   },
   props: {
     gameData: { type: Object, required: true },
@@ -134,6 +132,7 @@ export default {
       countDownNumber: 3,
       pointsTime: 0,
       playerAnsweredRight: false,
+      localPoints: 0
     };
   },
 
@@ -172,26 +171,21 @@ export default {
         })
       },
       onAnswer(answerData) {
-      const participant = this.gameData.participants.find(
-        (p) => p.name === this.userName
-      );
-      
-
       this.currentAnswer = answerData;
       this.currentPhase = "answeredPhase";
 
       if (answerData.isCorrect) {
         const points = Math.floor((this.countdownProgress / 100) * 1000);
         this.playerAnsweredRight = true;
-        participant.scoreGame1 += points;
-        this.updatePoints(participant);
+        this.localPoints += points;
+        
       }
     },
-    updatePoints(participant) {
+    updatePoints() {
       socket.emit("updatePlayerPoints", {
         gamePin: this.gamePin,
         userName: this.userName,
-        newScore: participant.scoreGame1
+        newScore: this.localPoints
       })
     },
     nextQuestion() {
@@ -275,6 +269,7 @@ export default {
                 console.log(this.currentPhase);
 
                 setTimeout(() => {
+                  this.updatePoints();
                   this.goToNextPhase(); 
                 }, 200)    
             }
