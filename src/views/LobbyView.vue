@@ -20,7 +20,13 @@
     <div class="waitingRoom" v-if="joined">
       <div>
         <h3>{{ this.uiLabels.players }}</h3>
+        <div class="toggle-button" @click="toggleListVisibility">
+          <span>{{ isListVisible ? 'Hide Players &#9650;' : 'Show Players &#9660;' }}</span>
+          <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
+        </div>
+        <ul v-if="isListVisible">
         <p v-for="participant in participants">{{ participant }}</p>
+        </ul>
       </div>
   </div>
   </div>
@@ -44,7 +50,9 @@ export default {
       joined: false,
       lang: localStorage.getItem("lang") || "en",
       participants: [],
-      uiLabels: {}
+      uiLabels: {},
+      isListVisible: false,
+      toggleText: "Show Players"
     }
   },
   created: function () {
@@ -121,6 +129,11 @@ export default {
         this.joined = false; // Default value if userName doesn't exist
         this.userName = ""; // Ensure userName is initialized to an empty string
       }
+    },
+    toggleListVisibility: function(isListVisible) {
+      console.log("list visibility toggled", this.isListVisible);
+        this.isListVisible = !this.isListVisible;
+        this.toggleText = this.isListVisible ? "Hide Players" : "Show Players";
     }
   },
   mounted() {

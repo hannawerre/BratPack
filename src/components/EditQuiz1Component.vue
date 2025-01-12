@@ -1,33 +1,40 @@
 <template>
-    <div v-if="isModalOpen" class="modal-background" @click.self="closeModal">
-      <div v-if="isModalOpen" class="modal-wrapper" @click.self="closeModal">
-        <div class="questions-list" @click.stop>
-          <h2>Questions</h2>
-          <ul>
-  <li v-for="(question, index) in savedQuestions" :key="index" class="question-item">
-    <div class="question-container">
-      <!-- Left side: Question and answers -->
-      <div class="question-details">
-        <strong class="question-title">Q{{ index + 1 }}: {{ question.question }}</strong>
-        <ul>
-          <li v-for="(answer, i) in question.answers" :key="i" class="answer-item">
-            {{ answer.answer }} 
-            <span v-if="answer.isCorrect">(Correct)</span>
-          </li>
-        </ul>
-      </div>
+   <div v-if="isModalOpen" class="modal-background" @click.self="closeModal">
+  <div v-if="isModalOpen" class="modal-wrapper" @click.self="closeModal">
+    
+  
 
-      <!-- Right side: Remove button -->
-      <button 
-        @click="removeQuestion(index)" 
-        class="remove-button" 
-        title="Remove this question">
-        &times;
-      </button>
+    <div class="questions-list" @click.stop>
+      <h2>Questions</h2>
+      <div class="toggle-button" @click="toggleListVisibility">
+        <span>{{ isListVisible ? 'Hide Questions &#9650;' : 'Show Questions &#9660;' }}</span>
+        <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
     </div>
-  </li>
-</ul>
-        </div>
+      <ul>
+        <li v-for="(question, index) in savedQuestions" :key="index" class="question-item" v-show="isListVisible">
+          <div class="question-container">
+            <!-- Left side: Question and answers -->
+            <div class="question-details">
+              <strong class="question-title">Q{{ index + 1 }}: {{ question.question }}</strong>
+              <ul>
+                <li v-for="(answer, i) in question.answers" :key="i" class="answer-item">
+                  {{ answer.answer }} 
+                  <span v-if="answer.isCorrect">(Correct)</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Right side: Remove button -->
+            <button 
+              @click="removeQuestion(index)" 
+              class="remove-button" 
+              title="Remove this question">
+              &times;
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
   
         <div class="modal-content" @click.stop>
           <h1>Edit {{ GameName }}</h1>
@@ -100,6 +107,9 @@
 
     const isModalOpen = ref(false);
 
+    const isListVisible = ref(false);
+    const toggleText = ref("Show questions");
+
     const useStandardQuestions = ref(true);
     const useOwnQuestions = ref(false);
 
@@ -116,6 +126,11 @@
     const openModal = () => {
         isModalOpen.value = true;
         emit('modal-opened');
+    };
+
+    const toggleListVisibility = () => {
+        isListVisible.value = !isListVisible.value;
+        toggleText.value = isListVisible.value ? "Hide questions" : "Show questions";
     };
 
     const saveQuestion = () => {
@@ -236,6 +251,7 @@
   margin-bottom: 4px;
   font-size: 0.9rem;
 }
+
 
 .modal-content {
   position: relative;

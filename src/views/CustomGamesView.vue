@@ -83,17 +83,22 @@
   </div>
 
 </div>
-  <div class="participants">
+<div class="participants">
     <h2>Participants</h2>
-      <ul>
-        <li v-if="userRole === 'play' && gameStarted=== false"><strong>{{ userName ? userName : "Admin" }}</strong></li>
-        <li v-for="(participant, index) in participants" :key="index">
-          <strong>{{ participant.name }}</strong> 
-        </li>
-      </ul>
-
+    <div class="toggle-button" @click="toggleListVisibility">
+      <span>{{ isListVisible ? 'Hide Participants &#9650;' : 'Show Participants &#9660;' }}</span>
+      <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
+</div>
+    <ul v-if="isListVisible">
+      <li v-if="userRole === 'play' && gameStarted === false">
+        <strong>{{ userName ? userName : "Admin" }}</strong>
+      </li>
+      <li v-for="(participant, index) in participants" :key="index">
+        <strong>{{ participant.name }}</strong>
+      </li>
+    </ul>
   </div>
-  </div>
+</div>
 </template>
 
 <script>
@@ -139,6 +144,8 @@ data: function() {
     userName:'',
     userRole: 'host',
     gameStarted: false,
+    isListVisible: false,
+    toggleText: "Show Participants",
 
   };
 },
@@ -450,6 +457,11 @@ methods: {
       console.log("Pressed log game data button");
       socket.emit('requestGameData', this.gamePin);
       console.log("Game data: ", this.gamePin, this.selectedGames, this.participants, this.selectedMinutes, this.customQuestions, this.useStandardQuestions, this.useOwnQuestions, this.active);
+    },
+    toggleListVisibility: function(isListVisible) {
+      console.log("list visibility toggled", this.isListVisible);
+        this.isListVisible = !this.isListVisible;
+        this.toggleText = this.isListVisible ? "Hide Participants" : "Show Participants";
     }
   },
 mounted() {

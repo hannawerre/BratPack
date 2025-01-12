@@ -236,6 +236,41 @@
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* TOGGLE BUTTON */
+.toggle-button {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
+  font-size: 1.2rem;
+  background-color: var(--our-blue); /* Bakgrundsfärg för knappen */
+  border-radius: 5px;
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+.toggle-button:hover {
+  background-color: var(--our-lightBlue); /* Bakgrundsfärg för knappen vid hover */
+}
+.toggle-button span {
+  display: inline-block; /* Visa som inline-block för att kunna styra visuellt */
+}
+
+.toggle-button span:first-child {
+  display: inline; /* Första delen av knappen syns alltid */
+}
+
+.toggle-button span:last-child {
+  display: none; /* Andra delen döljs */
+}
+
+.toggle-button[style*="none"] span:last-child {
+  display: inline; /* Visa pilen när listan är synlig */
+}
+
+.toggle-button[style*="none"] span:first-child {
+  display: none; /* Dölj pilen när listan är dold */
+}
 /*RESPONSIVE DESIGN*/
 @media (max-width: 768px) {
   #app {
