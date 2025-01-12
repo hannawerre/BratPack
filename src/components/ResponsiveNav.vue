@@ -19,15 +19,14 @@
         <h1>Name: {{ this.userName }}</h1>
       </div>
     </div>
-    <div id="Language">
-    
+
+    <!-- Language Switcher (Top Right) -->
     <div v-if="showLangSwitch" id="Language">
       <LanguageSwitcher 
         :lang="lang" 
         :uiLabels="uiLabels"
         @language-changed="emitLanguageChangeToParent"
-     />
-    </div>
+      />
     </div>
   </nav>
 </template>
@@ -78,8 +77,7 @@ export default {
       this.$emit('language-changed', newLang);
     }
   }
-}
-
+};
 </script>
 
 <style scoped>
@@ -96,15 +94,12 @@ nav {
   height: 70px; /* Adjust the height of the navbar */
   padding: 0 1rem;
   box-sizing: border-box;
- }
- #Logo img {
-   margin-top: 5px;
-  height: 90px;
 }
 #Logo img {
   height: 50px;
   cursor: pointer;
 }
+
 #Timer {
   flex-grow: 1;
   text-align: center;
@@ -113,20 +108,6 @@ nav {
 #UserInfo {
   text-align: right;
   display: flex;
-  flex-direction:column;
-  align-items: flex-end;
- }
- 
- #Links a {
-  color: black;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-  cursor: pointer;
- }
- 
- 
- .hide {
   flex-direction: column;
   align-items: flex-end;
 }
@@ -153,5 +134,5 @@ nav {
 
 .hide {
   display: none;
- }
- </style>
+}
+</style>

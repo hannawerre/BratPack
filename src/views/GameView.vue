@@ -4,9 +4,25 @@
     :userName="userName"
     :gameActive="true"
     />
+    <!--Visas när inget spel är aktiverat-->
+    <div v-if="!activeGame"> 
+        <div class="button-container">
+            <!-- Buttons only visible to admin -->
+            <div v-if="this.isAdmin">
+                <button
+                    v-for="gameName in gameData.selectedGames"
+                    :key="gameName"
+                    class="button blue"
+                    @click="playMiniGame(gameName)"
+                    >
+                        {{ gameName }}
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!--Game Components-->
-    <div v-if="activeGame && isPlaying"> 
+    <div v-else-if="activeGame && isPlaying"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
@@ -32,24 +48,8 @@
             :uiLabels="uiLabels"
             :userName="userName"
             :isAdmin="isAdmin" />
-    </div>
-    
-    <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
-    <!--Visas när inget spel är aktiverat-->
-    <div v-if="!activeGame"> 
-        <div class="button-container">
-            <!-- Buttons only visible to admin -->
-            <div v-if="this.isAdmin">
-                <button
-                    v-for="gameName in gameData.selectedGames"
-                    :key="gameName"
-                    class="button blue"
-                    @click="playMiniGame(gameName)"
-                    >
-                        {{ gameName }}
-                </button>
-            </div>
-        </div>
+
+        <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
     </div>
 </template>
 
