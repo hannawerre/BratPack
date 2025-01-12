@@ -43,10 +43,6 @@ function sockets(io, socket, data) {
   socket.on('answer_ThisOrThat', function(gamePin, userName, answerId){
     data.answer_ThisOrThat(gamePin, userName, answerId);
   });
-  socket.on('correctQuestion_ThisOrThat', function(gamePin, questionId){
-    data.correctQuestion_ThisOrThat(gamePin, questionId);
-    //io.to(gamePin).emit('updateGameData', data.getGameData(gamePin))
-  });
   socket.on('startRound', function(gamePin) {
     if(!data.roundInProgress(gamePin)){
 
@@ -55,7 +51,11 @@ function sockets(io, socket, data) {
 
       setTimeout(() => {
         data.correctQuestion_ThisOrThat(gamePin); // Correct the answers and add points
-        io.to(gamePin).emit("roundUpdate", data.getGameData(gamePin).ThisOrThat);
+        const gameData = data.getGameData(gamePin)
+        io.to(gamePin).emit("roundUpdate", gameData.ThisOrThat);
+        //console.log(`--->Socket ${socket.id} sent roundUpdate for gamePin: ${gamePin}`);
+        io.to(gamePin).emit("participantsUpdate", gameData.participants);
+        //console.log(`--->Socket ${socket.id} sent participantsUpdate for gamePin: ${gamePin}`);
       }, 20000) // 20 seconds is just after the question time ends.
 
       setTimeout(() => {
@@ -69,11 +69,13 @@ function sockets(io, socket, data) {
 // ---------------------------------------------------------------------------------
 // Timer ---------------------------------------------------------------------------
 socket.on('requestGameTime', (gamePin, callback) => {
-  const time = data.getGameTime(gamePin);
-  callback({
-    remainingTime: time, 
-    error: null
-});
+  if(data.customGameExists(gamePin)){
+    const time = data.getGameTime(gamePin);
+    callback({
+      remainingTime: time, 
+      error: null
+    })
+  };
 });
 // ---------------------------------------------------------------------------------
 
@@ -96,7 +98,25 @@ socket.on('requestGameTime', (gamePin, callback) => {
     io.to(gamePin).emit('updateGameData', data.getGameData(gamePin))
   });
   socket.on('joinSocketRoom', function(gamePin){
+    // console.log("Sebbetest: socket: ", socket.id, " joining socket room: ", gamePin)
+    // Leave all rooms except its own default room (the socket ID room)
+    for (const room of socket.rooms) {
+      if (room !== socket.id) { // Default room is the socket ID
+        socket.leave(room);
+        console.log(`Socket ${socket.id} left room: ${room}`);
+      }
+    }
     socket.join(gamePin);
+    // Print all rooms the socket is in
+    console.log(`Socket ${socket.id} is now in rooms:`);
+    console.log(Array.from(socket.rooms));
+  });
+  socket.on('leaveSocketRoom', function(gamePin){
+    console.log("Sebbetest: socket: ", socket.id, " leaving socket room: ", gamePin)
+    socket.leave(gamePin);
+    // Print all rooms the socket is in
+    console.log(`Socket ${socket.id} is now in rooms:`);
+    console.log(Array.from(socket.rooms));
   });
   socket.on('joinCustomGame', function(gamePin) { //joins the socket room 'gamePin'
     socket.join(gamePin);

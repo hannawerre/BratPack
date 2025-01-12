@@ -113,7 +113,7 @@ Data.prototype.participateInCustomGame = function (gamePin, playerObj) {
   if (this.customGameExists(gamePin)) {
     const game = this.customGames[gamePin];
     game.participants.push({
-      name: playerObj.name || "Anonymous",
+      name: playerObj.name || "Anonymous", // Anonymous??? ta bort eller?
       scoreGame1: playerObj.scoreGame1 || 0,
       scoreGame2: playerObj.scoreGame2 || 0,
       scoreGame3: playerObj.scoreGame3 || 0,
@@ -237,6 +237,12 @@ Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
   for(let [name, data] of participantsArray){
     if (data.answers[questionId] && data.answers[questionId] === correctAnswers[questionId]){
       this.customGames[gamePin].ThisOrThat.participants[name].points += 10;
+      // Find corresponding name in the general participants array and add points there as well.
+      const generalParticipants = this.customGames[gamePin].participants;
+      const matchingParticipant = generalParticipants.find((participant) => participant.name === name);
+      if (matchingParticipant) {
+        matchingParticipant.scoreGame4 += 10;
+      }
     }
   }
 };
@@ -284,8 +290,8 @@ Data.prototype.startCountDown = function() {
 };
 Data.prototype.getGameTime = function (gamePin) { 
   try {
-    console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin]);
-    console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin);
+    // console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin]);
+    // console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin);
     return this.customGames[gamePin].remainingTime;
   } catch (error) {
     console.error("Error accessing game data for gamePin:", gamePin, "Error details:", error);

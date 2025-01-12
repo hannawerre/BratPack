@@ -87,6 +87,14 @@
       clearInterval(this.localTimer);
       clearInterval(this.syncInterval);
     },
+    unmounted() { // TODO: behövs den?
+        // Disconnect socket when component is destroyed or view is changed
+        if (this.socket) {
+            this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
+            this.socket.disconnect(); // Disconnect the socket
+            this.socket = null;
+        }
+    }
   };
   </script>
   

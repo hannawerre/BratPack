@@ -151,6 +151,7 @@ data: function() {
 },
 
 created: function () {
+  //this.dismantleSocket(); //kanske ta bort?
   socket.on( "uiLabels", labels => this.uiLabels = labels );
   socket.on("updateGameData", (gameData) => {
         
@@ -470,6 +471,14 @@ methods: {
       localStorage.setItem("lang", newLang);
       socket.emit("getUILabels", this.lang);
     },
+    // dismantleSocket(){ //TODO kanske ta bort
+    //   console.log("-->before if-statement in dismantleSocket in CustomGamesView")
+    //   if(socket) {
+    //   console.log("-->inside if-statement in dismantleSocket in CustomGamesView")
+    //     socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
+    //     // socket.disconnect(); // Disconnect the socket
+    // }else console.log("this.socket does not exist in CustomGamesView")
+    // }
   },
 mounted() {
   // console.log(this.participants.length > 0,"participants >0")
@@ -499,6 +508,8 @@ mounted() {
   },
 beforeDestroy() {
     window.removeEventListener("beforeunload", this.handleWindowClose);
+    // console.log("-->beforeDestroy in CustomGamesView")
+    // this.dismantleSocket();
   },
 }
 </script>

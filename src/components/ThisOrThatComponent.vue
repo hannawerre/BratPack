@@ -71,7 +71,7 @@
 
 <script>
 import QuestionComponent from './QuestionComponent.vue';
-const socket = io("localhost:3000");
+//const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
 
 export default {
@@ -81,6 +81,9 @@ export default {
     },
 
     props: {
+        socket: {
+            type: Object
+        },
         gameData: {
             type: Object,
             required: true
@@ -117,10 +120,13 @@ export default {
         }
     },
     created: function() {
-        socket.emit('joinSocketRoom', this.gamePin);
+        //this.socket = io("localhost:3000"); // Initialize component-specific socket
+        this.socket.emit('joinSocketRoom', this.gamePin);
 
-        socket.on('roundUpdate', (ThisOrThat) => this.roundUpdate(ThisOrThat));
-        socket.on("nextRound", (nextQuestion, chosenParticipant) => {
+        this.socket.on('roundUpdate', (ThisOrThat) => {
+            // console.log("XXXXX Recieving roundUpdate in gamePin: ", this.gamePin, " with ThisOrThat: ", ThisOrThat)
+            this.roundUpdate(ThisOrThat)});
+            this.socket.on("nextRound", (nextQuestion, chosenParticipant) => {
             console.log("--> socket.on(nextRound) with nextQuestion:", nextQuestion, " and chosenParticipant:", chosenParticipant)
             this.startRound(nextQuestion, chosenParticipant)
         });
@@ -129,12 +135,12 @@ export default {
     },
     methods: {
         setupGame: function() {
-            socket.on('getQuestions_ThisOrThat', questions => this.questions = questions);
-            socket.on('setup_ThisOrThat', (ThisOrThat) => {
+            this.socket.on('getQuestions_ThisOrThat', questions => this.questions = questions);
+            this.socket.on('setup_ThisOrThat', (ThisOrThat) => {
                 this.participants = ThisOrThat.participants;
                 this.chosenParticipant = ThisOrThat.chosenParticipant;
             });
-            socket.emit('setup_ThisOrThat', this.gamePin, this.lang);
+            this.socket.emit('setup_ThisOrThat', this.gamePin, this.lang);
         },
         displayRules() {
             this.startCountdown(30, "rules")
@@ -151,7 +157,7 @@ export default {
 
             if(this.currentQuestion < this.questions.questions.length){
                 
-                socket.emit("startRound", this.gamePin);
+                this.socket.emit("startRound", this.gamePin);
                 this.currentPhase = 'showChosenParticipant'
                 this.startCountdown(5, "participant");
             }
@@ -211,7 +217,7 @@ export default {
         },
         onAnswer(answerData) { 
             // TODO: Just nu används inte questionId! /sebbe
-            socket.emit('answer_ThisOrThat', this.gamePin, this.userName, answerData.answerId)
+            this.socket.emit('answer_ThisOrThat', this.gamePin, this.userName, answerData.answerId)
             console.log("User: ", this.userName, "just answered");
         },
         setCorrectParticipants: function() {
@@ -225,11 +231,39 @@ export default {
                 }
             }
             this.correctParticipants = correctParticipants;
-        }
+        },
+        // dismantleSocket(){
+        //     console.log("-->before if-statement in dismantleSocket in ThisOrThatComponent")
+        //     if (this.socket) {
+        //         console.log("--> Cleaning up socket in ThisOrThatComponent");
+
+        //         // Remove listeners
+        //         this.socket.off("roundUpdate");
+        //         this.socket.off("nextRound");
+        //         this.socket.off("getQuestions_ThisOrThat");
+        //         this.socket.off("setup_ThisOrThat");
+
+        //         // Emit leave and disconnect
+        //         this.socket.emit("leaveSocketRoom", this.gamePin);
+        //         this.socket.disconnect();
+        //         this.socket = null;
+        //     }else console.log("this.socket does not exist in ThisOrThatComponent")
+        // }
     },
     mounted() {
         this.displayRules();
-    }
+    },
+    // beforeDestroy() {
+    // this.dismantleSocket();
+    // },
+    // beforeRouteLeave(to, from, next) {
+    // this.dismantleSocket()
+    // next();
+    // },
+    // deactivated() {
+    //     console.log("Component deactivated... Cleaning up!");
+    //     this.dismantleSocket();
+    // },
 }
 
 </script>

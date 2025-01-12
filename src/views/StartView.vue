@@ -119,9 +119,14 @@ export default {
   mounted: function() {
     document.addEventListener('click', this.closeOnClickOutside);
   },
-  beforeDestroy: function() {
+  beforeDestroy() {
     document.removeEventListener('click', this.closeOnClickOutside);
-  }
+    // if (this.socket) {
+    //             this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
+    //             this.socket.disconnect(); // Disconnect the socket
+    //             this.socket = null;
+    //         }
+    }
 }
 </script>
 <style scoped>

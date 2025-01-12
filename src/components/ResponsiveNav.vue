@@ -82,7 +82,7 @@ export default {
 
 <style scoped>
 nav {
-  position: sticky;
+  position: relative;
   top: 0;
   left: 0;
   z-index: 1000;

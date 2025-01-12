@@ -37,32 +37,37 @@
         />
         <ThisOrThatComponent 
             v-if="activeGame === 'ThisOrThat'" 
+            :socket="socket"
             :gameData="gameData" 
             :gamePin="gamePin" 
             :uiLabels="uiLabels"
             :userName="userName"
             @gameCompleted="onGameCompleted"
         />
+        <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
     </div>
 </template>
 
 <script>
 
-    const socket = io("localhost:3000");
+    //const socket = io("localhost:3000");
     import io from 'socket.io-client';
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
     import ResponsiveNav from '../components/ResponsiveNav.vue';
+    import ScoreBoardComponent from '../components/ScoreBoardComponent.vue';
 
     export default{
         name: 'GameView',
         components: {
             GeneralQuizComponent,
             ThisOrThatComponent,
-            ResponsiveNav
+            ResponsiveNav,
+            ScoreBoardComponent
         },
         data: function(){
             return {
+                socket:null,
                 lang: localStorage.getItem("lang") || "en",
                 gamePin: '',
                 userName: '',
@@ -74,21 +79,22 @@
             }
         },
         created: function() {
-            socket.on( "uiLabels", labels => this.uiLabels = labels );
-            socket.on('updateGameData', gameData => {
+            this.socket = io("localhost:3000"); // TODO: Fråga micke vilket sätt är bäst att instansiera ny socket?
+            this.socket.on( "uiLabels", labels => this.uiLabels = labels );
+            this.socket.on('updateGameData', gameData => {
                 this.gameData = gameData;
                 this.determineAdminStatus();
             });
             this.setup();
-            socket.emit('joinSocketRoom', this.gamePin);
-            socket.emit( "getUILabels", this.lang );
+            this.socket.emit('joinSocketRoom', this.gamePin);
+            this.socket.emit( "getUILabels", this.lang );
 
             
         },
         mounted: function() {
-            socket.on("onGameStart", gameName=> this.activeGame = gameName);
-            socket.on("participantsUpdate", participants => this.gameData.participants = participants)
-            socket.emit('updateAllGameData', this.gamePin);
+            this.socket.on("onGameStart", gameName=> this.activeGame = gameName);
+            this.socket.on("participantsUpdate", participants => this.gameData.participants = participants)
+            this.socket.emit('updateAllGameData', this.gamePin);
             console.log("Sent 'updateAllGameData' to gamePin: ", this.gamePin);
             window.addEventListener("beforeunload", this.handleWindowClose);
         },
@@ -96,7 +102,7 @@
             setup: function(){
                 this.gamePin = this.$route.params.gamePin;
                 this.userName = sessionStorage.getItem('userName');
-                socket.emit('requestGameData', this.gamePin);
+                this.socket.emit('requestGameData', this.gamePin);
             },
 
             determineAdminStatus () {
@@ -110,7 +116,7 @@
             playMiniGame: function(game){
                 console.log("playMiniGame with this.activeGame =", this.activeGame, " and this.isAdmin = ", this.isAdmin)
                 if(this.isAdmin){
-                    socket.emit("startMiniGame", {
+                    this.socket.emit("startMiniGame", {
                         gameName: game, 
                         gamePin: this.gamePin
                 })}
@@ -121,13 +127,32 @@
             // Delete user on window close / refresh
             handleWindowClose(event) {
             console.log("Window closed!!! Deleting user")
-            socket.emit('deleteUser', this.gamePin, this.userName);
+            this.socket.emit('deleteUser', this.gamePin, this.userName);
             },
+        //     dismantleSocket(){
+        //     console.log("-->before if-statement in dismantleSocket in GameView")
+        //     if(this.socket) {
+        //         console.log("-->inside if-statement in dismantleSocket in GameView")
+        //         this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
+        //         this.socket.disconnect(); // Disconnect the socket
+        //     }else console.log("this.socket does not exist in GameView")
+        // }
 
         },
         beforeDestroy() {
+            console.log("->GameView -> beforeDestroy");
             window.removeEventListener("beforeunload", this.handleWindowClose);
-        }
+            // this.dismantleSocket();
+        },
+        // beforeRouteLeave(to, from, next) {
+        //     console.log("->GameView -> beforeRouteLeave");
+        //     this.dismantleSocket()
+        //     next();
+        // },
+        // deactivated() {
+        //     console.log("->GameView -> deactivated");
+        //     this.dismantleSocket();
+        // },
     }
 
 </script>
