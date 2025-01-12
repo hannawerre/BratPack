@@ -134,6 +134,7 @@ export default {
       countDownNumber: 3,
       pointsTime: 0,
       playerAnsweredRight: false,
+      localPoints: 0
     };
   },
 
@@ -172,26 +173,21 @@ export default {
         })
       },
       onAnswer(answerData) {
-      const participant = this.gameData.participants.find(
-        (p) => p.name === this.userName
-      );
-      
-
       this.currentAnswer = answerData;
       this.currentPhase = "answeredPhase";
 
       if (answerData.isCorrect) {
         const points = Math.floor((this.countdownProgress / 100) * 1000);
         this.playerAnsweredRight = true;
-        participant.scoreGame1 += points;
-        this.updatePoints(participant);
+        this.localPoints += points;
+        
       }
     },
-    updatePoints(participant) {
+    updatePoints() {
       socket.emit("updatePlayerPoints", {
         gamePin: this.gamePin,
         userName: this.userName,
-        newScore: participant.scoreGame1
+        newScore: this.localPoints
       })
     },
     nextQuestion() {
@@ -275,6 +271,7 @@ export default {
                 console.log(this.currentPhase);
 
                 setTimeout(() => {
+                  this.updatePoints();
                   this.goToNextPhase(); 
                 }, 200)    
             }
