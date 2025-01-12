@@ -36,7 +36,7 @@
             @gameCompleted="onGameCompleted"
         />
         <ThisOrThatComponent 
-            v-if="activeGame === 'ThisOrThat'" 
+            v-if="activeGame === 'thisOrThat'" 
             :socket="socket"
             :gameData="gameData" 
             :gamePin="gamePin" 
