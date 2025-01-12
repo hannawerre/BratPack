@@ -101,7 +101,6 @@
 
   </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -146,7 +145,7 @@ data: function() {
     // useCustomQuestions: false,
     active: true, // Används denna? /sebbe
     userName: '',
-    uiLabels: {}
+    uiLabels: {},
     showGameExistsPopup: false,
     shouldRestoreState: false,
   };
