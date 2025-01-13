@@ -1,6 +1,7 @@
 <template>
     <div>
     <ResponsiveNav
+    :uiLabels="uiLabels"
     :gamePin="gamePin"
     :userName="userName"
     :gameActive="true"
@@ -21,6 +22,7 @@
         <ThisOrThatComponent 
             v-if="activeGame === 'thisOrThat'" 
             :socket="socket"
+            :lang="lang"
             :gameData="gameData" 
             :gamePin="gamePin" 
             :uiLabels="uiLabels"

@@ -18,7 +18,7 @@
     <div id="UserInfo" v-if="this.gamePin || this.userName">
       <div id="GamePin">Pin: {{ this.gamePin }}</div>
       <div id="UserName" v-if="this.userName">
-        <h1>Name: {{ this.userName }}</h1>
+        <h1>{{uiLabels.ResponsiveNav.name}} {{ this.userName }}</h1>
       </div>
     </div>
 
