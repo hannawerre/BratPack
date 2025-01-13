@@ -45,8 +45,8 @@ export default {
   font-weight: 500;
 }
 #flagFrame {
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     margin-left: 5px;
     margin-right: 10px;
     border-radius: 50%;

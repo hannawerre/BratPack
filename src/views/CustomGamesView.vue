@@ -23,12 +23,12 @@
 
 <div class="participants-toggle">
   <button @click="toggleParticipants">
-    ◀ Players
+    ◀ {{ uiLabels.CustomGamesView.players }} 
   </button>
 </div>
 
 <div class="participants-sidebar" :class="{ 'visible': isParticipantListVisible }">
-  <h2>Participants</h2>
+  <h2>{{ uiLabels.CustomGamesView.participants }}</h2>
   <ul>
     <li v-if="userRole === 'play' && gameStarted === false">
       <strong> {{ userName ? userName : "Admin" }}</strong>
@@ -43,8 +43,8 @@
 
 <div class="container">
   <div class="main-content"> 
-  <p v-if="gamePin" class="big-text">Game PIN: {{ gamePin }}</p>
-  <p v-else class="big-text">Loading Game PIN...</p>
+  <p v-if="gamePin" class="big-text">{{ uiLabels.CustomGamesView.pinGame }} {{ gamePin }}</p>
+  <p v-else class="big-text">{{ uiLabels.CustomGamesView.loadingGamePin }}</p>
   
   <div class="admin-player">
     <h2>{{ uiLabels.CustomGamesView.chooseYourRole }}</h2>
@@ -81,7 +81,7 @@
       <div class="value right"><strong>+</strong></div>
 
   </div>
-    <p>Playingtime: <strong> {{ selectedMinutes }}</strong> minutes</p>
+    <p>{{ uiLabels.CustomGamesView.playTime }} <strong> {{ selectedMinutes }}</strong> {{ uiLabels.CustomGamesView.minutes }}</p>
   </div>
 
   
