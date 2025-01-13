@@ -5,7 +5,7 @@
         <!-- TODO: Fixa så regler syns i rätt språk. -->
          <h3>{{ uiLabels.ThisOrThat.rules1 }}</h3>
          <h3>{{ uiLabels.ThisOrThat.rules2 }}</h3>
-         <h3>{{ uiLabels.ThisOrThat.ruels3 }}}</h3>
+         <h3>{{ uiLabels.ThisOrThat.ruels3 }}</h3>
         <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
       </div>
@@ -39,7 +39,7 @@
       {{ uiLabels.ThisOrThat.chosenParticipant }} {{ this.chosenParticipant }} {{ uiLabels.ThisOrThat.didntAnswer }}
     </h2>
     <h2 v-else class="correct-answer-message">
-      {{ uiLabels.ThisOrThat.correctAnswer }}}: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
+      {{ uiLabels.ThisOrThat.correctAnswer }}: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
     </h2>
 
     <!-- Countdown Bar -->

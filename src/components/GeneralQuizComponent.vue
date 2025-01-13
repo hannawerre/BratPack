@@ -160,6 +160,11 @@ export default {
           currentQuestionIndex: this.currentQuestionIndex
         })
       },
+      handleLanguageChange(newLang) {
+      this.lang = newLang;
+      sessionStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+    },
       onAnswer(answerData) {
       this.currentAnswer = answerData;
       
