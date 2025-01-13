@@ -10,7 +10,7 @@
      <button
         v-if="isAdmin"
   class="button blue"
-        @click="goBackToMenu()">Go back to meny</button> 
+        @click="goBackToMenu()">{{ uiLabels.GameView.menu }}</button> 
 
 
     <!--Game Components-->
