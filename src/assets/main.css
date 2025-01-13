@@ -9,10 +9,18 @@
   background: linear-gradient(to bottom right, #CFE8EF, #9eb5bc, #98c4d1);
   border: double 10px var(--our-orange);
   border-radius: 10px;
-  margin: 25px;
+  box-sizing: border-box;
+
+  /* Centering and responsive resizing */
+  position: absolute;
+  top: 10px; /* 10px gap from the top */
+  left: 10px; /* 10px gap from the left */
+  right: 10px; /* 10px gap from the right */
+  bottom: 10px; 
   padding: 15px;
-  padding-bottom: 20px;
+  overflow: hidden;
 }
+
 
 
 .button.orange { /* generic rules for buttons */
@@ -177,6 +185,7 @@
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+
 /* TOGGLE BUTTON */
 .toggle-button {
   cursor: pointer;
@@ -223,7 +232,7 @@
   .textBox-wrapper {
     padding: 15px;
     
-   min-width: 300px;
+    min-width: 300px;
     
     display: flex;
   }
