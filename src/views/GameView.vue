@@ -29,6 +29,7 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
+            :userName="userName"
             @gameCompleted="onGameCompleted"
         />
         <ThisOrThatComponent 
@@ -47,9 +48,39 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :userName="userName"
-            :isAdmin="isAdmin" />
+            :isAdmin="isAdmin" 
+            @gameCompleted="onGameCompleted"
+            />
+    </div>
 
-        <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
+    <ScoreBoardComponent 
+    :participants="gameData.participants"
+    :uiLabels="uiLabels"/>
+    
+    <div v-if="!activeGame">
+       <div class="button-container">
+
+
+           <div v-if="this.isAdmin">
+               <div v-for="gameName in gameData.selectedGames"
+                   :key="gameName"
+                   >
+               <button
+               v-if="!playedGames.includes(gameName)"
+               class="button blue"
+                   @click="playMiniGame(gameName)"
+                  
+                  
+                   >
+                       {{ gameName }}
+               </button></div>
+
+
+
+
+           </div>
+       </div>
+   </div>
     </div>
 </template>
 
@@ -81,6 +112,7 @@
                 gameData: {},
                 activeGame: '',
                 uiLabels: {},
+                playedGames: [],
                 isAdmin: false,
                 isPlaying: true
 
@@ -113,6 +145,12 @@
                 this.socket.emit('requestGameData', this.gamePin);
             },
 
+            handleLanguageChange(newLang) {
+                this.lang = newLang;
+                sessionStorage.setItem("lang", newLang);
+                socket.emit("getUILabels", this.lang);
+            },
+
             determineAdminStatus () {
                 const user = this.gameData.participants?.find(p=> p.name === this.userName) // används user? /sebbe
                 this.isAdmin = sessionStorage.getItem("isAdmin") === "true" || false;
@@ -130,7 +168,10 @@
                 })}
             },
             onGameCompleted() {
-                this.activeGame = '';
+                console.log("spelet som är spelat är ", this.activeGame);
+               this.playedGames.push(this.activeGame);
+               console.log("spelet som är playedGames är ", this.playedGames);
+               this.activeGame = '';
             },
             // Delete user on window close / refresh
             handleWindowClose(event) {

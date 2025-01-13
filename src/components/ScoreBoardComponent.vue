@@ -1,6 +1,6 @@
 <template>
   <div class="scoreboard-container">
-    <h2>Scoreboard</h2>
+    <h2>{{ uiLabels.GameView.scoreboard }}</h2>
     <transition-group name="fade" tag="ul" class="scoreboard">
       <li
         v-for="participant in sortedParticipants"
@@ -24,6 +24,9 @@
         type: Array,
         required: true,
       },
+      uiLabels: {
+        type: Object
+      }
     },
     data() {
         return {

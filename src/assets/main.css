@@ -110,16 +110,16 @@
   margin: 5px;
 }
 
-.join-container {
+/* .join-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 15px;
   padding: 10px;
-}
+} */
 
-.textBox-wrapper {
+/* .textBox-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -131,9 +131,9 @@
   border-radius: 6px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
   box-sizing: border-box;
-}
+} */
 
-.textBox.input {
+/* .textBox.input {
   border: 2px solid var(--border-darkBlue);
   border-radius: 4px;
   padding: 12px;
@@ -146,9 +146,9 @@
 .textBox.input:focus {
   outline: none;
   border-color: var(--border-darkBlue);
-}
+} */
 
-.textBox.click {
+/* .textBox.click {
   background-color: var(--gradient-darkBlue);
   border-radius: 4px;
   font-size: 16px;
@@ -159,7 +159,7 @@
   cursor: pointer;
   padding: 10px;
   margin: 5px;
-}
+} */
 
 /* MODALS */
 .modal-background {

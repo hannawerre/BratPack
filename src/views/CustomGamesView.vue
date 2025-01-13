@@ -1,27 +1,33 @@
 <template>
+  <Nav :hideNav="false"
+  :uiLabels="uiLabels"
+  :lang="lang"
+  :showLangSwitch="true"
+  @language-changed="handleLanguageChange">
+  </Nav>
 <div v-if="showGameExistsPopup && !shouldRestoreState" class="popup-overlay">
       <div class="popup-content">
-        <h2>Game Already in Session</h2>
-        <p>The game with PIN {{ gamePin }} is already active. Return to main menu</p>
-        <button @click="mainMenu">OK</button>
+        <h2>{{ uiLabels.CustomGamesView.gameAlreadyInSession }}</h2>
+        <p>{{ uiLabels.CustomGamesView.theGameWithPIN }} {{ gamePin }} {{ uiLabels.CustomGamesView.isAlreadyActiveReturnToMainMenu }}</p>
+        <button @click="mainMenu">{{ uiLabels.CustomGamesView.ok }}</button>
       </div>
 </div>
 <div class="container">
 
   <div class="main-content">
-  <h1 v-if="gamePin">Game PIN: {{ gamePin }}</h1>
-  <h1 v-else>Loading Game PIN...</h1>
+  <h1 v-if="gamePin"> {{ uiLabels.CustomGamesView.pinGame }} {{ gamePin }}</h1>
+  <h1 v-else>{{ uiLabels.CustomGamesView.loadingGamePIN }}</h1>
   <div class="admin-player">
-    <h2>Choose Your Role</h2>
+    <h2>{{ uiLabels.CustomGamesView.chooseYourRole }}</h2>
     <div class="play-as-admin">
       <div class="radio-group">
         <label class="radio-option">
           <input type="radio" value="play" v-model="userRole" />
-          Play
+          {{ uiLabels.CustomGamesView.play }}
         </label>
         <label class="radio-option">
           <input type="radio" value="host" v-model="userRole" />
-          Host Only
+          {{ uiLabels.CustomGamesView.hostOnly }}
         </label>
       </div>
     </div>
@@ -30,13 +36,13 @@
       <input
         type="text"
         v-model="userName"
-        placeholder="Admin"
+        :placeholder="uiLabels.CustomGamesView.admin"
         class="textBox input"
       />
     </div>
 </div>
   <div>
-      <p>Choose the time in minutes:</p>
+      <p>{{ uiLabels.CustomGamesView.chooseTheTimeInMinutes }}</p>
       <div class="button-container">
           <button class="button decrement" @click="decrementMinutes">-</button>
           {{ selectedMinutes }}
@@ -44,7 +50,7 @@
       </div>
   </div>
 
-  <h2>Choose your custom games below:</h2>
+  <h2>{{ uiLabels.CustomGamesView.chooseYourCustomGamesBelow }}</h2>
 
   <div v-for="game in games" :key="game.id" class="game-item">
       <input 
@@ -64,33 +70,36 @@
   <EditQuiz1Component 
       ref="modalGeneralQuiz" 
       :GameName="currentGame ? currentGame.name : ''"
+      :uiLabels="uiLabels"
       @questions-saved-generalQuiz="onQuestionsSaved"
       @modal-closed="onModalClosed"
   />
   <EditQuiz2Component 
       ref="modalWhosMostLikelyTo" 
       :GameName="currentGame ? currentGame.name : ''"
+      :uiLabels="uiLabels"
       @questions-saved-whosMostLikelyTo="onQuestionsSaved"
       @modal-closed="onModalClosed"
   />
   <EditQuiz3Component 
       ref="modalThisOrThat" 
       :GameName="currentGame ? currentGame.name : ''"
+      :uiLabels="uiLabels"
       @questions-saved-thisOrThat="onQuestionsSaved"
       @modal-closed="onModalClosed"
   />
 
 
   <div class="startbutton-container">
-      <button class="button orange" @click="startGame">Start Game</button>
+      <button class="button orange" @click="startGame">{{ uiLabels.CustomGamesView.startGame }}</button>
   </div>
 
 </div>
 <div class="participants">
-    <h2>Participants</h2>
+    <h2>{{ uiLabels.CustomGamesView.participants }}</h2>
     <div class="toggle-button" @click="toggleListVisibility">
-      <span>{{ isListVisible ? 'Hide Participants &#9650;' : 'Show Participants &#9660;' }}</span>
-      <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
+      <span>{{ isListVisible ? uiLabels.CustomGamesView.hideParticipants + '&#9650;' : uiLabels.CustomGamesView.showParticipants + '&#9660;'}}</span>
+      <span>{{ isListVisible ? '&#9650;' : '&#9660;' }}</span>
 </div>
     <ul v-if="isListVisible">
       <li v-if="userRole === 'play' && gameStarted === false">
@@ -160,6 +169,7 @@ data: function() {
 created: function () {
   //this.dismantleSocket(); //kanske ta bort? / sebbe
   socket.on( "uiLabels", labels => this.uiLabels = labels );
+  socket.emit( "getUILabels", this.lang );
   const shouldRestore = sessionStorage.getItem('shouldRestoreState');
   this.shouldRestoreState = shouldRestore;
 
@@ -273,6 +283,11 @@ methods: {
     }
   },
 
+  toggleListVisibility: function() {
+        this.isListVisible = !this.isListVisible;
+        this.toggleText = this.isListVisible ? "Hide questions" : "Show questions";
+    },
+
   isNameTaken: function(userName) {
         this.nameTaken = this.participants.some(participant => participant.name === userName);
         console.log("Name taken: ", this.nameTaken);
@@ -346,12 +361,6 @@ methods: {
     
     console.log("--> Listener carried over to /game/");
   });
-
-    // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
-    // this.$router.push({
-    //   name: 'GameView',
-    //   params: { gamePin }
-    // });
     console.log("--> After startGame!")
   },
 
@@ -383,12 +392,7 @@ methods: {
 
   this.customQuestions[this.currentGame.id].customQuestions = savedQuestions;
   this.customQuestions[this.currentGame.id].useCustomQuestions = useCustomQuestions;
-  // this.useCustomQuestions = useCustomQuestions;
-  // this.customQuestions = savedQuestions;
-
-
-  // console.log("Dessa ska vara lika dana:", this.customQuestions, "och", thiscustomQuestions[this.currentGame.id].customQuestions )
-
+  
   socket.emit(
     "savedQuestionsToServer", 
     this.gamePin, 
@@ -397,12 +401,6 @@ methods: {
     this.currentGame.id
   );
 },
-
-  // handleWindowClose(event) {
-  //     console.log("Admin window closed! unactivating lobby")
-  //     //socket.emit("adminLeftGame", this.gamePin, this.userName);
-  //   },
-
   handleBeforeUnload(event) {
       const dataToSave = {
         selectedGames: this.selectedGames,
@@ -420,30 +418,17 @@ methods: {
       // Visa standardvarning om det behövs
     },
 
-  checkIfRefreshPage() {
-    // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
-      let storagePin = sessionStorage.getItem('gamePin');
-      if (storagePin) {
+  // checkIfRefreshPage() {
+  //   // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
+  //     let storagePin = sessionStorage.getItem('gamePin');
+  //     if (storagePin) {
         
-        this.gamePin = storagePin;
-        socket.emit("requestParticipants", this.gamePin);
+  //       this.gamePin = storagePin;
+  //       socket.emit("requestParticipants", this.gamePin);
         
-      }
-    console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
-    },
-    handleLanguageChange(newLang) {
-      this.lang = newLang;
-      localStorage.setItem("lang", newLang);
-      socket.emit("getUILabels", this.lang);
-    },
-    // dismantleSocket(){ //TODO kanske ta bort
-    //   console.log("-->before if-statement in dismantleSocket in CustomGamesView")
-    //   if(socket) {
-    //   console.log("-->inside if-statement in dismantleSocket in CustomGamesView")
-    //     socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
-    //     // socket.disconnect(); // Disconnect the socket
-    // }else console.log("this.socket does not exist in CustomGamesView")
-    // }
+  //     }
+  //   console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
+  //   },
   },
 
 mounted() {

@@ -3,11 +3,11 @@
   <div>
       <!-- Start Phase -->
       <div v-if="currentPhase === 'startPhase'">
-        <h1> {{ uiLabels.generalTrivia }}</h1>
+        <h1> {{ uiLabels.GameView.generalTrivia }}</h1>
         <div v-if="isAdmin">
-          <button class="button blue small" @click="startQuiz"> {{ uiLabels.startQuiz }}</button>
+          <button class="button blue small" @click="startQuiz"> {{ uiLabels.GameView.startQuiz }}</button>
         </div>
-        <div v-else> {{ uiLabels.waitingOnAdmin }}</div>
+        <div v-else> {{ uiLabels.GameView.waitingOnAdmin }}</div>
       </div>
 
       <!-- Intro Phase  -->
@@ -39,43 +39,43 @@
         
         <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
-          <p> {{ uiLabels.youAnsweredRight }}</p>
-          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
-          <p>Hej hej!</p>
+          <p> {{ uiLabels.GameView.youAnsweredRight }}</p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
+          <p>Hej hej!</p> <!--Ska denna va här? //HANNA -->
         </div>
 
         <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.youWereWrong }}</p>
-          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
+          <p> {{ uiLabels.GameView.youWereWrong }}</p>
+          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.GameView.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
         </div>
 
         <!-- Om användaren inte hann svara -->
         <div v-else class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.tooSlow }}</p>
-          <p>{{ uiLabels.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p> {{uiLabels.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1"> {{ uiLabels.youAreBehind }} {{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }}</p>
+          <p> {{ uiLabels.GameView.tooSlow }}</p>
+          <p>{{ uiLabels.GameView.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+          <p> {{uiLabels.GameView.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
+          <p v-if="getPlayerRank(userName)!=1"> {{ uiLabels.GameView.youAreBehind }} {{ getPlayerAhead(userName) }} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }}</p>
         </div>
   
         <div v-if="isAdmin">
-          <button class="button blue small" v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
-          <button class="button blue small" v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
+          <button class="button blue small" v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.GameView.nextQuestion }}</button>
+          <button class="button blue small" v-else @click="nextQuestion"> {{ uiLabels.GameView.showResults }}</button>
         </div>
       
       </div>
       
  <!-- Score board--> 
       <div v-else-if="currentPhase === 'scoreBoard'">
-        <h2>{{ uiLabels.scoreboard }}</h2>
+        <h2>{{ uiLabels.GameView.scoreboard }}</h2>
           <ul>
             <li 
                v-for="(p, index) in sortedParticipants" 
               :key="index" 
               :class="{ 'top-player': index === 0 }"
             >
-              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} {{ uiLabels.points }}
+              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} {{ uiLabels.GameView.points }}
             </li>
           </ul>
       </div>
@@ -107,7 +107,8 @@ export default {
     gamePin: { type: String, required: true },
     uiLabels: { type: Object, required: true },
     isAdmin: { type: Boolean, required: true },
-    isPlaying: { type: Boolean, required: true },
+    userName: { type: Boolean, required: true}
+  
   },
 
   data() {
@@ -117,7 +118,6 @@ export default {
       currentQuestionIndex: 0,
       currentPhase: 'startPhase',
       countdownProgress: 100,
-      userName: sessionStorage.getItem('userName'),
       currentAnswer: null,
       countDownNumber: 3,
       pointsTime: 0,
@@ -160,6 +160,11 @@ export default {
           currentQuestionIndex: this.currentQuestionIndex
         })
       },
+      handleLanguageChange(newLang) {
+      this.lang = newLang;
+      sessionStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+    },
       onAnswer(answerData) {
       this.currentAnswer = answerData;
       
@@ -171,6 +176,7 @@ export default {
       }
     },
     updatePoints() {
+      console.log("updated points:", this.localPointsnpok)
       socket.emit("updatePlayerPoints", {
         gamePin: this.gamePin,
         userName: this.userName,
@@ -198,7 +204,7 @@ export default {
             break;
           
           case "questionPhase":
-          
+            this.updatePoints();
             this.currentPhase="feedbackPhase";
             break;
 
@@ -253,7 +259,7 @@ export default {
                 console.log(this.currentPhase);
 
                 setTimeout(() => {
-                  this.updatePoints();
+                  
                   this.goToNextPhase(); 
                 }, 200)    
             }
@@ -318,11 +324,11 @@ export default {
   justify-content: center;
   align-items: center;
   height: 300px; /* Sätt höjd så att siffran är centrerad */
-  background: black; /* Kanske bakgrundsfärg för "filmisk" känsla */
+    /* Kanske bakgrundsfärg för "filmisk" känsla */
 }
 
 .countdown-number {
-  color: white;
+  color: #1d3557;
   font-size: 8rem;
   font-weight: bold;
 }

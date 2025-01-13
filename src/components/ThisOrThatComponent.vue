@@ -3,9 +3,9 @@
     <!-- Rules -->
     <div v-if="currentPhase === 'showRules'">
         <!-- TODO: Fixa så regler syns i rätt språk. -->
-         <h3>One participant will be chosen for each round</h3>
-         <h3>The task is to pick the same answer as the chosen one</h3>
-         <h3>How well do you know your fellow mates?</h3>
+         <h3>{{ uiLabels.ThisOrThat.rules1 }}</h3>
+         <h3>{{ uiLabels.ThisOrThat.rules2 }}</h3>
+         <h3>{{ uiLabels.ThisOrThat.rules3 }}</h3>
         <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
       </div>
@@ -13,7 +13,7 @@
 
     <!-- Game Phase 1: Display Chosen Participant -->
     <div v-if="currentPhase === 'showChosenParticipant'">
-      <h2>Chosen participant: {{ chosenParticipant }}</h2>
+      <h2>{{ uiLabels.ThisOrThat.chosenParticipant }}: {{ chosenParticipant }}</h2>
       <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
       </div>
@@ -21,7 +21,7 @@
 
     <!-- Game Phase 2: Display Question -->
     <div v-if="currentPhase === 'showQuestion'">
-        <h2>Chosen participant: {{ chosenParticipant }}</h2>
+        <h2>{{ uiLabels.ThisOrThat.chosenParticipant }}: {{ chosenParticipant }}</h2>
       <QuestionComponent
         v-if="questions?.questions?.[currentQuestion]"
         :question="questions.questions[currentQuestion]"
@@ -36,21 +36,11 @@
   <div v-if="currentPhase === 'showAnswer'">
     <!-- If chosenParticipant didn't answer -->
     <h2 v-if="showChosenParticipantNoAnswer" class="no-answer-message">
-      Chosen Participant {{ this.chosenParticipant }} didn't answer
+      {{ uiLabels.ThisOrThat.chosenParticipant }} {{ this.chosenParticipant }} {{ uiLabels.ThisOrThat.didntAnswer }}
     </h2>
     <h2 v-else class="correct-answer-message">
-      Correct Answer: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
+      {{ uiLabels.ThisOrThat.correctAnswer }}: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
     </h2>
-
-    <!-- Display all participants and highlight those who got it right -->
-    <div v-for="[key,value] in Object.entries(participants)" :key="key">
-      <p v-if="correctParticipants.includes(key)">
-        <span class="correctParticipant">{{ key }}</span>: {{ value.points }}
-      </p>
-      <p v-else>
-        {{ key }}: {{ value.points }}
-      </p>
-    </div>
 
     <!-- Countdown Bar -->
     <div class="countdown-bar">
@@ -60,9 +50,10 @@
 
   <!-- Game Phase 4: Display Final Results -->
   <div v-if="currentPhase === 'showFinalResults'" class="final-results">
-    <h2>Final Results</h2>
-    <div v-for="[key,value] in Object.entries(participants)" :key="key" class="leaderboard-item">
-      <p>{{ key }}: {{ value.points }}</p>
+    <h2>{{ uiLabels.ThisOrThat.finalResults }}</h2>
+    <!-- Countdown Bar -->
+    <div class="countdown-bar">
+      <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
     </div>
   </div>
     
@@ -232,38 +223,10 @@ export default {
             }
             this.correctParticipants = correctParticipants;
         },
-        // dismantleSocket(){
-        //     console.log("-->before if-statement in dismantleSocket in ThisOrThatComponent")
-        //     if (this.socket) {
-        //         console.log("--> Cleaning up socket in ThisOrThatComponent");
-
-        //         // Remove listeners
-        //         this.socket.off("roundUpdate");
-        //         this.socket.off("nextRound");
-        //         this.socket.off("getQuestions_ThisOrThat");
-        //         this.socket.off("setup_ThisOrThat");
-
-        //         // Emit leave and disconnect
-        //         this.socket.emit("leaveSocketRoom", this.gamePin);
-        //         this.socket.disconnect();
-        //         this.socket = null;
-        //     }else console.log("this.socket does not exist in ThisOrThatComponent")
-        // }
     },
     mounted() {
         this.displayRules();
     },
-    // beforeDestroy() {
-    // this.dismantleSocket();
-    // },
-    // beforeRouteLeave(to, from, next) {
-    // this.dismantleSocket()
-    // next();
-    // },
-    // deactivated() {
-    //     console.log("Component deactivated... Cleaning up!");
-    //     this.dismantleSocket();
-    // },
 }
 
 </script>
@@ -289,15 +252,8 @@ export default {
 
 /* No Answer Message */
 h2.no-answer-message {
-  font-size: 1.25rem;
-  color: rgb(132, 0, 0);
+  color: rgb(192, 0, 0);
   font-weight: bold;
-}
-
-/* Highlighted Correct Participant */
-.correctParticipant {
-  font-weight: bold;
-  color: #2d6a4f; /* Green color for correct participants */
 }
 
 /* General text styling */
