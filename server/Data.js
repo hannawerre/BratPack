@@ -393,58 +393,70 @@ Data.prototype.storeAnswer = function(gamePin, userName, answerObj) {
   console.log(game.whosMostLikely.participants[userName].answers[questionId])
 
 }
-
-Data.prototype.calculateCorrectAnswer = function(gamePin ){
+Data.prototype.calculateCorrectAnswer = function(gamePin) {
   const game = this.customGames[gamePin];
   const currentQuestionIndex = game.whosMostLikely.currentQuestionIndex;
 
-  const participants = game.whosMostLikely.participants;
+  // Kolla om frågan redan är poängsatt
+  if (game.whosMostLikely.correctAnswers[currentQuestionIndex]?.isCalculated) {
+    console.log(`Fråga ${currentQuestionIndex} är redan beräknad, avbryter...`);
+    // Returnera redan uträknat svar om du vill
+    return game.whosMostLikely.correctAnswers[currentQuestionIndex].winningAnswers;
+  }
 
-  const answers = Object.values(participants).map(participant => participant.answers[currentQuestionIndex]?.answerText);
-  
-  const answerCounts = answers.reduce((counts, answer) =>{
+  const participants = game.whosMostLikely.participants;
+  // 1) Samla in svaren
+  const answers = Object.values(participants).map(
+    participant => participant.answers[currentQuestionIndex]?.answerText
+  );
+
+  // 2) Räkna röster
+  const answerCounts = answers.reduce((counts, answer) => {
     if (answer) {
       counts[answer] = (counts[answer] || 0) + 1;
     }
-    return counts
-  }, {})
+    return counts;
+  }, {});
 
   const maxCount = Math.max(...Object.values(answerCounts));
   const winningAnswers = Object.entries(answerCounts)
     .filter(([_, count]) => count === maxCount)
     .map(([answer]) => answer);
-  game.whosMostLikely.correctAnswers[currentQuestionIndex] = winningAnswers
 
-  console.log("Rätta svaren är,:", game.whosMostLikely.correctAnswers[currentQuestionIndex])
+  // Spara "vinnarsvaren"
+  game.whosMostLikely.correctAnswers[currentQuestionIndex] = {
+    winningAnswers,
+    isCalculated: true // <-- Markera att det redan är gjort
+  };
 
-  console.log(`Det mest valda svaret för fråga ${currentQuestionIndex} är "${winningAnswers}" med ${maxCount} röster.`);
-  
-  // Spara det korrekta svaret
+  console.log(
+    `\nDet mest valda svaret för fråga ${currentQuestionIndex} är "${winningAnswers}" med ${maxCount} röster.`
+  );
 
-  return winningAnswers
-}
+  // 3) Ge 500 poäng
+  for (const [playerName, data] of Object.entries(participants)) {
+    const playerAnswer = data.answers[currentQuestionIndex]?.answerText;
+    if (playerAnswer && winningAnswers.includes(playerAnswer)) {
+      const generalParticipant = game.participants.find(p => p.name === playerName);
+      if (generalParticipant) {
+        generalParticipant.scoreGame2 += 500; // Du kan byta fält om du vill
+        console.log("Uppdaterar poäng", generalParticipant.scoreGame2);
+      }
+    }
+  }
+
+  return winningAnswers;
+};
+
+
+
+
 
 Data.prototype.nextQuestionWhosMostLikelyTo = function (gamePin) {
   const game = this.customGames[gamePin];
   game.whosMostLikely.currentQuestionIndex++;
   return game.whosMostLikely.currentQuestionIndex
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //--------------------------------------------------------------------------------------------------
 // Timer -------------------------------------------------------------------------------------------
 Data.prototype.startCountDown = function() {

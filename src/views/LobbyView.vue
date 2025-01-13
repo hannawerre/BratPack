@@ -6,7 +6,7 @@
     :showLangSwitch="true"
     @language-changed="handleLanguageChange">
   </Nav>
-  <h3 class="lobby-id">Lobby ID: {{ gamePin }}</h3>
+  <h3 class="lobby-id">{{ uiLabels.LobbyView.lobbyID }}: {{ gamePin }}</h3>
   <div v-if="!this.joined" class="join-game-container">
     <div
       class="join-game-wrapper"
@@ -20,19 +20,20 @@
         @keyup.enter="handleEnter"
         :placeholder="uiLabels.userName"
       />
-      <p class="error-message" v-if="nameTaken">Name is already taken!</p>
-      <p class="error-message" v-if="showError">Please enter a username!</p>
+      <p class="error-message" v-if="nameTaken">{{ uiLabels.LobbyView.nameTaken }}</p>
+      <!-- uilabels -->
+      <p class="error-message" v-if="showError">Please enter a username!</p> 
     </div>
     <button
       class="submit-button"
       :class="{'disabled': nameTaken || userName.length === 0}"
       @click="handleEnter"
     >
-      {{ uiLabels.participateInPoll }}
+    {{ uiLabels.LobbyView.participateInPoll }}
     </button>
   </div>
     <div class="waitingRoom" v-if="joined">
-      <p>{{ this.uiLabels.waitingForHost }}</p>
+      <p>{{ uiLabels.LobbyView.waitingForHost }}</p>
       <div>
         <h3>{{ this.uiLabels.players }}</h3>
         <p v-for="participant in participants" :key="participant.name">{{ participant.name }}</p>

@@ -3,11 +3,11 @@
   <div>
       <!-- Start Phase -->
       <div v-if="currentPhase === 'startPhase'">
-        <h1> {{ uiLabels.generalTrivia }}</h1>
+        <h1> {{ uiLabels.QuizComponent.generalTrivia }}</h1>
         <div v-if="isAdmin">
-          <button class="button blue small" @click="startQuiz"> {{ uiLabels.startQuiz }}</button>
+          <button class="button blue small" @click="startQuiz"> {{ uiLabels.QuizComponent.startQuiz }}</button>
         </div>
-        <div v-else> {{ uiLabels.waitingOnAdmin }}</div>
+        <div v-else> {{ uiLabels.QuizComponent.waitingOnAdmin }}</div>
       </div>
 
       <!-- Intro Phase  -->
@@ -61,21 +61,21 @@
   
         <div v-if="isAdmin">
           <button class="button blue small" v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
-          <button class="button blue small" v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
+          <button class="button blue small" v-else @click="nextQuestion"> {{ uiLabels.QuizComponent.showResults }}</button>
         </div>
       
       </div>
       
  <!-- Score board--> 
       <div v-else-if="currentPhase === 'scoreBoard'">
-        <h2>{{ uiLabels.scoreboard }}</h2>
+        <h2>{{ uiLabels.QuizComponent.scoreboard }}</h2>
           <ul>
             <li 
                v-for="(p, index) in sortedParticipants" 
               :key="index" 
               :class="{ 'top-player': index === 0 }"
             >
-              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} {{ uiLabels.points }}
+              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} {{ uiLabels.QuizComponent.points }}
             </li>
           </ul>
       </div>
@@ -107,7 +107,8 @@ export default {
     gamePin: { type: String, required: true },
     uiLabels: { type: Object, required: true },
     isAdmin: { type: Boolean, required: true },
-    isPlaying: { type: Boolean, required: true },
+    userName: { type: Boolean, required: true}
+  
   },
 
   data() {
@@ -117,7 +118,6 @@ export default {
       currentQuestionIndex: 0,
       currentPhase: 'startPhase',
       countdownProgress: 100,
-      userName: sessionStorage.getItem('userName'),
       currentAnswer: null,
       countDownNumber: 3,
       pointsTime: 0,
@@ -171,6 +171,7 @@ export default {
       }
     },
     updatePoints() {
+      console.log("updated points:", this.localPointsnpok)
       socket.emit("updatePlayerPoints", {
         gamePin: this.gamePin,
         userName: this.userName,
@@ -198,7 +199,7 @@ export default {
             break;
           
           case "questionPhase":
-          
+            this.updatePoints();
             this.currentPhase="feedbackPhase";
             break;
 
@@ -253,7 +254,7 @@ export default {
                 console.log(this.currentPhase);
 
                 setTimeout(() => {
-                  this.updatePoints();
+                  
                   this.goToNextPhase(); 
                 }, 200)    
             }
@@ -318,11 +319,11 @@ export default {
   justify-content: center;
   align-items: center;
   height: 300px; /* Sätt höjd så att siffran är centrerad */
-  background: black; /* Kanske bakgrundsfärg för "filmisk" känsla */
+    /* Kanske bakgrundsfärg för "filmisk" känsla */
 }
 
 .countdown-number {
-  color: white;
+  color: #1d3557;
   font-size: 8rem;
   font-weight: bold;
 }

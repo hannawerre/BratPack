@@ -81,6 +81,7 @@ export default {
 </script>
 
 <style scoped>
+
 nav {
   position: relative;
   top: 0;
@@ -94,9 +95,8 @@ nav {
   padding: 0 1rem;
   box-sizing: border-box;
 }
-
 #Logo img {
-  height: 50px; /* Adjust logo size */
+  height: 50px;
   cursor: pointer;
 }
 
