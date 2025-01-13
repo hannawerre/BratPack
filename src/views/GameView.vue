@@ -48,11 +48,39 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :userName="userName"
-            :isAdmin="isAdmin" />
+            :isAdmin="isAdmin" 
+            @gameCompleted="onGameCompleted"
+            />
+    </div>
 
-        <ScoreBoardComponent 
-        :participants="gameData.participants"
-        :uiLabels="uiLabels"/>
+    <ScoreBoardComponent 
+    :participants="gameData.participants"
+    :uiLabels="uiLabels"/>
+    
+    <div v-if="!activeGame">
+       <div class="button-container">
+
+
+           <div v-if="this.isAdmin">
+               <div v-for="gameName in gameData.selectedGames"
+                   :key="gameName"
+                   >
+               <button
+               v-if="!playedGames.includes(gameName)"
+               class="button blue"
+                   @click="playMiniGame(gameName)"
+                  
+                  
+                   >
+                       {{ gameName }}
+               </button></div>
+
+
+
+
+           </div>
+       </div>
+   </div>
     </div>
 </template>
 
@@ -84,6 +112,7 @@
                 gameData: {},
                 activeGame: '',
                 uiLabels: {},
+                playedGames: [],
                 isAdmin: false,
                 isPlaying: true
 
@@ -139,7 +168,10 @@
                 })}
             },
             onGameCompleted() {
-                this.activeGame = '';
+                console.log("spelet som är spelat är ", this.activeGame);
+               this.playedGames.push(this.activeGame);
+               console.log("spelet som är playedGames är ", this.playedGames);
+               this.activeGame = '';
             },
             // Delete user on window close / refresh
             handleWindowClose(event) {
