@@ -1,4 +1,5 @@
 <template>
+    <div>
     <ResponsiveNav
     :gamePin="gamePin"
     :userName="userName"
@@ -81,7 +82,7 @@
            </div>
        </div>
    </div>
-    </div>
+</div>
 </template>
 
 <script>

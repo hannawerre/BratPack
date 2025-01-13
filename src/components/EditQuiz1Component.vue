@@ -1,13 +1,15 @@
 <template>
+
+
    <div v-if="isModalOpen" class="modal-background" @click.self="closeModal">
   <div v-if="isModalOpen" class="modal-wrapper" @click.self="closeModal">
     
   
 
     <div class="questions-list" @click.stop>
-      <h2>Questions</h2>
+      <h2> {{  uiLabels.EditQuizComponent.question }}</h2>
       <div class="toggle-button" style="background: var(--border-orange)" @click="toggleListVisibility">
-        <span>{{ isListVisible ? 'Hide Questions &#9650;' : 'Show Questions &#9660;' }}</span>
+        <span>{{ isListVisible ? uiLabels.EditQuizComponent.hideQuestions + '&#9650;' : uiLabels.EditQuizComponent.showQuestions + '&#9660;' }}</span>
         <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
     </div>
       <ul>
@@ -19,7 +21,7 @@
               <ul>
                 <li v-for="(answer, i) in question.answers" :key="i" class="answer-item">
                   {{ answer.answer }} 
-                  <span v-if="answer.isCorrect">(Correct)</span>
+                  <span v-if="answer.isCorrect">({{ uiLabels.EditQuizComponent.correct }})</span>
                 </li>
               </ul>
             </div>
@@ -37,8 +39,8 @@
     </div>
   
         <div class="modal-content" @click.stop>
-          <h1>Edit {{ GameName }}</h1>
-          <p>Here you can add questions to the game</p>
+          <h1>{{ uiLabels.EditQuizComponent.edit }} {{ GameName }}</h1>
+          <p>{{ uiLabels.EditQuizComponent.hereAddQuestions }}</p>
           <br />
           <div class="radio-buttons-container">
             <label>
@@ -47,7 +49,7 @@
                 :value="false"
                 v-model="useCustomQuestions"
                 />
-                Use standard questions
+                {{ uiLabels.EditQuizComponent.standardQuestions }}
             </label>
             <label>
                 <input 
@@ -55,39 +57,39 @@
                 :value="true"
                 v-model="useCustomQuestions"
                 />
-                Use own questions
+                {{ uiLabels.EditQuizComponent.ownQuestions }}
             </label>
             </div>
           <br />
   
-          <p>Add question</p>
+          <p>{{ uiLabels.EditQuizComponent. addQuestion }}</p>
           <input 
             v-model="question" 
-            placeholder="Add question" 
+            :placeholder="uiLabels.EditQuizComponent.addQuestion" 
             class="question"
           />
   
           <div v-for="(alt, index) in alternatives" :key="index" class="alternative-row">
             <input
               v-model="alt.text"
-              :placeholder="`Alternative`"
+              :placeholder="uiLabels.EditQuizComponent.alternative"
             />
             <input
               type="checkbox"
               v-model="alt.isCorrect"
               :id="`check-${index}`"
             />
-            <label :for="`check-${index}`">Correct</label>
+            <label :for="`check-${index}`">{{ uiLabels.EditQuizComponent.correct }}</label>
           </div>
   
           <button @click="addAlternative" id="alternatative-button">
-            Add alternative
+            {{ uiLabels.EditQuizComponent.addAlternative }}
           </button>
           <button @click="saveQuestion" id="save-button">
-            Save question
+            {{ uiLabels.EditQuizComponent.saveQuestion }}
           </button>
           <button @click="closeModal" id="close-button">
-            Close
+            {{ uiLabels.EditQuizComponent.close }}
           </button>
         </div>
       </div>
@@ -98,7 +100,8 @@
   import { ref, defineProps, defineExpose, defineEmits } from 'vue';
   
   const props = defineProps({
-    GameName: String
+    GameName: String,
+    uiLabels: Object
   });
   
   const emit = defineEmits([
