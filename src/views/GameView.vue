@@ -38,7 +38,9 @@
             />
     </div>
 
-    <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
+    <ScoreBoardComponent 
+    :participants="gameData.participants"
+    :uiLabels="uiLabels"/>
     
     <div v-if="!activeGame">
        <div class="button-container">

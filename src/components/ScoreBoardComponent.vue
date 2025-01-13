@@ -22,10 +22,11 @@
     props: {
       participants: {
         type: Array,
-      
         required: true,
       },
-      uiLabels: Object,
+      uiLabels: {
+        type: Object
+      }
     },
     data() {
         return {
