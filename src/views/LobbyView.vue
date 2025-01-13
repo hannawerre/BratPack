@@ -1,11 +1,12 @@
 <template>
+
   <Nav 
-    :hideNav="false"
     :uiLabels="uiLabels"
     :lang="lang"
     :showLangSwitch="true"
     @language-changed="handleLanguageChange">
   </Nav>
+
   <h3 class="lobby-id">{{ uiLabels.LobbyView.lobbyID }}: {{ gamePin }}</h3>
   <div v-if="!this.joined" class="join-game-container">
     <div
@@ -18,11 +19,9 @@
         v-model="userName"
         @input="validateInput"
         @keyup.enter="handleEnter"
-        :placeholder="uiLabels.userName"
+        :placeholder="uiLabels.LobbyView.userName"
       />
       <p class="error-message" v-if="nameTaken">{{ uiLabels.LobbyView.nameTaken }}</p>
-      <!-- uilabels -->
-      <p class="error-message" v-if="showError">Please enter a username!</p> 
     </div>
     <button
       class="submit-button"
@@ -49,18 +48,19 @@ const socket = io("localhost:3000");
 
 export default {
   name: 'LobbyView',
-  components: {Nav},
+  components: {
+    Nav
+  },
   data: function () {
     return {
       userName: "",
       nameTaken: false,
-      gameStarted: false,
+      gameStarted: false, // If a user joins late
       gamePin: "inactive game",
       uiLabels: {},
       joined: false,
       lang: sessionStorage.getItem("lang") || "en",
       participants: [],
-      uiLabels: {},
     }
   },
   created: function () {
@@ -68,8 +68,7 @@ export default {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.on( "participantsUpdate", p => {
       this.participants = p;
-      console.log("Socket ID: ", socket.id) // kanske spara ner socketID i dataobjektet ovan...? 
-                                            // Eller spara userName: socketID som key value pairs i Data.js /sebbe
+      console.log("Socket ID: ", socket.id) 
     });
     socket.on("updateGameData", data => {
       this.gameStarted = data.gameStarted;
@@ -81,7 +80,7 @@ export default {
   },
   methods: {
     handleEnter() {
-      console.log("Inside handleEnter with this.userName=", this.userName)
+      
       if (this.userName.length === 0) {
         this.triggerError();
         return;
@@ -105,8 +104,7 @@ export default {
         name: this.userName,
         scoreGame1: 0,
         scoreGame2: 0,
-        scoreGame3: 0,
-        scoreGame4: 0
+        scoreGame3: 0
       });
       this.joined = true;
       

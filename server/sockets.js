@@ -1,20 +1,14 @@
 function sockets(io, socket, data) {
   
-  
   socket.on("startingQuestion", function(data){
     console.log(`startQuizForAll received for gamePin = ${data.gamePin}`)
     io.to(data.gamePin).emit("startQuestion", data.currentQuestionIndex)
-  })
-
-  socket.on("setUpGame", function(data){
-
   })
 
   // Check if game exists
   socket.on("startMiniGame", function(data){
     const {gamePin, gameName} = data;
     io.to(gamePin).emit("onGameStart", gameName)
-    
   })
 
   socket.on("updatePlayerPoints", (d) => {
@@ -38,19 +32,18 @@ function sockets(io, socket, data) {
     socket.emit('sendingQuestions', data.getQuestions(lang, gamePin, gameName))
   });
 
-  //WhosMostLikelyTo---------------------------------------------------------------
+  // - WhosMostLikelyTo ---------------------------------------------------------------
   socket.on("settingUpWhosMostLikelyTo", function(gamePin){
     const whosMostLikelyGameData = data.setUpWhosMostLikely(gamePin);
     console.log("Datan för whos most likely to", whosMostLikelyGameData)
     socket.emit("setUpWhosMostLikelyTo", whosMostLikelyGameData)
-    
   })
+
   socket.on("getQuestionsWho", function(lang, gamePin, participants){
     let questions= data.getQuestions(lang, gamePin, "whosMostLikelyTo")
     let questionsWithAnswers = data.addAnswerAlternatives(questions, participants);
     console.log("Theo o dennis äter en häst", questionsWithAnswers);
     io.to(gamePin).emit("sendingQuestionsWho", questionsWithAnswers);
-
   })
 
   socket.on("playerAnswers", function(payload){
@@ -68,11 +61,7 @@ function sockets(io, socket, data) {
     io.to(gamePin).emit("increasingCurrentQuestionIndex", currentQuestionIndex);
   })
 
-
-  
-  
-
-  // ThisOrThat -------------------------------------------------------------------
+  // - ThisOrThat -------------------------------------------------------------------
   socket.on('setup_ThisOrThat', function(gamePin, lang) {
     console.log("Setting up ThisOrThat game, and returning questions");
     socket.emit('setup_ThisOrThat', data.setup_ThisOrThat(gamePin));
@@ -104,18 +93,16 @@ function sockets(io, socket, data) {
       }, 30000) // 10 seconds later
   }
   });
-// ---------------------------------------------------------------------------------
-// Timer ---------------------------------------------------------------------------
-socket.on('requestGameTime', (gamePin, callback) => {
-  if(data.customGameExists(gamePin)){
-    const time = data.getGameTime(gamePin);
-    callback({
-      remainingTime: time, 
-      error: null
-    })
-  };
-});
-// ---------------------------------------------------------------------------------
+  // - Timer ---------------------------------------------------------------------------
+  socket.on('requestGameTime', (gamePin, callback) => {
+    if(data.customGameExists(gamePin)){
+      const time = data.getGameTime(gamePin);
+      callback({
+        remainingTime: time, 
+        error: null
+      })
+    };
+  });
 
   socket.on('createGame', function(lang) {
     const {pin, customGame} = data.createCustomGame(lang);
@@ -193,7 +180,7 @@ socket.on('requestGameTime', (gamePin, callback) => {
   socket.on("adminStartedWithExisitingPin", function(gamePin, lang) {
     if(!data.customGameExists(gamePin)){
       console.log("Admin rejoined UNEXISTING game with pin: ", gamePin);
-      const customGame = data.createCustomGameAlt(gamePin, lang);
+      const customGame = data.createCustomGameAlt(gamePin);
       socket.emit('updateGameData', customGame);
       console.log("Game created with pin: ", gamePin);
     }else{

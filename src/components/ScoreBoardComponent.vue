@@ -45,31 +45,10 @@
             totalScore:
               participant.scoreGame1 +
               participant.scoreGame2 +
-              participant.scoreGame3 +
-              participant.scoreGame4,
+              participant.scoreGame3
           }))
           .sort((a, b) => b.totalScore - a.totalScore);
       },
-    },
-    methods: {
-        highlightPlayer(name) {
-            const participant = this.participantsWithHighlight.find(
-                (p) => p.name === name
-            );
-            if (participant) {
-                participant.highlighted = true;
-                setTimeout(() => {
-                participant.highlighted = false;
-                }, 1000); // Keep the highlight for 1 second
-            }
-        },
-        updateScore(playerName, points) {
-            const player = this.participantsWithHighlight.find((p) => p.name === playerName);
-            if (player) {
-                player.scoreGame4 += points;
-                this.highlightPlayer(playerName); // Trigger highlight when score is updated
-            }
-        },
     },
   };
   </script>

@@ -41,7 +41,6 @@
           <div class="icon-circle icon-correct">✔</div>
           <p> {{ uiLabels.GameView.youAnsweredRight }}</p>
           <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
-          <p>Hej hej!</p> <!--Ska denna va här? //HANNA -->
         </div>
 
         <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
@@ -299,26 +298,6 @@ export default {
 </script>
 
 <style scoped>
-.start-button{
-  background-color: green;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;  
-  display: inline-block;
-  font-size: 16px;
-  margin: 30px 4px;
-  padding: 15px;
-  text-align: center;
-  text-decoration: none;  
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.startbutton:hover{
-  background-color: rgb(8, 179, 8);
-  box-shadow: 0 0 15px 5px rgba(8, 179, 8, 0.5); 
-  transform: scale(1.05);
-}
 .intro-wrapper {
   display: flex;
   justify-content: center;
@@ -351,10 +330,12 @@ export default {
 
 .countdown-bar {
   width: 100%;
-  height: 20px;
+  height: 8px;
   background-color: #ddd;
   position: relative;
   margin-top: 10px;
+  border-radius: 5px;
+
 }
 
 .progress {

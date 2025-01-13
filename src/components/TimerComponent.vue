@@ -51,7 +51,7 @@
           if (this.remainingTime > 0) {
             this.remainingTime--;
           }
-          if (this.remainingTime % 60 === 0 && !this.muted) this.ringBell();
+          if (this.remainingTime % 60 === 0) this.ringBell();
         }, 1000);
   
         this.syncInterval = setInterval(this.syncWithServer, 10000); // Request sync with server every 10 seconds.
@@ -67,16 +67,20 @@
       },
       ringBell() {
         this.isFlashing = true; // Start flashing
-        const bell = new Audio('/audio/alarm.mp3');
-        bell.play().catch((error) => {
-          console.error("Could not play alarm:", error);
-        });
+        if(!this.muted){
+            console.error("Playing alarm!!! this.muted = ", this.muted);
+            const bell = new Audio('/audio/alarm.mp3');
+            bell.play().catch((error) => {
+            console.error("Could not play alarm:", error);
+            });
+        }
         setTimeout(() => {
           this.isFlashing = false; // Stop flashing after 1 second
         }, 2000);
       },
       toggleMute() {
         this.muted = !this.muted;
+        console.log("toggleMute -> this.muted = ", this.muted)
       }
     },
     mounted() {

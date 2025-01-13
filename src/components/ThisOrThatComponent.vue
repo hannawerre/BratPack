@@ -75,6 +75,9 @@ export default {
         socket: {
             type: Object
         },
+        lang: {
+            type: String
+        },
         gameData: {
             type: Object,
             required: true
@@ -98,7 +101,6 @@ export default {
             currentPhase: 'showRules',
             showChosenParticipantNoAnswer: false,
 
-            lang: sessionStorage.getItem("lang") || "en",
             questions: [],
             countdown:null,
             countdownProgress: 100,
