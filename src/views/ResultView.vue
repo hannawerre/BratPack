@@ -6,12 +6,12 @@
   </Nav>
 
   <div>
-    lang: {{ lang }}
-    {{ question.q }}
+    {{ uiLabels.ResultView.lang }}: {{ lang }}
+    {{ uiLabels.ResultView.question }}: {{ question.q }}
   </div>
   <BarsComponent v-bind:labels="question.a" v-bind:data="submittedAnswers"/>
 
-  <span>{{ submittedAnswers }}</span>
+  <span>{{ uiLabels.ResultView.submittedAnswers }}</span>
 </template>
 
 <script>

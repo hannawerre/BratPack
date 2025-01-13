@@ -1,8 +1,92 @@
 {
+	"StartView": {
+	"faq": "FAQ",
+    "joinGameButton": "Gå med i spel",
+    "gamePinPlaceholder": "Game PIN",
+    "joinButton": "Gå med",
+    "createGameButton": "Skapa spel",
+    "changeLanguage": "Change to English",
+    "lang": "Svenska",
+    "createPoll": "Skapa undersökning",
+    "about": "Om oss"
+	},
+
+	"ResultView": {
+    "lang": "Språk",
+    "question": "Fråga",
+    "submittedAnswers": "Inskickade svar"
+    },
+
+  	"LobbyView": {
+	"waitingForHost": "Väntar på spelledaren...",
+	"players": "Spelare",
+	"userName": "Användarnamn",
+	"participateInPoll": "Delta",
+	"Hide Players": "Dölj Spelare",
+	"Show Players": "Visa Spelare",
+	"nameTaken": "Namn upptaget!"
+	},
+
+	"CustomGamesView": {
+		"gameAlreadyInSession": "Spel redan igång",
+		"theGameWithPIN": "Spelet med PIN",
+		"isAlreadyActiveReturnToMainMenu": "är redan igång. Återgå till huvudmenyn",
+		"ok": "OK",
+		"lang": "Svenska",
+		"pinGame": "Spel-PIN",
+		"loadingGamePIN": "Läser in Spel-PIN",
+		"chooseYourRole": "Välj din roll",
+		"play": "Spela",
+		"hostOnly": "Värd endast",
+		"chooseTheTimeInMinutes": "Välj tid i minuter:",
+		"chooseYourCustomGamesBelow": "Välj dina egna spel nedan:",
+		"startGame": "Starta spelet",
+		"participants": "Deltagare",
+		"hideParticipants": "Dölj deltagare",
+		"showParticipants": "Visa deltagare",
+		"admin": "Admin"
+	  },
+
+	  "EditQuizComponent": {
+		"question": "Fråga",
+		"hideQuestions": "Dölj frågor",
+		"showQuestions": "Visa frågor",
+		"correct": "Rätt",
+		"edit": "Redigera",
+		"hereAddQuestions": "Här kan du lägga till frågor till spelet",
+		"standardQuestions": "Använd standardfrågor",
+		"ownQuestions": "Använd egna frågor",
+		"addQuestion": "Lägg till fråga",
+		"alternative": "Alternativ",
+		"addAlternative": "Lägg till alternativ",
+		"saveQuestion": "Spara fråga",
+		"close": "Stäng",
+		"saveAlternatives": "Spara alternativ"
+	  },
+
+	  "QuizComponent": {
+		"generalTrivia": "Frågesportspelet",
+		"startQuiz": "Starta spel",
+		"waitingOnAdmin": "Väntar på att admin ska starta quizet...",
+		"youHaveAnswered": "Du har svarat!",
+		"waitForTimeToRunOut": "Väntar tills tiden gått ut...",
+		"youAnsweredRight": "Du svarade rätt",
+		"yourPointsRightNow": "Din poäng just nu:",
+		"yourRankRightNow": "Din plats just nu",
+		"youAreBehind" : "Du ligger efter",
+		"youWereWrong": "Du hade fel",
+		"tooSlow": "Ooops, du var för långsam",
+		"nextQuestion": "Nästa fråga",
+		"showResults": "Visa resultat",
+		"scoreboard": "Poängställning",
+		"points": "poäng",
+		"with": "med"
+	  },
+	  
+
 	"sales-pitch": "Svar. Helt. Enkelt.",
 	"subHeading": "Ett enkelt enkätverktyg",
 	"invite": "Bjud in deltagare med den här länken:",
-
 
 	"createGame": "Skapa spel",
 	"playAsAdmin": "Vill du spela eller bara vara spelledare?",
@@ -11,13 +95,10 @@
     "enterDetails": "Ange ditt namn",
 	"participatePoll": "Delta i röstning",
 	"question": "Fråga",
-	"changeLanguage": "Change to English",
-	"about": "Om oss",
 	"userName": "Användarnamn",
 	"participateInPoll": "Gå med",
 	"players": "Spelare",
 	"waitingForHost": "Väntar på spelledaren...",
-	"Lang": "Svenska",
 	"Welcome": "Välkommen",
 	"generalTrivia": "Frågesportspelet",
 	"waitingOnAdmin": "Väntar på att admin ska starta quizet...",

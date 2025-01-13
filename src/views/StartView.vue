@@ -1,4 +1,25 @@
 <template>
+      <div id="LanguageSwitcher">
+        <button @click="switchLanguage">
+          {{ uiLabels.StartView.lang }}
+          <div id="flagFrame">
+            <img :src="`/img/${lang}.png`" alt="Language">
+          </div>
+        </button>
+      </div>
+     <!-- Navigation -->
+    <ResponsiveNav v-bind:hideNav="hideNav">
+      <button v-on:click="switchLanguage">
+        {{ uiLabels.StartView.changeLanguage }}
+      </button>
+      <router-link to="//">
+        {{ uiLabels.StartView.createPoll }}
+      </router-link>
+      <a href="">
+        {{ uiLabels.about }}
+      </a>
+      <a href="">{{ uiLabels.StartView.faq }}</a>
+    </ResponsiveNav>
 
   <header>
   
@@ -8,25 +29,19 @@
       
       <!--<img src="../assets/logo.svg">-->
     </div>
-  </header>
-  <ResponsiveNav v-bind:hideNav="hideNav">
-    <button v-on:click="switchLanguage">
-      {{ uiLabels.changeLanguage }}
-    </button>
-    <router-link to="//">
-      {{ uiLabels.createPoll }}
-    </router-link>
-    <a href="">
-      {{ uiLabels.about }}
-    </a>
-    <a href="">FAQ</a>
-  </ResponsiveNav>
+  <!-- Language Switcher -->
+  
+    </header>
+
+   
 
   
   <div class="content-wrapper">
     <div class="items">
       <div class="join-container" v-if="!isPlay">
-        <button class="button blue" @click="togglePlay" style="width: 300px;">Join Game</button>
+        <button class="button blue" @click="togglePlay" style="width: 300px;">
+          {{uiLabels.StartView.joinGameButton}}
+        </button>
       </div>
       <div class="join-container" v-if="isPlay">
         <div class="textBox-wrapper">
@@ -38,13 +53,13 @@
             :placeholder="'Game PIN'"
           />
           <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + gamePin">
-            <button class="button blue small">Join</button>
+            <button class="button blue small">{{ uiLabels.StartView.joinButton }}</button>
           </router-link>
         </div>
       </div>
     
       <router-link to="/customgames/">
-        <button class="button orange">Create Game</button>
+        <button class="button orange"> {{ uiLabels.StartView.createGameButton }}</button>
       </router-link>
     </div>
   </div>
@@ -65,7 +80,7 @@ export default {
     return {
       uiLabels: {},
       gamePin: "",
-      lang: sessionStorage.getItem( "lang") || "en",
+      lang: localStorage.getItem( "lang") || "en",
       hideNav: true,
       isPlay: false,
       gameExists: false,
@@ -101,8 +116,8 @@ export default {
       else {
         this.lang = "en"
       }
-      sessionStorage.setItem( "lang", this.lang );
-      socket.emit( "getUILabels", this.lang );
+      localStorage.setItem( "lang", this.lang );
+      socket.emit( "getUILabels", this.lang, this.socketId );
     },
     toggleNav: function () {
       this.hideNav = ! this.hideNav;
@@ -129,14 +144,9 @@ export default {
   mounted: function() {
     document.addEventListener('click', this.closeOnClickOutside);
   },
-  beforeDestroy() {
+  beforeDestroy: function() {
     document.removeEventListener('click', this.closeOnClickOutside);
-    // if (this.socket) {
-    //             this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
-    //             this.socket.disconnect(); // Disconnect the socket
-    //             this.socket = null;
-    //         }
-    }
+  }
 }
 </script>
 <style scoped>
@@ -171,6 +181,31 @@ export default {
     vertical-align: bottom;
     margin-right: 0.5rem; 
   }
+
+  #LanguageSwitcher button {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: black;
+  font-weight: 500;
+}
+
+#flagFrame {
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  margin-right: 10px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+#flagFrame img {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+}
   
   .content-wrapper {
   display: flex;
@@ -181,7 +216,6 @@ export default {
   }
 
   .items {
-  
   flex-direction: column;
   gap: 10px;
   margin: 5% auto;

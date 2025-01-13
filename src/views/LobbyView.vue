@@ -1,35 +1,46 @@
 <template>
-  <Nav :hideNav="false"
-  :uiLabels="uiLabels"
-  :lang="lang"
-  :showLangSwitch="true"
-  @language-changed="handleLanguageChange">
-  </Nav>
+    <Nav 
+    :hideNav="false"
+    :uiLabels="uiLabels"
+    :lang="lang"
+    :showLangSwitch="true"
+    @language-changed="handleLanguageChange"
+  />
   
   <div>
-    <h3>Lobby ID: {{gamePin}}</h3>
+    <h3>{{ uiLabels.LobbyView.lobbyID }}: {{ gamePin }}</h3>
     <div class="textBox-wrapper" style="width: 50%;" v-if="!joined">
-      <input class="textBox input" type="text" v-model="userName" @input=isNameTaken(userName) :placeholder=this.uiLabels.userName>
-      <button class="button blue small" v-if="!nameTaken" v-on:click="participateInCustomGame">
-        {{ this.uiLabels.participateInPoll }}
+      <input 
+        class="textBox input" 
+        type="text" 
+        v-model="userName" 
+        @input=isNameTaken(userName) 
+        :placeholder="uiLabels.LobbyView.userName"
+      />
+      <button 
+        class="button blue small" 
+        v-if="!nameTaken" 
+        v-on:click="participateInCustomGame"
+      >
+        {{ uiLabels.LobbyView.participateInPoll }}
       </button>
       <p v-else>
-        Name taken!
+       {{ uiLabels.LobbyView.nameTaken }}
       </p>
     </div>
-    <p>{{ this.uiLabels.waitingForHost }}</p>
+    <p>{{ uiLabels.LobbyView.waitingForHost }}</p>
     <div class="waitingRoom" v-if="joined">
       <div>
-        <h3>{{ this.uiLabels.players }}</h3>
+        <h3>{{ uiLabels.LobbyView.players }}</h3>
         <div class="toggle-button" @click="toggleListVisibility">
-          <span>{{ isListVisible ? 'Hide Players &#9650;' : 'Show Players &#9660;' }}</span>
-          <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
+          <span>{{ isListVisible ? uiLabels.LobbyView.HidePlayers : uiLabels.LobbyView.ShowPlayers }}</span>
+          <span>{{ isListVisible ? '▲' : '▼' }}</span>
         </div>
         <ul v-if="isListVisible">
-        <p v-for="participant in participants">{{ participant }}</p>
+          <p v-for="participant in participants" :key="participant">{{ participant }}</p>
         </ul>
       </div>
-  </div>
+    </div>
   </div>
 </template>
 
