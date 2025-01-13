@@ -12,6 +12,12 @@
         <button @click="mainMenu">{{ uiLabels.CustomGamesView.ok }}</button>
       </div>
 </div>
+<AlertModal
+      :title="'Alert'"
+      :message="alertMessage"
+      :isOpen="isAlertOpen"
+      @close="handleModalClose"
+    />
 <div class="container">
 
   <div class="main-content">
@@ -120,9 +126,8 @@ import io from 'socket.io-client';
 import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';
-import EditQuiz4Component from '../components/EditQuiz4Component.vue';
 import Nav from '@/components/ResponsiveNav.vue';
-
+import AlertModal from '@/components/AlertModal.vue';
 
 
 export default {
@@ -132,7 +137,7 @@ components: {
   EditQuiz1Component,
   EditQuiz2Component,
   EditQuiz3Component,
-
+  AlertModal,
 },
 data: function() {
   return {
@@ -162,6 +167,9 @@ data: function() {
     gameStarted: false,
     isListVisible: false,
     toggleText: "Show Participants",
+    isAlertOpen: false,
+    alertMessage: "",
+    
 
   };
 },
@@ -217,15 +225,16 @@ created: function () {
       socket.emit('joinSocketRoom', pin); //joins the socket room 'gamePin'
       this.$router.replace({ path: `/customgames/${pin}` });
       
-      socket.on("updateGameData", (gameData) => {
+      // socket.on("updateGameData", (gameData) => {
         
-        console.log("Game data received: ", gameData);
-        this.selectedGames = gameData.selectedGames;
-        this.participants = gameData.participants;
-        this.selectedMinutes = gameData.selectedMinutes;
-        this.customQuestions = gameData.customQuestions;
-        console.log("Updated gameData, participants: ", this.participants);
-        });
+      //   console.log("Game data received: ", gameData);
+      //   this.selectedGames = gameData.selectedGames;
+      //   this.participants = gameData.participants;
+      //   this.selectedMinutes = gameData.selectedMinutes;
+      //   this.customQuestions = gameData.customQuestions;
+      //   console.log("Updated gameData, gamedata: ", gameData);
+      //   });
+
       });
   console.log("Listener for 'updateGameData' in CustomGamesView.vue is active");
   socket.emit("createGame", this.lang);
@@ -259,6 +268,16 @@ socket.on('participantsUpdate', participants => {
   */
 },
 methods: {
+
+  triggerValidationError: function(message) {
+      this.alertMessage = message;
+      this.isAlertOpen = true;
+  },
+
+    // Funktion för att hantera stängning av modalen
+  handleModalClose: function() {
+      this.isAlertOpen = false;
+  },
 
   mainMenu: function() {
     window.removeEventListener("beforeunload", this.handleBeforeUnload);
@@ -299,29 +318,32 @@ methods: {
     console.log("playerRole: ", this.playerRole);
 
     if(this.isNameTaken(this.userName)){
-      alert("Name is taken, please choose another one");
+      this.triggerValidationError("Name is taken, please choose another one");
       return;
     }
 
     if (this.selectedGames.length === 0) {
-      alert("Please select at least one game.");
+      this.triggerValidationError("Please select at least one game.");
       return;
     }
 
     if (this.participants.length === 0 && this.userRole === 'play') {
-      alert("No players have joined yet.");
+      this.triggerValidationError("No players have joined yet. At least two players are required to start the game.");
       return;
     }
     if(this.participants.length < 2 && this.userRole === 'host'){
-      alert("Only one player has joined. At least two players are required to start the game.");
+      this.triggerValidationError(
+          "Only one player has joined. At least two players are required to start the game."
+        );
       return;
     }
 
     if (this.userRole === 'play') {
       if (!this.userName) {
-        alert("Please enter your username.");
+        this.triggerValidationError("Please enter your username.");
         return;
       }
+    
       console.log("hej",   this.userName);
       const adminName={      
         name: this.userName,

@@ -1,7 +1,6 @@
 <template>
       <div id="LanguageSwitcher">
         <button @click="switchLanguage">
-          {{ uiLabels.StartView.lang }}
           <div id="flagFrame">
             <img :src="`/img/${lang}.png`" alt="Language">
           </div>

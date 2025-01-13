@@ -47,7 +47,7 @@
 	  },
 
 	  "EditQuizComponent": {
-		"question": "Fråg",
+		"question": "Frågor",
 		"hideQuestions": "Dölj frågor",
 		"showQuestions": "Visa frågor",
 		"correct": "Rätt",

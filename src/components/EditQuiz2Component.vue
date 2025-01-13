@@ -196,6 +196,12 @@
   
   <style scoped>
 
+/* Spara h1 i denna view */
+  h1 {
+    font-size: 1.5rem;
+    margin: 10px;
+  }
+
 .modal-background {
   position: fixed;
   top: 0;
