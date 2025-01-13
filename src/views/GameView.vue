@@ -7,11 +7,6 @@
     :gameActive="true"
     />
     
-     <button
-        v-if="isAdmin"
-  class="button blue"
-        @click="goBackToMenu()">Go back to meny</button> 
-
 
     <!--Game Components-->
     <div v-if="activeGame && isPlaying"> 
@@ -59,7 +54,7 @@
                    :key="gameName"
                    >
                <button
-               v-if="!gameIsPlayed(gameName)"
+               v-if="!playedGames.includes(gameName)"
                class="button blue"
                    @click="playMiniGame(gameName)"
                   
@@ -78,8 +73,6 @@
 </template>
 
 <script>
-
-    //const socket = io("localhost:3000");
     import io from 'socket.io-client';
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
@@ -132,7 +125,6 @@
             window.addEventListener("beforeunload", this.handleWindowClose);
         },
         methods: {
-
             setup: function(){
                 this.gamePin = this.$route.params.gamePin;
                 this.userName = sessionStorage.getItem('userName');
@@ -167,20 +159,6 @@
                console.log("spelet som är playedGames är ", this.playedGames);
                this.activeGame = '';
             },
-            goBackToMenu() {
-                this.playedGames.push(this.activeGame);
-                this.activeGame = '';
-                this.socket.emit("startMiniGame", {
-                        gameName: '', 
-                        gamePin: this.gamePin
-                })
-                
-        
-            },
-
-            gameIsPlayed(gameName) {
-                return this.playedGames.includes(gameName);
-            },
             // Delete user on window close / refresh
             handleWindowClose(event) {
             console.log("Window closed!!! Deleting user")
@@ -213,7 +191,6 @@
   border: none;
   cursor: pointer;
 }
-
 
 
 </style>

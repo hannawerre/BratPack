@@ -183,7 +183,6 @@ const saveQuestion = () => {
   if (question.value.trim() !== "") {
     const hasCorrectAnswer = alternatives.value.some((alt) => alt.isCorrect);
 
-    // Kolla minst 2 alternativ med text
     const nonEmptyAlternatives = alternatives.value.filter((alt) => alt.text.trim() !== "");
     if (nonEmptyAlternatives.length < 2) {
 
@@ -235,7 +234,6 @@ const closeModal = () => {
   );
   emit('modal-closed');
 
-  // Rensa bort tomma alternativ
   alternatives.value = alternatives.value.filter((alt, index) => {
     return index === 0 || alt.text.trim() !== "";
   });
