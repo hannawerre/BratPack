@@ -7,6 +7,11 @@
     :gameActive="true"
     />
     
+     <button
+        v-if="isAdmin"
+  class="button blue"
+        @click="goBackToMenu()">{{ uiLabels.GameView.menu }}</button> 
+
 
     <!--Game Components-->
     <div v-if="activeGame && isPlaying"> 

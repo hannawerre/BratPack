@@ -209,6 +209,7 @@ export default {
   font-size: 1rem;
   outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
 }
 
 .join-game-input:focus {
