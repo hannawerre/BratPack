@@ -1,38 +1,45 @@
 <template>
-  <Nav :hideNav="false"
-  :uiLabels="uiLabels"
-  :lang="lang"
-  :showLangSwitch="true"
-  @language-changed="handleLanguageChange">
+  <Nav 
+    :hideNav="false"
+    :uiLabels="uiLabels"
+    :lang="lang"
+    :showLangSwitch="true"
+    @language-changed="handleLanguageChange">
   </Nav>
-  
-  <div>
-    <h3>Lobby ID: {{gamePin}}</h3>
-    <div class="textBox-wrapper" style="width: 50%;" v-if="!joined">
-      <input class="textBox input" type="text" v-model="userName" @input=isNameTaken(userName) :placeholder=this.uiLabels.userName>
-      <button class="button blue small" v-if="!nameTaken" v-on:click="participateInCustomGame">
-        {{ this.uiLabels.participateInPoll }}
-      </button>
-      <p v-else>
-        Name taken!
-      </p>
+  <h3 class="lobby-id">Lobby ID: {{ gamePin }}</h3>
+  <div v-if="!this.joined" class="join-game-container">
+    <div
+      class="join-game-wrapper"
+      :class="{'shake': nameTaken || showError}"
+    >
+      <input
+        class="join-game-input"
+        type="text"
+        v-model="userName"
+        @input="validateInput"
+        @keyup.enter="handleEnter"
+        :placeholder="uiLabels.userName"
+      />
+      <p class="error-message" v-if="nameTaken">Name is already taken!</p>
+      <p class="error-message" v-if="showError">Please enter a username!</p>
     </div>
-    <p>{{ this.uiLabels.waitingForHost }}</p>
+    <button
+      class="submit-button"
+      :class="{'disabled': nameTaken || userName.length === 0}"
+      @click="handleEnter"
+    >
+      {{ uiLabels.participateInPoll }}
+    </button>
+  </div>
     <div class="waitingRoom" v-if="joined">
+      <p>{{ this.uiLabels.waitingForHost }}</p>
       <div>
         <h3>{{ this.uiLabels.players }}</h3>
-        <!-- <div class="toggle-button" @click="toggleListVisibility">
-          <span>{{ isListVisible ? 'Hide Players &#9650;' : 'Show Players &#9660;' }}</span>
-          <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
-        </div> -->
-        <!-- Ta bort v-if -->
-        <!-- <ul v-if="isListVisible">  -->
-        <p v-for="participant in participants">{{ participant.name }}</p>
-        <!-- </ul> -->
+        <p v-for="participant in participants" :key="participant.name">{{ participant.name }}</p>
       </div>
-  </div>
-  </div>
+    </div>
 </template>
+
 
 <script>
 import Nav from '@/components/ResponsiveNav.vue'
@@ -74,6 +81,26 @@ export default {
     socket.emit( "getUILabels", this.lang);
   },
   methods: {
+    handleEnter() {
+      console.log("Inside handleEnter with this.userName=", this.userName)
+      if (this.userName.length === 0) {
+        this.triggerError();
+        return;
+      }
+      if (!this.nameTaken) {
+        this.participateInCustomGame();
+      } 
+      else {
+        this.triggerError();
+      }
+    },
+    triggerError() {
+      this.showError = this.userName.length === 0;
+      this.nameTaken = !this.showError;
+      setTimeout(() => {
+        this.showError = false;
+      }, 1000);
+    },
     participateInCustomGame: function () {
       socket.emit( "participateInCustomGame", this.gamePin, {
         name: this.userName,
@@ -101,10 +128,9 @@ export default {
       sessionStorage.setItem("lang", newLang);
       socket.emit("getUILabels", this.lang);
     },
-    isNameTaken(userName) {
-        this.nameTaken = this.participants.some(participant => participant.name === userName);
-        console.log("Name taken: ", this.nameTaken);
-        console.log("All participants: ", this.participants);
+    validateInput() {
+      this.nameTaken = this.participants.some(participant => participant.name === this.userName);
+      this.showError = false; // Reset error state on new input
     },
 
     // Delete user on window close / refresh
@@ -155,11 +181,87 @@ export default {
 
 <style scoped>
 
-.container {
+.join-game-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  padding: 20px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  max-width: 400px;
+  text-align: center;
+}
+
+.lobby-id {
+  font-size: 1.2rem;
+  color: #1d3557;
+  margin-bottom: 20px;
+}
+
+.join-game-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.join-game-wrapper.shake .join-game-input {
+  border-color: red;
+  animation: shake 0.5s ease-in-out;
+}
+
+.join-game-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #457b9d;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.join-game-input:focus {
+  border-color: #1d3557;
+  box-shadow: 0 0 8px rgba(29, 53, 87, 0.4);
+}
+
+.error-message {
+  font-size: 0.875rem;
+  color: red;
+  margin-top: 5px;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #1d3557;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.submit-button:hover:not(.disabled) {
+  background-color: #457b9d;
+}
+
+.submit-button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25%, 75% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
 }
 
 .waitingRoom div{

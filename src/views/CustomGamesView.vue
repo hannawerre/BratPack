@@ -1,4 +1,10 @@
 <template>
+  <Nav :hideNav="false"
+  :uiLabels="uiLabels"
+  :lang="lang"
+  :showLangSwitch="true"
+  @language-changed="handleLanguageChange">
+  </Nav>
 <div v-if="showGameExistsPopup && !shouldRestoreState" class="popup-overlay">
       <div class="popup-content">
         <h2>Game Already in Session</h2>
@@ -346,12 +352,6 @@ methods: {
     
     console.log("--> Listener carried over to /game/");
   });
-
-    // TODO: Admin ska också till gameView. men i nåt sorts 'admin mode' där hen kan starta minigames etc. /sebbe
-    // this.$router.push({
-    //   name: 'GameView',
-    //   params: { gamePin }
-    // });
     console.log("--> After startGame!")
   },
 
@@ -383,12 +383,7 @@ methods: {
 
   this.customQuestions[this.currentGame.id].customQuestions = savedQuestions;
   this.customQuestions[this.currentGame.id].useCustomQuestions = useCustomQuestions;
-  // this.useCustomQuestions = useCustomQuestions;
-  // this.customQuestions = savedQuestions;
-
-
-  // console.log("Dessa ska vara lika dana:", this.customQuestions, "och", thiscustomQuestions[this.currentGame.id].customQuestions )
-
+  
   socket.emit(
     "savedQuestionsToServer", 
     this.gamePin, 
@@ -397,12 +392,6 @@ methods: {
     this.currentGame.id
   );
 },
-
-  // handleWindowClose(event) {
-  //     console.log("Admin window closed! unactivating lobby")
-  //     //socket.emit("adminLeftGame", this.gamePin, this.userName);
-  //   },
-
   handleBeforeUnload(event) {
       const dataToSave = {
         selectedGames: this.selectedGames,
@@ -420,30 +409,17 @@ methods: {
       // Visa standardvarning om det behövs
     },
 
-  checkIfRefreshPage() {
-    // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
-      let storagePin = sessionStorage.getItem('gamePin');
-      if (storagePin) {
+  // checkIfRefreshPage() {
+  //   // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
+  //     let storagePin = sessionStorage.getItem('gamePin');
+  //     if (storagePin) {
         
-        this.gamePin = storagePin;
-        socket.emit("requestParticipants", this.gamePin);
+  //       this.gamePin = storagePin;
+  //       socket.emit("requestParticipants", this.gamePin);
         
-      }
-    console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
-    },
-    handleLanguageChange(newLang) {
-      this.lang = newLang;
-      localStorage.setItem("lang", newLang);
-      socket.emit("getUILabels", this.lang);
-    },
-    // dismantleSocket(){ //TODO kanske ta bort
-    //   console.log("-->before if-statement in dismantleSocket in CustomGamesView")
-    //   if(socket) {
-    //   console.log("-->inside if-statement in dismantleSocket in CustomGamesView")
-    //     socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
-    //     // socket.disconnect(); // Disconnect the socket
-    // }else console.log("this.socket does not exist in CustomGamesView")
-    // }
+  //     }
+  //   console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
+  //   },
   },
 
 mounted() {
