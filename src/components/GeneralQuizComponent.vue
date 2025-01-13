@@ -33,31 +33,21 @@
       </div>
 
       <!-- Answered Phase-->
-      <div v-else-if="currentPhase === 'answeredPhase'">
-        <h2> {{ uiLabels.QuizComponent.youHaveAnswered }}</h2>
-        <p> {{ uiLabels.QuizComponent.waitingForTimeToRunOut }}</p>
-        <div class="countdown-bar">
-          <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
-        </div>
-      </div>
       
       <!-- Feedback Phase -->
       <div v-else-if="currentPhase === 'feedbackPhase'">
         
         <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
-          <p> {{ uiLabels.QuizComponent.youAnsweredRight }}</p>
-          <p> {{ uiLabels.QuizComponent.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p> {{ uiLabels.QuizComponent.yourRankRightNow }} {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.QuizComponent.youAreBehind}} {{ getPlayerAhead(userName) }} {{ uiLabels.QuizComponent.with }} {{ getPointsBehind(userName) }} poäng </p>
+          <p> {{ uiLabels.youAnsweredRight }}</p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
+          <p>Hej hej!</p>
         </div>
 
         <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.QuizComponent.youWereWrong }}</p>
-          <p> {{ uiLabels.QuizComponent.yourPointsRightNow}} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p> {{uiLabels.QuizComponent.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.QuizComponent.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.QuizComponent.with }} {{ getPointsBehind(userName) }} {{ uiLabels.QuizComponent.points }} </p>
+          <p> {{ uiLabels.youWereWrong }}</p>
+          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
         </div>
 
         <!-- Om användaren inte hann svara -->
@@ -104,22 +94,21 @@ GLÖM EJ ATT ÄNDRA SPRÅKET TILL LOCALSTORAGE
 */
 
 import QuestionComponent from './QuestionComponent.vue';
-import Nav from './ResponsiveNav.vue';
 const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
 
 export default {
   name: 'GeneralQuizComponent',
   components: {
-    QuestionComponent,
-    Nav
+    QuestionComponent
   },
   props: {
     gameData: { type: Object, required: true },
     gamePin: { type: String, required: true },
     uiLabels: { type: Object, required: true },
     isAdmin: { type: Boolean, required: true },
-    isPlaying: { type: Boolean, required: true },
+    userName: { type: Boolean, required: true}
+  
   },
 
   data() {
@@ -129,7 +118,6 @@ export default {
       currentQuestionIndex: 0,
       currentPhase: 'startPhase',
       countdownProgress: 100,
-      userName: sessionStorage.getItem('userName'),
       currentAnswer: null,
       countDownNumber: 3,
       pointsTime: 0,
@@ -174,8 +162,7 @@ export default {
       },
       onAnswer(answerData) {
       this.currentAnswer = answerData;
-      this.currentPhase = "answeredPhase";
-
+      
       if (answerData.isCorrect) {
         const points = Math.floor((this.countdownProgress / 100) * 1000);
         this.playerAnsweredRight = true;
@@ -184,6 +171,7 @@ export default {
       }
     },
     updatePoints() {
+      console.log("updated points:", this.localPointsnpok)
       socket.emit("updatePlayerPoints", {
         gamePin: this.gamePin,
         userName: this.userName,
@@ -211,16 +199,11 @@ export default {
             break;
           
           case "questionPhase":
-            if(this.currentAnswer!=null){
-              this.currentPhase = "answeredPhase"}
-            else{
-                this.currentPhase="feedbackPhase";
-              }
+            this.updatePoints();
+            this.currentPhase="feedbackPhase";
             break;
 
-          case "answeredPhase":
-            this.currentPhase="feedbackPhase"
-            break;
+        
             
           case "feedbackPhase":
             if(this.currentQuestionIndex > this.questions.length - 1) {
@@ -271,7 +254,7 @@ export default {
                 console.log(this.currentPhase);
 
                 setTimeout(() => {
-                  this.updatePoints();
+                  
                   this.goToNextPhase(); 
                 }, 200)    
             }
@@ -336,11 +319,11 @@ export default {
   justify-content: center;
   align-items: center;
   height: 300px; /* Sätt höjd så att siffran är centrerad */
-  background: black; /* Kanske bakgrundsfärg för "filmisk" känsla */
+    /* Kanske bakgrundsfärg för "filmisk" känsla */
 }
 
 .countdown-number {
-  color: white;
+  color: #1d3557;
   font-size: 8rem;
   font-weight: bold;
 }

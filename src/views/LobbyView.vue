@@ -31,14 +31,15 @@
     <p>{{ uiLabels.LobbyView.waitingForHost }}</p>
     <div class="waitingRoom" v-if="joined">
       <div>
-        <h3>{{ uiLabels.LobbyView.players }}</h3>
-        <div class="toggle-button" @click="toggleListVisibility">
-          <span>{{ isListVisible ? uiLabels.LobbyView.HidePlayers : uiLabels.LobbyView.ShowPlayers }}</span>
-          <span>{{ isListVisible ? '▲' : '▼' }}</span>
-        </div>
-        <ul v-if="isListVisible">
-          <p v-for="participant in participants" :key="participant">{{ participant }}</p>
-        </ul>
+        <h3>{{ this.uiLabels.players }}</h3>
+        <!-- <div class="toggle-button" @click="toggleListVisibility">
+          <span>{{ isListVisible ? 'Hide Players &#9650;' : 'Show Players &#9660;' }}</span>
+          <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
+        </div> -->
+        <!-- Ta bort v-if -->
+        <!-- <ul v-if="isListVisible">  -->
+        <p v-for="participant in participants">{{ participant.name }}</p>
+        <!-- </ul> -->
       </div>
     </div>
   </div>

@@ -6,11 +6,7 @@
     />
     <!--Visas när inget spel är aktiverat-->
     <div v-if="!activeGame"> 
-
         <div class="button-container">
-            
-            <!-- TODO: Scoreboard -->
-
             <!-- Buttons only visible to admin -->
             <div v-if="this.isAdmin">
                 <button
@@ -26,13 +22,14 @@
     </div>
 
     <!--Game Components-->
-    <div v-else-if="activeGame"> 
+    <div v-else-if="activeGame && isPlaying"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
+            :userName="userName"
             @gameCompleted="onGameCompleted"
         />
         <ThisOrThatComponent 
@@ -53,7 +50,7 @@
             :userName="userName"
             :isAdmin="isAdmin" />
 
-            <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
+        <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
     </div>
 </template>
 

@@ -16,25 +16,6 @@ function Data() {
     gameStarted: false,
     playerAnswers: {},
   };
-
-
-
-
-  // Poll
-  this.polls = {};
-  this.polls['test'] = {
-    questions: [
-      {q: "How old are you?", 
-       a: ["0-13", "14-18", "19-25", "26-35", "36-45","45-"]
-      },
-      {q: "How much do you enjoy coding?", 
-       a: ["1", "2", "3", "4", "5"]
-      }
-    ],
-    answers: [],
-    currentQuestion: 0,
-    participants: []
-  }
 }
 
 
@@ -156,14 +137,29 @@ Data.prototype.participateInCustomGame = function (gamePin, playerObj) {
 
 Data.prototype.deleteUser = function (gamePin, userName) {
   if (this.customGameExists(gamePin)) {
-    const participants = this.customGames[gamePin].participants;
-    this.customGames[gamePin].participants = participants.filter(
+    const gameData = this.customGames[gamePin];
+
+    // Delete from participants array
+    const participants = gameData.participants;
+    gameData.participants = participants.filter(
       (participant) => participant.name !== userName
     );
-    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", this.customGames[gamePin].participants)
+    console.log("Deleted user: ", userName, " from gamePin: ", gamePin, "   Current participants: ", gameData.participants);
+
+    // Delete from ThisOrThat participants if exists
+    if (gameData.ThisOrThat && gameData.ThisOrThat.participants) {
+      if (gameData.ThisOrThat.participants[userName]) {
+        delete gameData.ThisOrThat.participants[userName];
+        console.log("Deleted user: ", userName, " from ThisOrThat participants of gamePin: ", gamePin, "   Current ThisOrThat participants: ", gameData.ThisOrThat.participants);
+      }
+    }
+  } else {
+    console.log(
+      "ERROR, could not delete user because gamePin does not exist!"
+    );
   }
-  else console.log("ERROR, could not delete user because gamePin does not exist!");
 };
+
 
 
 Data.prototype.getUILabels = function (lang) {
@@ -265,25 +261,64 @@ Data.prototype.newChosenParticipant = function(gamePin, isSetup_flag = false){
     console.log("ERROR! -> could not get newChosenParticipant in Data.js")
   }
 };
-Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
-  
-  const participantsArray = Object.entries(this.customGames[gamePin].ThisOrThat.participants);
-  const correctAnswers = this.customGames[gamePin].ThisOrThat.correctAnswers;
-  const questionId = this.customGames[gamePin].ThisOrThat.currentQuestion;
-  console.log("-------> Inside correctQuestion_ThisOrThat", participantsArray, this.customGames[gamePin].ThisOrThat)
-  // Add 10 points if answer is correct
-  for(let [name, data] of participantsArray){
-    if (data.answers[questionId] && data.answers[questionId] === correctAnswers[questionId]){
-      this.customGames[gamePin].ThisOrThat.participants[name].points += 10;
-      // Find corresponding name in the general participants array and add points there as well.
-      const generalParticipants = this.customGames[gamePin].participants;
-      const matchingParticipant = generalParticipants.find((participant) => participant.name === name);
-      if (matchingParticipant) {
-        matchingParticipant.scoreGame4 += 10;
-      }
+// ----- 1) Hjälpfunktioner -----
+Data.prototype._getCorrectPlayersExcludingChosen = function(game, questionId, correctAnswer) {
+  let correctPlayers = [];
+  for (const [playerName, data] of Object.entries(game.ThisOrThat.participants)) {
+    // Skippa chosenParticipant
+    if (playerName === game.ThisOrThat.chosenParticipant) continue;
+    // Om svaret matchar correctAnswer → lägg till
+    if (data.answers[questionId] === correctAnswer) {
+      correctPlayers.push(playerName);
     }
   }
+  return correctPlayers;
 };
+
+Data.prototype._distributePoints_ThisOrThat = function(game, correctPlayers) {
+  // Är det inga rätta spelare → avbryt
+  if (correctPlayers.length === 0) return;
+  
+  const totalPlayers = Object.keys(game.ThisOrThat.participants).length;
+  const pot = 200 * totalPlayers;  
+  const share = Math.floor(pot / correctPlayers.length);
+
+  correctPlayers.forEach(name => {
+    // Uppdatera ThisOrThat-poäng
+    //game.ThisOrThat.participants[name].points += share;
+    // Uppdatera "ordinarie" scoreboard
+    const generalParticipant = game.participants.find(p => p.name === name);
+    if (generalParticipant) {
+      generalParticipant.scoreGame4 += share;
+    }
+  });
+};
+
+// ----- 2) Själva huvudetoden -----
+Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
+  const game = this.customGames[gamePin];
+  const qId = game.ThisOrThat.currentQuestion;
+  const chosen = game.ThisOrThat.chosenParticipant;
+  const correctAnswer = game.ThisOrThat.correctAnswers[qId];
+  
+  // Kolla om chosenParticipant har svarat
+  const chosenAnswer = game.ThisOrThat.participants[chosen].answers[qId];
+  if (!chosenAnswer) {
+    // Om chosenParticipant inte svarat -> minus 1000 poäng
+    console.log(`ChosenParticipant (${chosen}) svarade inte – ger -1000 poäng.`);
+    const generalParticipant = game.participants.find(p => p.name === chosen);
+    if (generalParticipant) {
+      generalParticipant.scoreGame4 -= 1000;
+    }
+    return;
+  }
+
+  // Om chosenParticipant svarade -> hitta vilka andra som matchar
+  const correctPlayers = this._getCorrectPlayersExcludingChosen(game, qId, correctAnswer);
+  this._distributePoints_ThisOrThat(game, correctPlayers);
+};
+
+
 Data.prototype.nextQuestion_ThisOrThat = function(gamePin) {
   return ++this.customGames[gamePin].ThisOrThat.currentQuestion; // Increase by 1
 };
@@ -334,26 +369,28 @@ Data.prototype.setUpWhosMostLikely = function (gamePin) {
 };
 
 Data.prototype.generateAnswerAlternatives = function(participants){
-  const listOfParticipantsNames = [];
   const namesOfParticipant = Object.keys(participants);
-  
-  namesOfParticipant.forEach(participant => {
-    listOfParticipantsNames.push(participant)
-  });
+  // Skapa en kopia av arrayen (om du vill undvika att påverka 'namesOfParticipant')
+  const listOfParticipantsNames = [...namesOfParticipant]; 
 
-  if(listOfParticipantsNames.length > 4) {
-    for (let i =listOfParticipantsNames.length - 1; i > 0; i--){
+  // Om fler än 4 deltagare, shuffla och ta ut 4 av dem:
+  if (listOfParticipantsNames.length > 4) {
+    for (let i = listOfParticipantsNames.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [listOfParticipantsNames[i], listOfParticipantsNames[j] = listOfParticipantsNames[j], listOfParticipantsNames[i]];
+      // Korrekt sätt att byta plats på två element
+      [listOfParticipantsNames[i], listOfParticipantsNames[j]] 
+        = [listOfParticipantsNames[j], listOfParticipantsNames[i]];
     }
-
+    // Returnera 4 slumpmässiga deltagare
     return listOfParticipantsNames.slice(0, 4);
-  }else {
+  } else {
+    // Om färre än 4 deltagare
     return listOfParticipantsNames;
   }
 };
 
- 
+
+ //12 jan
 Data.prototype.addAnswerAlternatives = function(questionObj, participants) {
   if (!questionObj || !Array.isArray(questionObj.questions)) {
     console.error("Expected an object with a 'questions' array, but got:", questionObj);
@@ -381,58 +418,70 @@ Data.prototype.storeAnswer = function(gamePin, userName, answerObj) {
   console.log(game.whosMostLikely.participants[userName].answers[questionId])
 
 }
-
-Data.prototype.calculateCorrectAnswer = function(gamePin ){
+Data.prototype.calculateCorrectAnswer = function(gamePin) {
   const game = this.customGames[gamePin];
   const currentQuestionIndex = game.whosMostLikely.currentQuestionIndex;
 
-  const participants = game.whosMostLikely.participants;
+  // Kolla om frågan redan är poängsatt
+  if (game.whosMostLikely.correctAnswers[currentQuestionIndex]?.isCalculated) {
+    console.log(`Fråga ${currentQuestionIndex} är redan beräknad, avbryter...`);
+    // Returnera redan uträknat svar om du vill
+    return game.whosMostLikely.correctAnswers[currentQuestionIndex].winningAnswers;
+  }
 
-  const answers = Object.values(participants).map(participant => participant.answers[currentQuestionIndex]?.answerText);
-  
-  const answerCounts = answers.reduce((counts, answer) =>{
+  const participants = game.whosMostLikely.participants;
+  // 1) Samla in svaren
+  const answers = Object.values(participants).map(
+    participant => participant.answers[currentQuestionIndex]?.answerText
+  );
+
+  // 2) Räkna röster
+  const answerCounts = answers.reduce((counts, answer) => {
     if (answer) {
       counts[answer] = (counts[answer] || 0) + 1;
     }
-    return counts
-  }, {})
+    return counts;
+  }, {});
 
   const maxCount = Math.max(...Object.values(answerCounts));
   const winningAnswers = Object.entries(answerCounts)
     .filter(([_, count]) => count === maxCount)
     .map(([answer]) => answer);
-  game.whosMostLikely.correctAnswers[currentQuestionIndex] = winningAnswers
 
-  console.log("Rätta svaren är,:", game.whosMostLikely.correctAnswers[currentQuestionIndex])
+  // Spara "vinnarsvaren"
+  game.whosMostLikely.correctAnswers[currentQuestionIndex] = {
+    winningAnswers,
+    isCalculated: true // <-- Markera att det redan är gjort
+  };
 
-  console.log(`Det mest valda svaret för fråga ${currentQuestionIndex} är "${winningAnswers}" med ${maxCount} röster.`);
-  
-  // Spara det korrekta svaret
+  console.log(
+    `\nDet mest valda svaret för fråga ${currentQuestionIndex} är "${winningAnswers}" med ${maxCount} röster.`
+  );
 
-  return winningAnswers
-}
+  // 3) Ge 500 poäng
+  for (const [playerName, data] of Object.entries(participants)) {
+    const playerAnswer = data.answers[currentQuestionIndex]?.answerText;
+    if (playerAnswer && winningAnswers.includes(playerAnswer)) {
+      const generalParticipant = game.participants.find(p => p.name === playerName);
+      if (generalParticipant) {
+        generalParticipant.scoreGame2 += 500; // Du kan byta fält om du vill
+        console.log("Uppdaterar poäng", generalParticipant.scoreGame2);
+      }
+    }
+  }
+
+  return winningAnswers;
+};
+
+
+
+
 
 Data.prototype.nextQuestionWhosMostLikelyTo = function (gamePin) {
   const game = this.customGames[gamePin];
   game.whosMostLikely.currentQuestionIndex++;
   return game.whosMostLikely.currentQuestionIndex
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //--------------------------------------------------------------------------------------------------
 // Timer -------------------------------------------------------------------------------------------
 Data.prototype.startCountDown = function() {
