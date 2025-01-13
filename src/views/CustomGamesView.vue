@@ -70,20 +70,16 @@
       />
     </div>
 </div>
-  <div>
-      
-    
-  <div class= "range">
-    <div class="slider-value">
-      <span> {{ selectedMinutes }}</span>
-    </div>
-    <div class="field">
-      <div class="value left"><strong>-</strong></div>
+
+      <div class= "range">
+        <div class="slider-value">
+          <span> {{ selectedMinutes }}</span>
+        </div>
+      <div class="field">
+        <div class="value left"><strong>-</strong></div>
       <input type="range" v-model=selectedMinutes min="10" max="120" step="10" />
       <div class="value right"><strong>+</strong></div>
 
-    </div>
-  
   </div>
     <p>Playingtime: <strong> {{ selectedMinutes }}</strong> minutes</p>
   </div>
@@ -516,14 +512,14 @@ methods: {
 
 
 <style>
+
+
  .container {
     align-items: flex-start;
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
     justify-content: space-between;
-    padding: 20px;
-    
   }
 
   .main-content {
@@ -652,7 +648,6 @@ methods: {
   );
   border-radius: 5px;
   outline: none;
- 
 }
 
 .range .field input::-webkit-slider-thumb {
@@ -673,7 +668,8 @@ methods: {
   display: flex;
   flex-direction: column;
   align-items: center; /* Centrera alla rader horisontellt */
-  gap: 15px; /* Mellanrum mellan rader */
+  gap: 10px; /* Mellanrum mellan rader */
+  margin: 20px; /* Avstånd från föregående element */
 }
 
 .game-option {
@@ -861,8 +857,7 @@ methods: {
 .popup-content button:hover {
   background-color: #45a049;
 }
-.startbutton-container {
-  margin-top: 40px; /* Ger mer marginal mellan spelen och startknappen */
+.startbutton-container { /* Ger mer marginal mellan spelen och startknappen */
   display: flex;
   justify-content: center; /* Centrerar knappen */
 }

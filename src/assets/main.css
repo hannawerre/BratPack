@@ -1,16 +1,6 @@
 @import './base.css';
 
 #app {
-  font-family: Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  justify-content: center;
-  background: linear-gradient(to bottom right,#ff8c42, #457b9d, #a8dadc, #f1faee, #de9263);
-  border-radius: 10px;
-  box-sizing: border-box;
-
-  /* Centering and responsive resizing */
   position: absolute;
   top: 10px; /* 10px gap from the top */
   left: 10px; /* 10px gap from the left */
@@ -18,16 +8,7 @@
   bottom: 10px; 
   padding: 15px;
   padding-bottom: 20px;
-  position: absolute;
-  top: 10px; /* 10px gap from the top */
-  left: 10px; /* 10px gap from the left */
-  right: 10px; /* 10px gap from the right */
-  bottom: 10px; 
-  padding: 15px;
-  overflow: hidden;
 }
-
-
 
 .button.orange { /* generic rules for buttons */
   border: none;
@@ -180,6 +161,7 @@
 .big-text{
   font-size: 50px;
   font-weight: 700;
+  margin: 0 0 10px 0;
 }
 /*RESPONSIVE DESIGN*/
 @media (max-width: 768px) {
