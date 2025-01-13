@@ -1,10 +1,11 @@
 <template>
-  <Nav :hideNav="false"
+<Nav 
   :uiLabels="uiLabels"
   :lang="lang"
   :showLangSwitch="true"
   @language-changed="handleLanguageChange">
-  </Nav>
+</Nav>
+
 <div v-if="showGameExistsPopup && !shouldRestoreState" class="popup-overlay">
       <div class="popup-content">
         <h2>{{ uiLabels.CustomGamesView.gameAlreadyInSession }}</h2>
@@ -12,6 +13,13 @@
         <button @click="mainMenu">{{ uiLabels.CustomGamesView.ok }}</button>
       </div>
 </div>
+
+<AlertModal
+      :title="'Alert'"
+      :message="alertMessage"
+      :isOpen="isAlertOpen"
+      @close="handleModalClose"
+/>
 
 <div class="participants-toggle">
   <button @click="toggleParticipants">
@@ -34,7 +42,7 @@
 
 
 <div class="container">
-  <div class="main-content">
+  <div class="main-content"> 
   <p v-if="gamePin" class="big-text">Game PIN: {{ gamePin }}</p>
   <p v-else class="big-text">Loading Game PIN...</p>
   
@@ -49,7 +57,6 @@
         <label class="radio-option">
           <input type="radio" value="host" v-model="userRole" />
           {{ uiLabels.CustomGamesView.hostOnly }}
-          Host
         </label>
       </div>
     </div>
@@ -119,7 +126,7 @@
 
 
   <div class="startbutton-container">
-      <button class="button orange" @click="startGame">{{ uiLabels.CustomGamesView.startGame }}</button>
+      <button class="button blue" @click="startGame">{{ uiLabels.CustomGamesView.startGame }}</button>
   </div>
 
 </div>
@@ -137,7 +144,7 @@ import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';
 import Nav from '@/components/ResponsiveNav.vue';
-
+import AlertModal from '@/components/AlertModal.vue';
 
 
 export default {
@@ -147,7 +154,7 @@ components: {
   EditQuiz1Component,
   EditQuiz2Component,
   EditQuiz3Component,
-
+  AlertModal,
 },
 data: function() {
   return {
@@ -180,6 +187,9 @@ data: function() {
    
     
 
+    isAlertOpen: false,
+    alertMessage: "",
+    
 
   };
 },
@@ -235,15 +245,16 @@ created: function () {
       socket.emit('joinSocketRoom', pin); //joins the socket room 'gamePin'
       this.$router.replace({ path: `/customgames/${pin}` });
       
-      socket.on("updateGameData", (gameData) => {
+      // socket.on("updateGameData", (gameData) => {
         
-        console.log("Game data received: ", gameData);
-        this.selectedGames = gameData.selectedGames;
-        this.participants = gameData.participants;
-        this.selectedMinutes = gameData.selectedMinutes;
-        this.customQuestions = gameData.customQuestions;
-        console.log("Updated gameData, participants: ", this.participants);
-        });
+      //   console.log("Game data received: ", gameData);
+      //   this.selectedGames = gameData.selectedGames;
+      //   this.participants = gameData.participants;
+      //   this.selectedMinutes = gameData.selectedMinutes;
+      //   this.customQuestions = gameData.customQuestions;
+      //   console.log("Updated gameData, gamedata: ", gameData);
+      //   });
+
       });
   console.log("Listener for 'updateGameData' in CustomGamesView.vue is active");
   socket.emit("createGame", this.lang);
@@ -277,6 +288,16 @@ mounted() {
 },
 
 methods: {
+
+  triggerValidationError: function(message) {
+      this.alertMessage = message;
+      this.isAlertOpen = true;
+  },
+
+    // Funktion för att hantera stängning av modalen
+  handleModalClose: function() {
+      this.isAlertOpen = false;
+  },
   toggleButtonVisible() {
     this.isButtonVisible = !this.isButtonVisible;
   },
@@ -334,29 +355,32 @@ methods: {
     console.log("playerRole: ", this.playerRole);
 
     if(this.isNameTaken(this.userName)){
-      alert("Name is taken, please choose another one");
+      this.triggerValidationError("Name is taken, please choose another one");
       return;
     }
 
     if (this.selectedGames.length === 0) {
-      alert("Please select at least one game.");
+      this.triggerValidationError("Please select at least one game.");
       return;
     }
 
     if (this.participants.length === 0 && this.userRole === 'play') {
-      alert("No players have joined yet.");
+      this.triggerValidationError("No players have joined yet. At least two players are required to start the game.");
       return;
     }
     if(this.participants.length < 2 && this.userRole === 'host'){
-      alert("Only one player has joined. At least two players are required to start the game.");
+      this.triggerValidationError(
+          "Only one player has joined. At least two players are required to start the game."
+        );
       return;
     }
 
     if (this.userRole === 'play') {
       if (!this.userName) {
-        alert("Please enter your username.");
+        this.triggerValidationError("Please enter your username.");
         return;
       }
+    
       console.log("hej",   this.userName);
       const adminName={      
         name: this.userName,
@@ -463,11 +487,7 @@ methods: {
       }
     console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
     },
-    handleLanguageChange(newLang) {
-      this.lang = newLang;
-      localStorage.setItem("lang", newLang);
-      socket.emit("getUILabels", this.lang);
-    },
+
     // dismantleSocket(){ //TODO kanske ta bort
     //   console.log("-->before if-statement in dismantleSocket in CustomGamesView")
     //   if(socket) {
@@ -522,7 +542,7 @@ methods: {
 .admin-player h2 {
   font-size: 1.2rem;
   margin-bottom: 10px;
-  color: #333;
+  color: #000000;
 }
 
 .radio-group {
@@ -536,7 +556,7 @@ methods: {
   align-items: center;
   gap: 8px;
   font-size: 1rem;
-  color: #555;
+  color: #000000;
 }
 
 .radio-option input[type="radio"] {
@@ -661,7 +681,7 @@ methods: {
   align-items: center; /* Vertikal centrering */
   width: 300px; /* Anpassad bredd för knappen */
   padding: 10px 15px;
-  background-color: #457b9d; /* Blå bakgrund */
+  background-color: #2e607f; /* Blå bakgrund */
   border-radius: 8px;
   color: white; /* Vit text */
   font-size: 1.2rem;
@@ -797,7 +817,7 @@ methods: {
   transform: scale(1.05); /* Förstora knappen lite vid hover */
 }
 
-popup-overlay {
+.popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -846,7 +866,7 @@ popup-overlay {
   justify-content: center; /* Centrerar knappen */
 }
 
-.button.orange {
+.button.blue {
   background: linear-gradient(45deg, #1d3557, #457b9d); /* Mörkblå gradient */
   font-size: 24px; /* Gör knappen större */
   padding: 15px 30px; /* Mer padding för att göra knappen större */
@@ -855,7 +875,7 @@ popup-overlay {
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-.button.orange:hover {
+.button.blue:hover {
   background: linear-gradient(45deg, #457b9d, #a8dadc); /* Ljusare blå vid hover */
   box-shadow: 0 0 15px 5px #457b9d;
   transform: scale(1.1); /* Gör knappen större vid hover */
