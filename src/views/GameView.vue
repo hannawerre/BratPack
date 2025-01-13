@@ -1,29 +1,15 @@
 <template>
     <div>
     <ResponsiveNav
+    :uiLabels="uiLabels"
     :gamePin="gamePin"
     :userName="userName"
     :gameActive="true"
     />
-    <!--Visas när inget spel är aktiverat-->
-    <div v-if="!activeGame"> 
-        <div class="button-container">
-            <!-- Buttons only visible to admin -->
-            <div v-if="this.isAdmin">
-                <button
-                    v-for="gameName in gameData.selectedGames"
-                    :key="gameName"
-                    class="button blue"
-                    @click="playMiniGame(gameName)"
-                    >
-                        {{ gameName }}
-                </button>
-            </div>
-        </div>
-    </div>
+    
 
     <!--Game Components-->
-    <div v-else-if="activeGame && isPlaying"> 
+    <div v-if="activeGame && isPlaying"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
@@ -36,6 +22,7 @@
         <ThisOrThatComponent 
             v-if="activeGame === 'thisOrThat'" 
             :socket="socket"
+            :lang="lang"
             :gameData="gameData" 
             :gamePin="gamePin" 
             :uiLabels="uiLabels"
@@ -179,31 +166,34 @@
             console.log("Window closed!!! Deleting user")
             this.socket.emit('deleteUser', this.gamePin, this.userName);
             },
-        //     dismantleSocket(){
-        //     console.log("-->before if-statement in dismantleSocket in GameView")
-        //     if(this.socket) {
-        //         console.log("-->inside if-statement in dismantleSocket in GameView")
-        //         this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
-        //         this.socket.disconnect(); // Disconnect the socket
-        //     }else console.log("this.socket does not exist in GameView")
-        // }
-
         },
         beforeDestroy() {
             console.log("->GameView -> beforeDestroy");
             window.removeEventListener("beforeunload", this.handleWindowClose);
             // this.dismantleSocket();
         },
-        // beforeRouteLeave(to, from, next) {
-        //     console.log("->GameView -> beforeRouteLeave");
-        //     this.dismantleSocket()
-        //     next();
-        // },
-        // deactivated() {
-        //     console.log("->GameView -> deactivated");
-        //     this.dismantleSocket();
-        // },
     }
 
 </script>
 
+<style>
+
+
+.button-container div {
+  display: flex;
+  gap: 10px; 
+  flex-wrap: wrap; 
+  justify-content: center; 
+}
+
+.button-container button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+
+
+</style>

@@ -18,11 +18,9 @@
         v-model="userName"
         @input="validateInput"
         @keyup.enter="handleEnter"
-        :placeholder="uiLabels.userName"
+        :placeholder="uiLabels.LobbyView.userName"
       />
       <p class="error-message" v-if="nameTaken">{{ uiLabels.LobbyView.nameTaken }}</p>
-      <!-- uilabels -->
-      <p class="error-message" v-if="showError">Please enter a username!</p> 
     </div>
     <button
       class="submit-button"
@@ -68,8 +66,7 @@ export default {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.on( "participantsUpdate", p => {
       this.participants = p;
-      console.log("Socket ID: ", socket.id) // kanske spara ner socketID i dataobjektet ovan...? 
-                                            // Eller spara userName: socketID som key value pairs i Data.js /sebbe
+      console.log("Socket ID: ", socket.id) 
     });
     socket.on("updateGameData", data => {
       this.gameStarted = data.gameStarted;

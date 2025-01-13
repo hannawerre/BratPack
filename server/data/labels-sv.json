@@ -86,10 +86,13 @@
 		"rules1": "En deltagare kommer bli utvald inför varje runda",
 		"rules2": "Uppdraget är att välja samma svar som den utvalde deltagaren",
 		"rules3": "Hur väl känner du din medspelare?",
-		"chosenParticipant": "utvald deltagare",
+		"chosenParticipant": "Utvald deltagare",
 		"didntAnswer": "Svarade inte",
 		"correctAnswer": "Rätt svar",
 		"finalResults": "Slutgiltigt resultat"
+	  },
+	  "ResponsiveNav": {
+		"name": "Namn"
 	  }
 
 }

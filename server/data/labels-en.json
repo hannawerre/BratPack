@@ -86,9 +86,12 @@
 		"rules2": "The task is to pick the same answer as the chosen one",
 		"rules3": "How well do you know your fellow mates?",
 		"chosenParticipant": "Chosen participant",
-		"didntAnswer": "didn't answer",
+		"didntAnswer": "Didn't answer",
 		"correctAnswer": "Correct answer",
 		"finalResults": "Final results"
+	  },
+	  "ResponsiveNav": {
+		"name": "Name"
 	  }
 
 }

@@ -18,11 +18,32 @@
       :isOpen="isAlertOpen"
       @close="handleModalClose"
     />
-<div class="container">
 
+<div class="participants-toggle">
+  <button @click="toggleParticipants">
+    ◀ Players
+  </button>
+</div>
+
+<div class="participants-sidebar" :class="{ 'visible': isParticipantListVisible }">
+  <h2>Participants</h2>
+  <ul>
+    <li v-if="userRole === 'play' && gameStarted === false">
+      <strong> {{ userName ? userName : "Admin" }}</strong>
+    </li>
+    <li v-for="(participant, index) in participants" :key="index">
+      {{ participant.name }}
+    </li>
+  </ul>
+  <button @click="toggleParticipants">Close</button>
+</div>
+
+
+<div class="container">
   <div class="main-content">
-  <h1 v-if="gamePin"> {{ uiLabels.CustomGamesView.pinGame }} {{ gamePin }}</h1>
-  <h1 v-else>{{ uiLabels.CustomGamesView.loadingGamePIN }}</h1>
+  <p v-if="gamePin" class="big-text">Game PIN: {{ gamePin }}</p>
+  <p v-else class="big-text">Loading Game PIN...</p>
+  
   <div class="admin-player">
     <h2>{{ uiLabels.CustomGamesView.chooseYourRole }}</h2>
     <div class="play-as-admin">
@@ -34,6 +55,7 @@
         <label class="radio-option">
           <input type="radio" value="host" v-model="userRole" />
           {{ uiLabels.CustomGamesView.hostOnly }}
+          Host
         </label>
       </div>
     </div>
@@ -48,29 +70,35 @@
     </div>
 </div>
   <div>
-      <p>{{ uiLabels.CustomGamesView.chooseTheTimeInMinutes }}</p>
-      <div class="button-container">
-          <button class="button decrement" @click="decrementMinutes">-</button>
-          {{ selectedMinutes }}
-          <button class="button increment" @click="incrementMinutes">+</button>
-      </div>
+      
+    
+  <div class= "range">
+    <div class="slider-value">
+      <span> {{ selectedMinutes }}</span>
+    </div>
+    <div class="field">
+      <div class="value left"><strong>-</strong></div>
+      <input type="range" v-model=selectedMinutes min="10" max="120" step="10" />
+      <div class="value right"><strong>+</strong></div>
+
+    </div>
+  
+  </div>
+    <p>Playingtime: <strong> {{ selectedMinutes }}</strong> minutes</p>
   </div>
 
-  <h2>{{ uiLabels.CustomGamesView.chooseYourCustomGamesBelow }}</h2>
+  
 
-  <div v-for="game in games" :key="game.id" class="game-item">
-      <input 
-          type="checkbox" 
-          :id="game.id" 
-          :value="game.id" 
-          v-model="selectedGames"
-      />
-      <label :for="game.id">{{ game.name }}</label>
-
-      <div class="edit-button" @click="openModal(game)">
-          <img src="/img/Gear-icon.png" alt="Edit" class="edit-icon" />
-      </div>
+  
+  <div class="game-selection">
+    <div v-for="game in games" :key="game.id" class="game-option">
+      <input type="checkbox" :id="game.id" :value="game.id" v-model="selectedGames" />
+      <label :for="game.id" class="game-label">{{ game.name }}</label>
+      <img src="/img/Gear-icon.png" alt="Edit" class="edit-image" @click="openModal(game)" />
+    </div>
   </div>
+
+
 
   <!-- Modal-komponenter med unika ref -->
   <EditQuiz1Component 
@@ -101,21 +129,9 @@
   </div>
 
 </div>
-<div class="participants">
-    <h2>{{ uiLabels.CustomGamesView.participants }}</h2>
-    <div class="toggle-button" @click="toggleListVisibility">
-      <span>{{ isListVisible ? uiLabels.CustomGamesView.hideParticipants + '&#9650;' : uiLabels.CustomGamesView.showParticipants + '&#9660;'}}</span>
-      <span>{{ isListVisible ? '&#9650;' : '&#9660;' }}</span>
-</div>
-    <ul v-if="isListVisible">
-      <li v-if="userRole === 'play' && gameStarted === false">
-        <strong>{{ userName ? userName : "Admin" }}</strong>
-      </li>
-      <li v-for="(participant, index) in participants" :key="index">
-        <strong>{{ participant.name }}</strong>
-      </li>
-    </ul>
-  </div>
+
+
+
 </div>
 </template>
 
@@ -142,7 +158,7 @@ components: {
 data: function() {
   return {
     lang: sessionStorage.getItem("lang") || "en",
-    selectedMinutes: 60,
+    selectedMinutes: 10,
     games: [
       // { id: 'General Quiz', name: 'Quiz 1'} ,
       // { id: 'Who´s most likely', name: 'Quiz 2'},
@@ -165,8 +181,11 @@ data: function() {
     showGameExistsPopup: false,
     shouldRestoreState: false,
     gameStarted: false,
-    isListVisible: false,
-    toggleText: "Show Participants",
+    isParticipantListVisible: false,
+    isButtonVisible: false,
+   
+    
+
     isAlertOpen: false,
     alertMessage: "",
     
@@ -259,14 +278,14 @@ socket.on('participantsUpdate', participants => {
 });
 
 
-/*
 
-  //Används ej
-  socket.emit("adminRejoined", (this.gamePin))
-  console.log("adminRejoined",this.gamePin, this.userName)
-
-  */
 },
+
+mounted() {
+  window.addEventListener("beforeunload", this.handleBeforeUnload);
+  this.updateSliderValue();
+},
+
 methods: {
 
   triggerValidationError: function(message) {
@@ -278,6 +297,38 @@ methods: {
   handleModalClose: function() {
       this.isAlertOpen = false;
   },
+  toggleButtonVisible() {
+    this.isButtonVisible = !this.isButtonVisible;
+  },
+  toggleParticipants() {
+    this.isParticipantListVisible = !this.isParticipantListVisible;
+  },
+  updateSliderValue() {
+    const slideValue = document.querySelector(".slider-value span");
+    const inputSlider = document.querySelector(".field input");
+
+    inputSlider.oninput = () => {
+      const value = inputSlider.value;
+      const max = inputSlider.max;
+      const percent = (value / max) * 100;
+
+      slideValue.textContent = value;
+      slideValue.style.left = percent + "%";
+      inputSlider.style.setProperty("--value-percent", `${percent}%`);
+      slideValue.classList.add("show");
+    };
+
+    inputSlider.onchange = () => {
+      // Runda av till närmaste steg om användaren släpper slidern
+      this.selectedMinutes = Math.round(this.selectedMinutes / 10) * 10;
+    };
+
+    inputSlider.onblur = () => {
+      slideValue.classList.remove("show");
+    };
+  },
+
+
 
   mainMenu: function() {
     window.removeEventListener("beforeunload", this.handleBeforeUnload);
@@ -291,22 +342,7 @@ methods: {
       socket.emit("getUILabels", this.lang);
   }, 
   
-  incrementMinutes: function() {
-    this.selectedMinutes += 10;
-    console.log(this.participants);
-  },
-
-  decrementMinutes: function () {
-    if(this.selectedMinutes > 10){
-      this.selectedMinutes -= 10;
-    }
-  },
-
-  toggleListVisibility: function() {
-        this.isListVisible = !this.isListVisible;
-        this.toggleText = this.isListVisible ? "Hide questions" : "Show questions";
-    },
-
+ 
   isNameTaken: function(userName) {
         this.nameTaken = this.participants.some(participant => participant.name === userName);
         console.log("Name taken: ", this.nameTaken);
@@ -440,24 +476,32 @@ methods: {
       // Visa standardvarning om det behövs
     },
 
-  // checkIfRefreshPage() {
-  //   // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
-  //     let storagePin = sessionStorage.getItem('gamePin');
-  //     if (storagePin) {
+  checkIfRefreshPage() {
+    // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
+      let storagePin = sessionStorage.getItem('gamePin');
+      if (storagePin) {
         
-  //       this.gamePin = storagePin;
-  //       socket.emit("requestParticipants", this.gamePin);
+        this.gamePin = storagePin;
+        socket.emit("requestParticipants", this.gamePin);
         
-  //     }
-  //   console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
-  //   },
+      }
+    console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
+    },
+    handleLanguageChange(newLang) {
+      this.lang = newLang;
+      localStorage.setItem("lang", newLang);
+      socket.emit("getUILabels", this.lang);
+    },
+    // dismantleSocket(){ //TODO kanske ta bort
+    //   console.log("-->before if-statement in dismantleSocket in CustomGamesView")
+    //   if(socket) {
+    //   console.log("-->inside if-statement in dismantleSocket in CustomGamesView")
+    //     socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
+    //     // socket.disconnect(); // Disconnect the socket
+    // }else console.log("this.socket does not exist in CustomGamesView")
+    // }
   },
 
-mounted() {
-
-  window.addEventListener("beforeunload", this.handleBeforeUnload);
-
-  },
   beforeUnmount() {
     // this.dismantleSocket();
     console.log("Admin left game, removed event listener");
@@ -475,7 +519,7 @@ mounted() {
 
 
 <style>
-  .container {
+ .container {
     align-items: flex-start;
     display: flex;
     flex-wrap: wrap;
@@ -521,7 +565,7 @@ mounted() {
 
 .radio-option input[type="radio"] {
   transform: scale(1.2);
-  accent-color: #4caf50;
+  accent-color: #1d3557;
   cursor: pointer;
   margin-right: 6px;
 }
@@ -534,86 +578,250 @@ mounted() {
   gap: 10px;
 }
 
-
-
-.game-item {
-display: flex;
-justify-content: center; 
-align-items: center; 
-margin-bottom: 20px; 
+.range{
+    height: 10px;
+    width: 300px;
+    display: inline-block;
+    border-radius: 10px;
+    
+}
+.range .slider-value{
+  position: relative;
+  width: 100%;
+}
+.range .slider-value span{
+  position: absolute;
+  height: 45px;
+  width: 45px;
+  
+  color: #fff;
+  font-weight: 500;
+  top: -40px;
+  transform: translateX(-50%) scale(0);
+  transform-origin: bottom;
+  transition: transform 0.3s ease-in-out;
+  line-height: 55px;
+  z-index: 2;
 }
 
-.game-item label {
-margin-left: 10px; 
-margin-right: 20px; 
-font-weight: bold;
+.range .slider-value span:after{
+  position: absolute;
+  content: "";
+  height: 45px;
+  width: 45px;
+  background: #1d3557;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  border: 3px solid #fff;
+  line-height: 55px;
+  z-index: -1;
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+  border-bottom-left-radius: 50%;
+}
+.range .field{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+.range .field .value{
+    position: static;
+    font-size: 40px;
+    font-weight: 700;
+    color: #1d3557;
+}
+.range .field .value.left{
+  left: -22px;
+  transform: translateX(-50%);
+}
+.range .field .value.right {
+  right: 43px; /* Placera direkt mot högra kanten av föräldraelementet */
+  transform: translateX(15%); /* Justera för bättre centrering över slidern */
 }
 
-.edit-button {
-display: inline-block;
-background-color: rgb(183, 183, 183);
-color: white;
-border: none;
-border-radius: 40px;
-padding: 6px 8px;
-text-align: center;
-text-decoration: none;
-font-size: 14px;
-cursor: pointer;
-transition: background-color 0.3s ease, transform 0.2s ease;
+.range .field input {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    #1d3557 0%,
+    #1d3557 var(--value-percent, 0%),
+    #ddd var(--value-percent, 0%),
+    #ddd 100%
+  );
+  border-radius: 5px;
+  outline: none;
+ 
 }
 
-.edit-button:hover {
-background-color: rgb(170, 168, 168);
-transform: scale(1.02);
-box-shadow: 0 0 5px 2px  rgba(0, 0, 0, 0.5);
+.range .field input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-left: 2px;
+  appearance: none;
+  height: 25px;
+  width: 25px;
+  background: #1d3557;
+  border-radius: 50%;
+  border: 1px solid #1d3557;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
 }
 
-.edit-button:active {
-transform: scale(1);
-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.5);
-}
-.edit-icon {
-width: 30px; 
-height: 30px; 
-vertical-align: middle; 
+.game-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrera alla rader horisontellt */
+  gap: 15px; /* Mellanrum mellan rader */
 }
 
-input[type="checkbox"] {  
-      width: 20px;
-      height: 20px;
-  }
-
-  .participants {
-    flex: 0 0 auto;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 15px;
-    background-color: lightblue;
-    position: absolute;
-    right: 0;
-    margin-right: 50px;
-    margin-top: 20px;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+.game-option {
+  display: flex;
+  justify-content: space-between; /* Mellan checkbox och kugghjulsikon */
+  align-items: center; /* Vertikal centrering */
+  width: 300px; /* Anpassad bredd för knappen */
+  padding: 10px 15px;
+  background-color: #457b9d; /* Blå bakgrund */
+  border-radius: 8px;
+  color: white; /* Vit text */
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Skugga för djup */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animation för hover */
 }
- .participants h2{
-    text-align: center;
-    margin-bottom: 10px;
-  }
 
-  .participants ul{
-    list-style-type: none;
-    padding: 0;
-  }
+.game-option:hover {
+  transform: translateY(-5px); /* Lyft vid hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Förstärk skuggan vid hover */
+}
 
-  .participants li{
-    padding: 5px 0;
-    border-bottom: 1px solid #ddd;
-  }
+.game-option input[type="checkbox"] {
+  appearance: none;
+  background-color: white; /* Vit bakgrund för checkbox */
+  border: 2px solid #457b9d; /* Blå kant */
+  width: 20px;
+  height: 20px;
+  border-radius: 4px; /* Gör checkboxen rundad */
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  margin-right: 10px; /* Mellanrum mellan checkbox och text */
+}
 
+.game-option input[type="checkbox"]:checked {
+  background-color: #1d3557; /* Mörkare blå vid aktiv */
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+.game-option input[type="checkbox"]:checked::before {
+  content: '✔'; /* Kryss för vald */
+  color: white;
+  font-size: 14px;
+  display: inline-block;
+  text-align: center;
+}
 
-  .popup-overlay {
+.game-label {
+  flex: 1; /* Gör så att texten fyller ut */
+  text-align: left; /* Justera text till vänster */
+  padding-left: 10px; /* Mellanrum från checkbox */
+}
+
+.edit-image {
+  width: 30px;
+  height: 30px;
+  cursor: pointer; /* Klickbar ikon */
+}
+
+.participants-sidebar {
+  position: fixed;
+  top: 0;
+  right: -320px; /* Start utanför skärmen */
+  width: 300px;
+  height: 100%;
+  background-color: #457b9d;
+  color: white;
+  padding: 20px;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease-in-out; /* Övergångseffekt */
+}
+
+.participants-sidebar.visible {
+  transform: translateX(-300px); /* Flytta in på skärmen */
+}
+
+.participants-sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.participants-sidebar ul {
+  list-style: none;
+  padding: 0;
+  flex: 1;
+  overflow-y: auto; /* Scroll om listan blir för lång */
+}
+
+.participants-sidebar li {
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.participants-sidebar button {
+  background-color: #1d3557;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-bottom: 50px;
+}
+
+.participants-sidebar button:hover {
+  background-color: red;
+}
+
+.participants-toggle {
+  position: fixed;
+  top: 15%; /* Vertikalt centrerad */
+  right: 10px; /* Nära högra kanten */
+  transform: translateY(-50%);
+  z-index: 1000;
+}
+
+.participants-toggle button {
+  background-color: #457b9d; /* Blå bakgrund */
+  color: white; /* Vit text */
+  border: none;
+  border-radius: 5px; /* Rundade hörn */
+  font-size: 1rem; /* Textstorlek */
+  font-weight: bold;
+  padding: 10px 20px; /* Padding för större knapp */
+  display: flex;
+  align-items: center; /* Centrera text och ikon vertikalt */
+  gap: 10px; /* Avstånd mellan pilen och texten */
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Lätt skugga */
+  transition: background-color 0.3s, transform 0.2s; /* Smooth hover-effekt */
+}
+
+.participants-toggle button:hover {
+  background-color: #1d3557; /* Mörkare blå vid hover */
+  transform: scale(1.05); /* Förstora knappen lite vid hover */
+}
+
+popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -656,4 +864,25 @@ input[type="checkbox"] {
 .popup-content button:hover {
   background-color: #45a049;
 }
+.startbutton-container {
+  margin-top: 40px; /* Ger mer marginal mellan spelen och startknappen */
+  display: flex;
+  justify-content: center; /* Centrerar knappen */
+}
+
+.button.orange {
+  background: linear-gradient(45deg, #1d3557, #457b9d); /* Mörkblå gradient */
+  font-size: 24px; /* Gör knappen större */
+  padding: 15px 30px; /* Mer padding för att göra knappen större */
+  border-radius: 10px; /* Rundade hörn */
+  border: 2px solid #1d3557; /* Ger en mörkblå kant */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.button.orange:hover {
+  background: linear-gradient(45deg, #457b9d, #a8dadc); /* Ljusare blå vid hover */
+  box-shadow: 0 0 15px 5px #457b9d;
+  transform: scale(1.1); /* Gör knappen större vid hover */
+}
+
 </style>

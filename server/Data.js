@@ -12,7 +12,7 @@ function Data() {
  
     participants: [],
     selectedGames: [],
-    selectedMinutes: 60,
+    selectedMinutes: 10,
     gameStarted: false,
     playerAnswers: {},
   };
@@ -43,7 +43,7 @@ Data.prototype.createCustomGame = function () { // lang = "en" ???
  
   customGame.participants = [];
   customGame.selectedGames = [];
-  customGame.selectedMinutes = 60; // 60 minutes default
+  customGame.selectedMinutes = 10; // 60 minutes default
   customGame.remainingTime = 3600; //
   customGame.gameStarted = false;
   customGame.customQuestions = {};
@@ -61,7 +61,7 @@ Data.prototype.createCustomGameAlt = function (pin, lang) { // lang = "en" ???
   customGame.lang = lang;  
   customGame.participants = [];
   customGame.selectedGames = [];
-  customGame.selectedMinutes = 60; // 60 minutes default
+  customGame.selectedMinutes = 10; // 60 minutes default
   customGame.remainingTime = 3600; //
   customGame.gameStarted = false;
   // customGame.customQuestions = {};

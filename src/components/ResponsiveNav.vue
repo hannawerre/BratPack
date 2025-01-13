@@ -9,14 +9,16 @@
 
     <!-- Timer (Always Centered) -->
     <div id="Timer" v-if="this.gameActive">
-      <TimerComponent :gamePin="gamePin" />
+      <div class="timer-wrapper">
+        <TimerComponent :gamePin="gamePin" />
+      </div>
     </div>
 
     <!-- Game Pin and Username (Clustered on Top Right) -->
     <div id="UserInfo" v-if="this.gamePin || this.userName">
       <div id="GamePin">Pin: {{ this.gamePin }}</div>
       <div id="UserName" v-if="this.userName">
-        <h1>Name: {{ this.userName }}</h1>
+        <h1>{{uiLabels.ResponsiveNav.name}} {{ this.userName }}</h1>
       </div>
     </div>
 
@@ -96,14 +98,23 @@ nav {
   box-sizing: border-box;
 }
 #Logo img {
-  height: 50px;
+  height: 100px;
   cursor: pointer;
 }
 
 #Timer {
   flex-grow: 1;
+  display: flex;
   text-align: center;
+  align-items: center;
 }
+.timer-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Säkerställ att wrappern tar hela bredden */
+}
+
 
 #UserInfo {
   text-align: right;
