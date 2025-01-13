@@ -15,7 +15,7 @@
         type="text" 
         v-model="userName" 
         @input=isNameTaken(userName) 
-        :placeholder="uiLabels.LobbyView.userName"
+        :placeholder="uiLabels.LobbyView.userName" 
       />
       <button 
         class="button blue small" 
@@ -31,15 +31,10 @@
     <p>{{ uiLabels.LobbyView.waitingForHost }}</p>
     <div class="waitingRoom" v-if="joined">
       <div>
-        <h3>{{ this.uiLabels.players }}</h3>
-        <!-- <div class="toggle-button" @click="toggleListVisibility">
-          <span>{{ isListVisible ? 'Hide Players &#9650;' : 'Show Players &#9660;' }}</span>
-          <span>{{ isListVisible ? '&#9650;' : '▼' }}</span>
-        </div> -->
-        <!-- Ta bort v-if -->
-        <!-- <ul v-if="isListVisible">  -->
+        <h3>{{ uiLabels.LobbyView.players }}</h3>
+       
         <p v-for="participant in participants">{{ participant.name }}</p>
-        <!-- </ul> -->
+
       </div>
     </div>
   </div>
@@ -64,8 +59,6 @@ export default {
       lang: sessionStorage.getItem("lang") || "en",
       participants: [],
       uiLabels: {},
-      isListVisible: false,
-      toggleText: "Show Players"
     }
   },
   created: function () {
@@ -143,11 +136,6 @@ export default {
         this.userName = ""; // Ensure userName is initialized to an empty string
       }
     },
-    toggleListVisibility: function(isListVisible) {
-      console.log("list visibility toggled", this.isListVisible);
-        this.isListVisible = !this.isListVisible;
-        this.toggleText = this.isListVisible ? "Hide Players" : "Show Players";
-    }
   },
   mounted() {
     window.addEventListener("beforeunload", this.handleWindowClose);

@@ -11,13 +11,8 @@
     "about": "About"
 	},
 
-	"ResultView": {
-    "lang": "Language",
-    "question": "Question",
-    "submittedAnswers": "Submitted Answers"
-  	},
-
 	"LobbyView": {
+	"lobbyID": "Lobby ID",
 	"waitingForHost": "Waiting for Host",
 	"players": "Players",
 	"userName": "Username",
@@ -33,7 +28,7 @@
 		"isAlreadyActiveReturnToMainMenu": "is already active. Return to main menu",
 		"ok": "OK",
 		"lang": "English",
-		"pinGame": "Game PIN",
+		"pinGame": "Game PIN:",
 		"loadingGamePIN": "Loading Game PIN",
 		"chooseYourRole": "Choose your role",
 		"play": "Play",
@@ -48,7 +43,7 @@
 	  },
 
 	  "EditQuizComponent": {
-		"question": "Question",
+		"question": "Questions",
 		"hideQuestions": "Hide questions",
 		"showQuestions": "Show questions",
 		"correct": "Correct",
@@ -64,7 +59,7 @@
 		"saveAlternatives": "Save alternatives"
 	  },
 
-	  "QuizComponent": {
+	  "GameView": {
 		"generalTrivia": "General Trivia Quiz",
 		"startQuiz": "Start Quiz",
 		"waitingOnAdmin": "Waiting for admin to start the quiz...",
@@ -82,7 +77,17 @@
 		"points": "points",
 		"with": "with"
 	  },
-	  
+
+	  "ThisOrThat": {
+		"rules1": "One participant will be chosen for each round",
+		"rules2": "The task is to pick the same answer as the chosen one",
+		"rules3": "How well do you know your fellow mates?",
+		"chosenParticipant": "Chosen participant",
+		"didntAnswer": "didn't answer",
+		"correctAnswer": "Correct answer",
+		"finalResults": "Final results"
+	  },
+
 
 	
 
