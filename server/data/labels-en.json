@@ -19,7 +19,8 @@
 	"participateInPoll": "Participate",
 	"Hide Players": "Hide Players",
 	"Show Players": "Show Players",
-	"nameTaken": "Name taken!"
+	"nameTaken": "Name taken!",
+	"lobbyID": "Game Pin"
 	},
 
 	"CustomGamesView": {

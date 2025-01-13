@@ -66,7 +66,7 @@
 
  <!-- Score board--> 
       <div v-else-if="currentPhase === 'scoreBoard'">
-            <p>scoreBoard</p>
+            <p>Final Result</p>
       </div>
   </div> 
 </template>
@@ -218,6 +218,7 @@
             case "feedbackPhase":
               if(this.currentQuestionIndex > this.questions.length - 1) {
                 this.currentPhase = "scoreBoard"
+                this.$emit('gameCompleted');
               }
               else{
                 this.currentAnswer = null;
