@@ -39,7 +39,7 @@
       {{ uiLabels.ThisOrThat.chosenParticipant }} {{ this.chosenParticipant }} {{ uiLabels.ThisOrThat.didntAnswer }}
     </h2>
     <h2 v-else class="correct-answer-message">
-      {{ uiLabels.ThisOrThat.correctAnswer }}}: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
+      {{ uiLabels.ThisOrThat.correctAnswer }}: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
     </h2>
 
     <!-- Countdown Bar -->

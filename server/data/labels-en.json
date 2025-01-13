@@ -89,41 +89,6 @@
 		"didntAnswer": "didn't answer",
 		"correctAnswer": "Correct answer",
 		"finalResults": "Final results"
-	  },
-
-
-	
-
-	"sales-pitch": "Simply. Great. Polling.",
-	"subHeading": "A simple polling tool",
-	"invite": "Invite participants with this link:",
-	"enterDetails": "Enter your name",
-	"createGame": "Create Game",
-	"playAsAdmin":"Do you want to play or be the host?",
-	"play": "Play",
-	"hostOnly": "Host",
-	"participatePoll": "Participate in poll",
-	"question": "Question",
-	"userName": "Username",
-	"participateInPoll": "Join game",
-	"players": "Players",
-	"waitingForHost": "Waiting for host to start...",
-	"Welcome": "Welcome",
-	"generalTrivia": "General Trivia Quiz",
-	"waitingOnAdmin": "Waiting for admin to start the quiz...",
-	"startQuiz": "Start quiz",
-	"youHaveAnswered": "You have answered!",
-	"waitForTimeToRunOut": "Waiting for time to run out...",
-	"youAnsweredRight": "You were right!",
-	"yourPointsRightNow": "Your points right now:",
-	"yourRankRightNow": "You are in position",
-	"youAreBehind" : "You are behind",
-	"youWereWrong": "You were wrong",
-	"tooSlow": "Ooops, you were too slow",
-	"nextQuestion": "Next question",
-	"showResults": "Show results",
-	"scoreboard": "Scoreboard",
-	"points": "points",
-	"with": "with"
+	  }
 
 }

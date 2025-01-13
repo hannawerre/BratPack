@@ -15,7 +15,7 @@
       <router-link to="//">
         {{ uiLabels.StartView.createPoll }}
       </router-link>
-      andvänds inte just nu
+
       <a href="">
         {{ uiLabels.StartView.about }}
       </a>

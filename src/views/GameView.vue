@@ -1,13 +1,28 @@
 <template>
-    <div>
     <ResponsiveNav
     :gamePin="gamePin"
     :userName="userName"
     :gameActive="true"
     />
+    <!--Visas när inget spel är aktiverat-->
+    <div v-if="!activeGame"> 
+        <div class="button-container">
+            <!-- Buttons only visible to admin -->
+            <div v-if="this.isAdmin">
+                <button
+                    v-for="gameName in gameData.selectedGames"
+                    :key="gameName"
+                    class="button blue"
+                    @click="playMiniGame(gameName)"
+                    >
+                        {{ gameName }}
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!--Game Components-->
-    <div v-if="activeGame && isPlaying"> 
+    <div v-else-if="activeGame && isPlaying"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
@@ -128,6 +143,12 @@
                 this.gamePin = this.$route.params.gamePin;
                 this.userName = sessionStorage.getItem('userName');
                 this.socket.emit('requestGameData', this.gamePin);
+            },
+
+            handleLanguageChange(newLang) {
+                this.lang = newLang;
+                sessionStorage.setItem("lang", newLang);
+                socket.emit("getUILabels", this.lang);
             },
 
             determineAdminStatus () {
