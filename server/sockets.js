@@ -59,6 +59,7 @@ function sockets(io, socket, data) {
 
   socket.on("calculateCorrectAnswer", function(gamePin) {
     const correctAnswer = data.calculateCorrectAnswer(gamePin);
+    io.to(gamePin).emit("participantsUpdate", data.getGameData(gamePin).participants)
     io.to(gamePin).emit("correctAnswerCalculated", correctAnswer);
   })
 

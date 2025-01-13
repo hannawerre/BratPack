@@ -1,4 +1,92 @@
 {
+	"StartView": {
+	"faq": "FAQ",
+    "joinGameButton": "Join Game",
+    "gamePinPlaceholder": "Game PIN",
+    "joinButton": "Join",
+    "createGameButton": "Create Game",
+    "changeLanguage": "Byt till svenska",
+    "lang": "English",
+    "createPoll": "Create Poll",
+    "about": "About"
+	},
+
+	"ResultView": {
+    "lang": "Language",
+    "question": "Question",
+    "submittedAnswers": "Submitted Answers"
+  	},
+
+	"LobbyView": {
+	"waitingForHost": "Waiting for Host",
+	"players": "Players",
+	"userName": "Username",
+	"participateInPoll": "Participate",
+	"Hide Players": "Hide Players",
+	"Show Players": "Show Players",
+	"nameTaken": "Name taken!",
+	"lobbyID": "Game Pin"
+	},
+
+	"CustomGamesView": {
+		"gameAlreadyInSession": "Game already in session",
+		"theGameWithPIN": "The game with PIN",
+		"isAlreadyActiveReturnToMainMenu": "is already active. Return to main menu",
+		"ok": "OK",
+		"lang": "English",
+		"pinGame": "Game PIN",
+		"loadingGamePIN": "Loading Game PIN",
+		"chooseYourRole": "Choose your role",
+		"play": "Play",
+		"hostOnly": "Host only",
+		"chooseTheTimeInMinutes": "Choose the time in minutes:",
+		"chooseYourCustomGamesBelow": "Choose your custom games below:",	
+		"startGame": "Start Game",
+		"participants": "Participants",
+		"hideParticipants": "Hide participants",
+		"showParticipants": "Show participants",
+		"admin": "Admin"
+	  },
+
+	  "EditQuizComponent": {
+		"question": "Question",
+		"hideQuestions": "Hide questions",
+		"showQuestions": "Show questions",
+		"correct": "Correct",
+		"edit": "Edit",
+		"hereAddQuestions": "Here you can add questions to the game",
+		"standardQuestions": "Use standard questions",
+		"ownQuestions": "Use own questions",
+		"addQuestion": "Add question",
+		"alternative": "Alternative",
+		"addAlternative": "Add alternative",
+		"saveQuestion": "Save question",
+		"close": "Close",
+		"saveAlternatives": "Save alternatives"
+	  },
+
+	  "QuizComponent": {
+		"generalTrivia": "General Trivia Quiz",
+		"startQuiz": "Start Quiz",
+		"waitingOnAdmin": "Waiting for admin to start the quiz...",
+		"youHaveAnswered": "You have answered!",
+		"waitForTimeToRunOut": "Waiting for time to run out...",
+		"youAnsweredRight": "You answered right",
+		"yourPointsRightNow": "Your points right now:",
+		"yourRankRightNow": "You are in position",
+		"youAreBehind" : "You are behind",
+		"youWereWrong": "You were wrong",
+		"tooSlow": "Ooops, you were too slow",
+		"nextQuestion": "Next question",
+		"showResults": "Show results",
+		"scoreboard": "Scoreboard",
+		"points": "points",
+		"with": "with"
+	  },
+	  
+
+	
+
 	"sales-pitch": "Simply. Great. Polling.",
 	"subHeading": "A simple polling tool",
 	"invite": "Invite participants with this link:",
@@ -9,13 +97,10 @@
 	"hostOnly": "Host",
 	"participatePoll": "Participate in poll",
 	"question": "Question",
-	"changeLanguage": "Byt till svenska",
-	"about": "About",
 	"userName": "Username",
 	"participateInPoll": "Join game",
 	"players": "Players",
 	"waitingForHost": "Waiting for host to start...",
-	"Lang": "English",
 	"Welcome": "Welcome",
 	"generalTrivia": "General Trivia Quiz",
 	"waitingOnAdmin": "Waiting for admin to start the quiz...",

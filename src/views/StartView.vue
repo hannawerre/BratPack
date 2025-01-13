@@ -1,4 +1,27 @@
 <template>
+      <div id="LanguageSwitcher">
+        <button @click="switchLanguage">
+          {{ uiLabels.StartView.lang }}
+          <div id="flagFrame">
+            <img :src="`/img/${lang}.png`" alt="Language">
+          </div>
+        </button>
+      </div>
+     <!-- Navigation -->
+    <!-- <ResponsiveNav v-bind:hideNav="hideNav">
+      <button v-on:click="switchLanguage">
+        {{ uiLabels.StartView.changeLanguage }}
+      </button>
+      <router-link to="//">
+        {{ uiLabels.StartView.createPoll }}
+      </router-link>
+      <a href="">
+        {{ uiLabels.about }}
+      </a>
+      <a href="">{{ uiLabels.StartView.faq }}</a>
+    </ResponsiveNav> -->
+
+
 
   <header>
   
@@ -8,43 +31,63 @@
       
       <!--<img src="../assets/logo.svg">-->
     </div>
-  </header>
-  <ResponsiveNav v-bind:hideNav="hideNav">
-    <button v-on:click="switchLanguage">
-      {{ uiLabels.changeLanguage }}
-    </button>
-    <router-link to="//">
-      {{ uiLabels.createPoll }}
-    </router-link>
-    <a href="">
-      {{ uiLabels.about }}
-    </a>
-    <a href="">FAQ</a>
-  </ResponsiveNav>
+    </header>
+
+   
 
   
   <div class="content-wrapper">
     <div class="items">
-      <div class="join-container" v-if="!isPlay">
-        <button class="button blue" @click="togglePlay" style="width: 300px;">Join Game</button>
-      </div>
-      <div class="join-container" v-if="isPlay">
-        <div class="textBox-wrapper">
+      <!-- <div class="join-container" v-if="!isPlay">
+      <button class="button blue" @click="togglePlay" style="width: 300px;">Join Game</button>
+      </div> -->
+
+      <!-- <div class="join-container">
+        <div
+          class="join-game-wrapper"
+          :class="{'shake': showError}"
+        >
           <input 
-            class="textBox input" 
+            class="gamepin-input" 
             type="text" 
-            @input="checkGameExists(gamePin)" 
             v-model="gamePin" 
             :placeholder="'Game PIN'"
+            @input="removeError"
+            @keyup.enter="checkGameExists(gamePin)"
           />
-          <router-link v-if="this.gameExists" v-bind:to="'/lobby/' + gamePin">
-            <button class="button blue small">Join</button>
-          </router-link>
+          <p class="error-message" v-if="showError">Game doesn't exist!</p>
+          <button class="submit-button" 
+          @click="checkGameExists(gamePin)"
+          :class="{'disabled': gamePin.length === 0}">Join</button>
         </div>
+      </div> -->
+      <div class="join-game-container">
+        <div
+          class="join-game-wrapper"
+          :class="{'shake': showError}"
+        >
+          <input
+            class="join-game-input"
+            type="text"
+            v-model="gamePin"
+            @input="removeError"
+            @keyup.enter="checkGameExists(gamePin)"
+            :placeholder="'Game Pin'"
+          />
+          <!-- uilabels! -->
+          <p class="error-message" v-if="showError">Game doesn't exist</p>
+        </div>
+        <button
+          class="submit-button"
+          :class="{'disabled': gamePin.length === 0}"
+          @click="checkGameExists(gamePin)"
+        >
+        {{ uiLabels.StartView.joinButton }}
+        </button>
       </div>
     
       <router-link to="/customgames/">
-        <button class="button orange">Create Game</button>
+        <button class="button orange"> {{ uiLabels.StartView.createGameButton }}</button>
       </router-link>
     </div>
   </div>
@@ -65,10 +108,10 @@ export default {
     return {
       uiLabels: {},
       gamePin: "",
-      lang: sessionStorage.getItem( "lang") || "en",
+      lang: localStorage.getItem( "lang") || "en",
       hideNav: true,
-      isPlay: false,
-      gameExists: false,
+      // isPlay: false,
+      showError: false, // For displaying the error message
     }
   },
   created: function () {
@@ -78,7 +121,10 @@ export default {
     socket.on( "uiLabels", labels => this.uiLabels = labels );
     socket.emit( "getUILabels", this.lang );
     // Listening for "pollExists" from socket.js
-    socket.on("gameExists", exists => this.gameExists = exists);
+    socket.on("gameExists", exists => {
+
+      this.handleGameExists(exists);
+    });
   },
   methods: {
 
@@ -101,8 +147,8 @@ export default {
       else {
         this.lang = "en"
       }
-      sessionStorage.setItem( "lang", this.lang );
-      socket.emit( "getUILabels", this.lang );
+      localStorage.setItem( "lang", this.lang );
+      socket.emit( "getUILabels", this.lang, this.socketId );
     },
     toggleNav: function () {
       this.hideNav = ! this.hideNav;
@@ -112,6 +158,34 @@ export default {
       console.log("Checking if game with gamePin:", gamePin, "exists");
       socket.emit("customGameExists", gamePin);
       console.log("Game exists: ", this.gameExists)
+    },
+    // handleEnter() {
+    //   if (!this.gameExists && this.gamePin.length > 0) {
+    //     // Trigger the shake effect if the game doesn't exist
+    //     const inputWrapper = this.$refs.textBoxWrapper;
+    //     inputWrapper.classList.add('shake');
+    //     setTimeout(() => {
+    //       inputWrapper.classList.remove('shake');
+    //     }, 500); // Reset the animation class
+    //   }
+    // },
+    handleGameExists(exists) {
+      if (!exists) {
+        // Show error and trigger shake effect if the gamePin is invalid
+        this.showError = true;
+        const inputWrapper = this.$refs.textBoxWrapper;
+        inputWrapper.classList.add("shake");
+        // setTimeout(() => {
+        //   inputWrapper.classList.remove("shake");
+        // }, 500);
+      } else {
+        // Route to the lobby if the gamePin is valid
+        this.$router.push(`/lobby/${this.gamePin}`);
+      }
+    },
+    removeError: function(){
+      this.showError = false;
+      this.$refs.textBoxWrapper.classList.remove("shake");
     },
     togglePlay: function () {
       console.log("togglePlay")
@@ -129,14 +203,9 @@ export default {
   mounted: function() {
     document.addEventListener('click', this.closeOnClickOutside);
   },
-  beforeDestroy() {
+  beforeDestroy: function() {
     document.removeEventListener('click', this.closeOnClickOutside);
-    // if (this.socket) {
-    //             this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
-    //             this.socket.disconnect(); // Disconnect the socket
-    //             this.socket = null;
-    //         }
-    }
+  }
 }
 </script>
 <style scoped>
@@ -171,8 +240,151 @@ export default {
     vertical-align: bottom;
     margin-right: 0.5rem; 
   }
+
+  #LanguageSwitcher button {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: black;
+  font-weight: 500;
+}
+
+#flagFrame {
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  margin-right: 10px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+#flagFrame img {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+}
   
   .content-wrapper {
+  }
+  .join-game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  max-width: 400px;
+  text-align: center;
+}
+
+.lobby-id {
+  font-size: 1.2rem;
+  color: #1d3557;
+  margin-bottom: 20px;
+}
+
+.join-game-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.join-game-wrapper.shake .join-game-input {
+  border-color: red;
+  animation: shake 0.5s ease-in-out;
+}
+
+.join-game-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #457b9d;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.join-game-input:focus {
+  border-color: #1d3557;
+  box-shadow: 0 0 8px rgba(29, 53, 87, 0.4);
+}
+
+.error-message {
+  font-size: 0.875rem;
+  color: red;
+  margin-top: 5px;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #1d3557;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.submit-button:hover:not(.disabled) {
+  background-color: #457b9d;
+}
+
+.submit-button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25%, 75% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+/* 
+.button {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #1d3557;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.button:hover:not(.disabled) {
+  background-color: #457b9d;
+}
+
+.button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+} */
+
+/* @keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25%, 75% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+} */
+  /* .content-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -181,7 +393,6 @@ export default {
   }
 
   .items {
-  
   flex-direction: column;
   gap: 10px;
   margin: 5% auto;
@@ -202,5 +413,5 @@ export default {
   header {
     margin: 2% auto;  
   }
-}
+} */
 </style>

@@ -1,42 +1,20 @@
 <template>
+    <div>
     <ResponsiveNav
     :gamePin="gamePin"
     :userName="userName"
     :gameActive="true"
     />
-    <!--Visas när inget spel är aktiverat-->
-    <div v-if="!activeGame"> 
-        <div class="button-container">
-            <!-- Buttons only visible to admin -->
-            <div v-if="this.isAdmin">
-                <div v-for="gameName in gameData.selectedGames"
-                    :key="gameName"
-                    >
-                <button
-                v-if="!playedGames.includes(gameName)"
-                class="button blue"
-                    @click="playMiniGame(gameName)"
-                    
-                    
-                    >
-                        {{ gameName }}
-                </button></div>
-
-
-            </div>
-        </div>
-    </div>
-
-
 
     <!--Game Components-->
-    <div v-else-if="activeGame && isPlaying"> 
+    <div v-if="activeGame && isPlaying"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
+            :userName="userName"
             @gameCompleted="onGameCompleted"
         />
         <ThisOrThatComponent 
@@ -55,11 +33,27 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :userName="userName"
-            :isAdmin="isAdmin" 
-            @gameCompleted="onGameCompleted"
-            />
+            :isAdmin="isAdmin" />
+    </div>
 
-        <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
+    <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
+    
+    <!--Visas när inget spel är aktiverat-->
+    <div v-if="!activeGame"> 
+        <div class="button-container">
+            <!-- Buttons only visible to admin -->
+            <div v-if="this.isAdmin">
+                <button
+                    v-for="gameName in gameData.selectedGames"
+                    :key="gameName"
+                    class="button blue"
+                    @click="playMiniGame(gameName)"
+                    >
+                        {{ gameName }}
+                </button>
+            </div>
+        </div>
+    </div>
     </div>
 </template>
 
@@ -90,11 +84,10 @@
                 userName: '',
                 gameData: {},
                 activeGame: '',
-                playedGames: [],
                 uiLabels: {},
                 isAdmin: false,
                 isPlaying: true
- //13 jan
+
             }
         },
         created: function() {
@@ -141,15 +134,7 @@
                 })}
             },
             onGameCompleted() {
-                console.log("spelet som är spelat är ", this.activeGame);
-                this.playedGames.push(this.activeGame);
-                console.log("spelet som är playedGames är ", this.playedGames);
                 this.activeGame = '';
-                
-                
-
-
-                
             },
             // Delete user on window close / refresh
             handleWindowClose(event) {
