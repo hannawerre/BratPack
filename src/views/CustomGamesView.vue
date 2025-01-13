@@ -156,15 +156,8 @@ data: function() {
   return {
     lang: sessionStorage.getItem("lang") || "en",
     selectedMinutes: 10,
-    games: [
-      // { id: 'General Quiz', name: 'Quiz 1'} ,
-      // { id: 'Who´s most likely', name: 'Quiz 2'},
-      // { id: 'Music quiz', name: 'Quiz 3'},
-      // { id: 'This or that', name: 'Quiz 4'}
-      { id: 'generalQuiz', name: 'General Quiz'} ,
-      { id: 'whosMostLikelyTo', name: 'Who´s most likely to'},
-      { id: 'thisOrThat', name: 'This or that'}
-    ],
+    uiLabels: {},
+
     selectedGames: [],
     participants: [],
     gamePin: '',
@@ -174,7 +167,6 @@ data: function() {
     active: true, // Används denna? /sebbe
     userName: '',
     userRole: 'host',
-    uiLabels: {},
     showGameExistsPopup: false,
     shouldRestoreState: false,
     gameStarted: false,
@@ -188,6 +180,16 @@ data: function() {
     
 
   };
+},
+computed: {
+  games() {
+    if (!this.uiLabels.CustomGamesView) return [];
+    return [
+      { id: 'generalQuiz', name: this.uiLabels.CustomGamesView.generalQuiz },
+      { id: 'whosMostLikelyTo', name: this.uiLabels.CustomGamesView.whosMostLikelyTo },
+      { id: 'thisOrThat', name: this.uiLabels.CustomGamesView.thisOrThat }
+    ];
+  },
 },
 
 created: function () {
@@ -351,29 +353,29 @@ methods: {
     console.log("playerRole: ", this.playerRole);
 
     if(this.isNameTaken(this.userName)){
-      this.triggerValidationError("Name is taken, please choose another one");
+      this.triggerValidationError(this.uiLabels?.CustomGamesView?.nameTakenChooseNew);
       return;
     }
 
     if (this.selectedGames.length === 0) {
-      this.triggerValidationError("Please select at least one game.");
+      this.triggerValidationError(this.uiLabels?.CustomGamesView?.selectAtLeastOneGame);
       return;
     }
 
     if (this.participants.length === 0 && this.userRole === 'play') {
-      this.triggerValidationError("No players have joined yet. At least two players are required to start the game.");
+      this.triggerValidationError(this.uiLabels?.CustomGamesView?.noPlayersJoined);
       return;
     }
     if(this.participants.length < 2 && this.userRole === 'host'){
       this.triggerValidationError(
-          "Only one player has joined. At least two players are required to start the game."
+          this.uiLabels?.CustomGamesView?.notEnoughPlayers
         );
       return;
     }
 
     if (this.userRole === 'play') {
       if (!this.userName) {
-        this.triggerValidationError("Please enter your username.");
+        this.triggerValidationError(this.uiLabels?.CustomGamesView?.enterUserame);
         return;
       }
     
