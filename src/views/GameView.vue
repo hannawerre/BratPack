@@ -9,17 +9,25 @@
         <div class="button-container">
             <!-- Buttons only visible to admin -->
             <div v-if="this.isAdmin">
-                <button
-                    v-for="gameName in gameData.selectedGames"
+                <div v-for="gameName in gameData.selectedGames"
                     :key="gameName"
-                    class="button blue"
+                    >
+                <button
+                v-if="!playedGames.includes(gameName)"
+                class="button blue"
                     @click="playMiniGame(gameName)"
+                    
+                    
                     >
                         {{ gameName }}
-                </button>
+                </button></div>
+
+
             </div>
         </div>
     </div>
+
+
 
     <!--Game Components-->
     <div v-else-if="activeGame && isPlaying"> 
@@ -47,7 +55,9 @@
             :gamePin="gamePin"
             :uiLabels="uiLabels"
             :userName="userName"
-            :isAdmin="isAdmin" />
+            :isAdmin="isAdmin" 
+            @gameCompleted="onGameCompleted"
+            />
 
         <ScoreBoardComponent :participants="gameData.participants"></ScoreBoardComponent>
     </div>
@@ -80,10 +90,11 @@
                 userName: '',
                 gameData: {},
                 activeGame: '',
+                playedGames: [],
                 uiLabels: {},
                 isAdmin: false,
                 isPlaying: true
-
+ //13 jan
             }
         },
         created: function() {
@@ -130,7 +141,15 @@
                 })}
             },
             onGameCompleted() {
+                console.log("spelet som är spelat är ", this.activeGame);
+                this.playedGames.push(this.activeGame);
+                console.log("spelet som är playedGames är ", this.playedGames);
                 this.activeGame = '';
+                
+                
+
+
+                
             },
             // Delete user on window close / refresh
             handleWindowClose(event) {
