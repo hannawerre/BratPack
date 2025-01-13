@@ -1,16 +1,6 @@
 @import './base.css';
 
 #app {
-  font-family: Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  justify-content: center;
-  background: linear-gradient(to bottom right,#ff8c42, #457b9d, #a8dadc, #f1faee, #de9263);
-  border-radius: 10px;
-  box-sizing: border-box;
-
-  /* Centering and responsive resizing */
   position: absolute;
   top: 10px; 
   left: 10px; 
@@ -18,13 +8,7 @@
   bottom: 10px; 
   padding: 15px;
   padding-bottom: 20px;
-  position: absolute;
-  top: 10px; 
-  left: 10px; 
-  right: 10px;
-  bottom: 10px; 
-  padding: 15px;
-  overflow: hidden;
+  
 }
 
 
@@ -61,6 +45,7 @@
 .big-text{
   font-size: 50px;
   font-weight: 700;
+  margin: 0 0 10px 0;
 }
 
 /*RESPONSIVE DESIGN*/

@@ -17,7 +17,15 @@ body {
   background: linear-gradient(to bottom right,#ff8c42, #457b9d, #a8dadc, #f1faee, #de9263);
     background-size: cover; /* Gör att bakgrunden täcker hela ytan */
     background-attachment: fixed; /* Fixerar bakgrunden så att den inte rör sig vid scroll */
-    height: 100vh; /* Säkerställer att body täcker hela viewporten */
+    height: 150vh; /* Säkerställer att body täcker hela viewporten */
+    font-family: Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    justify-content: center;
+    border-radius: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 @media (max-width: 768px) {
