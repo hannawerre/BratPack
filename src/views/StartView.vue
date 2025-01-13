@@ -15,8 +15,9 @@
       <router-link to="//">
         {{ uiLabels.StartView.createPoll }}
       </router-link>
+      <!--andvänds inte just nu-->
       <a href="">
-        {{ uiLabels.about }}
+        {{ uiLabels.StartView.about }}
       </a>
       <a href="">{{ uiLabels.StartView.faq }}</a>
     </ResponsiveNav> -->
@@ -241,6 +242,7 @@ export default {
     margin-right: 0.5rem; 
   }
 
+  /* Language Switcher */
   #LanguageSwitcher button {
   cursor: pointer;
   display: flex;
@@ -249,6 +251,10 @@ export default {
   border: none;
   color: black;
   font-weight: 500;
+  position: absolute; 
+  top: 7px; 
+  right: 10px; 
+  margin: 30px;
 }
 
 #flagFrame {

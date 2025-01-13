@@ -3,11 +3,11 @@
   <div>
       <!-- Start Phase -->
       <div v-if="currentPhase === 'startPhase'">
-        <h1> {{ uiLabels.QuizComponent.generalTrivia }}</h1>
+        <h1> {{ uiLabels.GameView.generalTrivia }}</h1>
         <div v-if="isAdmin">
-          <button class="button blue small" @click="startQuiz"> {{ uiLabels.QuizComponent.startQuiz }}</button>
+          <button class="button blue small" @click="startQuiz"> {{ uiLabels.GameView.startQuiz }}</button>
         </div>
-        <div v-else> {{ uiLabels.QuizComponent.waitingOnAdmin }}</div>
+        <div v-else> {{ uiLabels.GameView.waitingOnAdmin }}</div>
       </div>
 
       <!-- Intro Phase  -->
@@ -39,43 +39,43 @@
         
         <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
-          <p> {{ uiLabels.youAnsweredRight }}</p>
-          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
-          <p>Hej hej!</p>
+          <p> {{ uiLabels.GameView.youAnsweredRight }}</p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
+          <p>Hej hej!</p> <!--Ska denna va här? //HANNA -->
         </div>
 
         <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.youWereWrong }}</p>
-          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }} </p>
+          <p> {{ uiLabels.GameView.youWereWrong }}</p>
+          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.GameView.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
         </div>
 
         <!-- Om användaren inte hann svara -->
         <div v-else class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.tooSlow }}</p>
-          <p>{{ uiLabels.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p> {{uiLabels.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1"> {{ uiLabels.youAreBehind }} {{ getPlayerAhead(userName) }} {{ uiLabels.with }} {{ getPointsBehind(userName) }} {{ uiLabels.points }}</p>
+          <p> {{ uiLabels.GameView.tooSlow }}</p>
+          <p>{{ uiLabels.GameView.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
+          <p> {{uiLabels.GameView.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
+          <p v-if="getPlayerRank(userName)!=1"> {{ uiLabels.GameView.youAreBehind }} {{ getPlayerAhead(userName) }} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }}</p>
         </div>
   
         <div v-if="isAdmin">
-          <button class="button blue small" v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
-          <button class="button blue small" v-else @click="nextQuestion"> {{ uiLabels.QuizComponent.showResults }}</button>
+          <button class="button blue small" v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.GameView.nextQuestion }}</button>
+          <button class="button blue small" v-else @click="nextQuestion"> {{ uiLabels.GameView.showResults }}</button>
         </div>
       
       </div>
       
  <!-- Score board--> 
       <div v-else-if="currentPhase === 'scoreBoard'">
-        <h2>{{ uiLabels.QuizComponent.scoreboard }}</h2>
+        <h2>{{ uiLabels.GameView.scoreboard }}</h2>
           <ul>
             <li 
                v-for="(p, index) in sortedParticipants" 
               :key="index" 
               :class="{ 'top-player': index === 0 }"
             >
-              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} {{ uiLabels.QuizComponent.points }}
+              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} {{ uiLabels.GameView.points }}
             </li>
           </ul>
       </div>

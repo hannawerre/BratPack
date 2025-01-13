@@ -61,8 +61,6 @@ export default {
       lang: sessionStorage.getItem("lang") || "en",
       participants: [],
       uiLabels: {},
-      isListVisible: false,
-      toggleText: "Show Players"
     }
   },
   created: function () {
@@ -159,11 +157,6 @@ export default {
         this.userName = ""; // Ensure userName is initialized to an empty string
       }
     },
-    toggleListVisibility: function(isListVisible) {
-      console.log("list visibility toggled", this.isListVisible);
-        this.isListVisible = !this.isListVisible;
-        this.toggleText = this.isListVisible ? "Hide Players" : "Show Players";
-    }
   },
   mounted() {
     window.addEventListener("beforeunload", this.handleWindowClose);

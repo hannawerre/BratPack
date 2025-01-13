@@ -11,13 +11,9 @@
     "about": "Om oss"
 	},
 
-	"ResultView": {
-    "lang": "Språk",
-    "question": "Fråga",
-    "submittedAnswers": "Inskickade svar"
-    },
 
   	"LobbyView": {
+	"lobbyID": "Lobby ID",
 	"waitingForHost": "Väntar på spelledaren...",
 	"players": "Spelare",
 	"userName": "Användarnamn",
@@ -34,7 +30,7 @@
 		"isAlreadyActiveReturnToMainMenu": "är redan igång. Återgå till huvudmenyn",
 		"ok": "OK",
 		"lang": "Svenska",
-		"pinGame": "Spel-PIN",
+		"pinGame": "Spel-PIN:",
 		"loadingGamePIN": "Läser in Spel-PIN",
 		"chooseYourRole": "Välj din roll",
 		"play": "Spela",
@@ -49,7 +45,7 @@
 	  },
 
 	  "EditQuizComponent": {
-		"question": "Fråga",
+		"question": "Fråg",
 		"hideQuestions": "Dölj frågor",
 		"showQuestions": "Visa frågor",
 		"correct": "Rätt",
@@ -65,7 +61,7 @@
 		"saveAlternatives": "Spara alternativ"
 	  },
 
-	  "QuizComponent": {
+	  "GameView": {
 		"generalTrivia": "Frågesportspelet",
 		"startQuiz": "Starta spel",
 		"waitingOnAdmin": "Väntar på att admin ska starta quizet...",
@@ -83,7 +79,16 @@
 		"points": "poäng",
 		"with": "med"
 	  },
-	  
+
+	  "ThisOrThat": {
+		"rules1": "En deltagare kommer bli utvald inför varje runda",
+		"rules2": "Uppdraget är att välja samma svar som den utvalde deltagaren",
+		"rules3": "Hur väl känner du din medspelare?",
+		"chosenParticipant": "utvald deltagare",
+		"didntAnswer": "Svarade inte",
+		"correctAnswer": "Rätt svar",
+		"finalResults": "Slutgiltigt resultat"
+	  },
 
 	"sales-pitch": "Svar. Helt. Enkelt.",
 	"subHeading": "Ett enkelt enkätverktyg",

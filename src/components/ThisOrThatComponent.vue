@@ -3,9 +3,9 @@
     <!-- Rules -->
     <div v-if="currentPhase === 'showRules'">
         <!-- TODO: Fixa så regler syns i rätt språk. -->
-         <h3>One participant will be chosen for each round</h3>
-         <h3>The task is to pick the same answer as the chosen one</h3>
-         <h3>How well do you know your fellow mates?</h3>
+         <h3>{{ uiLabels.ThisOrThat.rules1 }}</h3>
+         <h3>{{ uiLabels.ThisOrThat.rules2 }}</h3>
+         <h3>{{ uiLabels.ThisOrThat.ruels3 }}}</h3>
         <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
       </div>
@@ -13,7 +13,7 @@
 
     <!-- Game Phase 1: Display Chosen Participant -->
     <div v-if="currentPhase === 'showChosenParticipant'">
-      <h2>Chosen participant: {{ chosenParticipant }}</h2>
+      <h2>{{ uiLabels.ThisOrThat.chosenParticipant }}: {{ chosenParticipant }}</h2>
       <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
       </div>
@@ -21,7 +21,7 @@
 
     <!-- Game Phase 2: Display Question -->
     <div v-if="currentPhase === 'showQuestion'">
-        <h2>Chosen participant: {{ chosenParticipant }}</h2>
+        <h2>{{ uiLabels.ThisOrThat.chosenParticipant }}: {{ chosenParticipant }}</h2>
       <QuestionComponent
         v-if="questions?.questions?.[currentQuestion]"
         :question="questions.questions[currentQuestion]"
@@ -36,10 +36,10 @@
   <div v-if="currentPhase === 'showAnswer'">
     <!-- If chosenParticipant didn't answer -->
     <h2 v-if="showChosenParticipantNoAnswer" class="no-answer-message">
-      Chosen Participant {{ this.chosenParticipant }} didn't answer
+      {{ uiLabels.ThisOrThat.chosenParticipant }} {{ this.chosenParticipant }} {{ uiLabels.ThisOrThat.didntAnswer }}
     </h2>
     <h2 v-else class="correct-answer-message">
-      Correct Answer: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
+      {{ uiLabels.ThisOrThat.correctAnswer }}}: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
     </h2>
 
     <!-- Countdown Bar -->
@@ -50,7 +50,7 @@
 
   <!-- Game Phase 4: Display Final Results -->
   <div v-if="currentPhase === 'showFinalResults'" class="final-results">
-    <h2>Final Results</h2>
+    <h2>{{ uiLabels.ThisOrThat.finalResults }}</h2>
     <!-- Countdown Bar -->
     <div class="countdown-bar">
       <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
