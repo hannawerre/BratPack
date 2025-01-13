@@ -71,7 +71,7 @@
     </div>
 </div>
 
-      <div class= "range">
+      <div class="range">
         <div class="slider-value">
           <span> {{ selectedMinutes }}</span>
         </div>
@@ -168,10 +168,8 @@ data: function() {
     selectedGames: [],
     participants: [],
     gamePin: '',
-    currentGame: null, // Används denna? /sebbe
+    currentGame: null, 
     customQuestions: {},
-    // useCustomQuestions: false,
-    active: true, // Används denna? /sebbe
     userName: '',
     userRole: 'host',
     uiLabels: {},
@@ -180,31 +178,24 @@ data: function() {
     gameStarted: false,
     isParticipantListVisible: false,
     isButtonVisible: false,
-   
-    
-
     isAlertOpen: false,
     alertMessage: "",
-    
-
   };
 },
 
 created: function () {
-  //this.dismantleSocket(); //kanske ta bort? / sebbe
   socket.on( "uiLabels", labels => this.uiLabels = labels );
   socket.emit( "getUILabels", this.lang );
+ 
+  //Should restore
   const shouldRestore = sessionStorage.getItem('shouldRestoreState');
   this.shouldRestoreState = shouldRestore;
-
   console.log("Should restore state:", shouldRestore);
     if (shouldRestore) {
       const savedData = sessionStorage.getItem('savedData');
       if (savedData) {
       try {
-        
         const parsedData = JSON.parse(savedData);
-        // Återställ varje egenskap från det sparade objektet
         this.selectedGames = parsedData.selectedGames || [];
         this.participants = parsedData.participants || [];
         this.customQuestions = parsedData.customQuestions || {};
@@ -212,45 +203,23 @@ created: function () {
         this.userRole = parsedData.userRole || 'host';
         this.selectedMinutes = parsedData.selectedMinutes || 60;
       } catch (error) {
-        console.error("Fel vid tolkning av sparad data:", error);
+        console.error("Fel vid inläsning av sessionstorage:", error);
       }
     }
+    //
     sessionStorage.removeItem('shouldRestoreState');
     sessionStorage.removeItem('savedData');
 
     console.log("Restored data:", this.selectedGames, this.participants, this.customQuestions, this.userName);
   }
 
-  // socket.on("updateGameData", (gameData) => {
-        
-        // console.log("Game data received: ", gameData);
-        // // this.customQuestions = gameData.customQuestions;
-        // // this.useStandardQuestions = gameData.useStandardQuestions;
-        // // this.useOwnQuestions = gameData.useOwnQuestions;
-        // this.selectedGames = gameData.selectedGames;
-        // this.participants = gameData.participants;
-        // this.selectedMinutes = gameData.selectedMinutes;
-        // // this.customQuestions = gameData.customQuestions;
-        // // this.useCustomQuestions = gameData.useCustomQuestions;
-        // console.log("Updated gameData, participants: ", this.participants);
-        // });
+
   if (!this.$route.params.gamePin) { 
     socket.on('gameCreated', pin => {
       this.gamePin = pin
       console.log("GamePin created: ", this.gamePin);
       socket.emit('joinSocketRoom', pin); //joins the socket room 'gamePin'
       this.$router.replace({ path: `/customgames/${pin}` });
-      
-      // socket.on("updateGameData", (gameData) => {
-        
-      //   console.log("Game data received: ", gameData);
-      //   this.selectedGames = gameData.selectedGames;
-      //   this.participants = gameData.participants;
-      //   this.selectedMinutes = gameData.selectedMinutes;
-      //   this.customQuestions = gameData.customQuestions;
-      //   console.log("Updated gameData, gamedata: ", gameData);
-      //   });
-
       });
   console.log("Listener for 'updateGameData' in CustomGamesView.vue is active");
   socket.emit("createGame", this.lang);
@@ -261,7 +230,6 @@ created: function () {
       socket.on("gameAlreadyExists", (gamepin)=> {
         console.log("Game already exists, gamepin: ", gamepin);
         this.showGameExistsPopup = true;
-
       })
       socket.emit("adminStartedWithExisitingPin", this.gamePin, this.lang) //behöver listener?
       socket.emit("joinSocketRoom",this.gamePin); // lägga denna tidigare?
@@ -876,4 +844,85 @@ methods: {
   transform: scale(1.1); /* Gör knappen större vid hover */
 }
 
+@media (max-width: 500px) { 
+  .container {
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+  }
+  .main-content {
+    text-align: center;
+    margin: 0 auto;
+  }
+  .big-text {
+    font-size: rem;
+    margin: 10px 0;
+  }
+  .admin-player {
+    max-width: 80%;
+    margin: 5px auto;
+  }
+  .game-option {
+    width: 90%;
+    font-size: 0.9rem;
+    padding: 5px 8px;
+    gap: 3px;
+  }
+  .range {
+    width: 90%;
+  }
+
+  .popup-content {
+    width: 85%;
+    padding: 10px;
+    margin: 5px auto;
+  }
+
+  .participants-sidebar {
+    z-index: -1;
+    width: 70%;
+    right: -70%;
+  }
+
+  .participants-sidebar.visible {
+    z-index: 9999;
+    transform: translateX(-70%);
+  }
+
+  .participants-toggle button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    box-shadow: none;
+  }
+
+  .participants-toggle button:hover {
+    transform: scale(1.0); 
+  }
+  .game-label {
+    padding-left: 3px;
+    font-size: 0.8rem;
+  }
+  .button.blue {
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    border-radius: 6px;
+  }
+  .popup-content h2 {
+    font-size: 1rem;
+    margin: 5px 0;
+  }
+  .popup-content p {
+    font-size: 0.8rem;
+    margin: 5px 0;
+  }
+  .popup-content button {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+.participants-sidebar button{
+  width: 50%;
+  margin-left: 40px;
+  text-align: center; 
+}
+}
 </style>
