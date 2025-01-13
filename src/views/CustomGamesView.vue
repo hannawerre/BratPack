@@ -23,12 +23,12 @@
 
 <div class="participants-toggle">
   <button @click="toggleParticipants">
-    ◀ Players
+    ◀ {{ uiLabels.CustomGamesView.players }} 
   </button>
 </div>
 
 <div class="participants-sidebar" :class="{ 'visible': isParticipantListVisible }">
-  <h2>Participants</h2>
+  <h2>{{ uiLabels.CustomGamesView.participants }}</h2>
   <ul>
     <li v-if="userRole === 'play' && gameStarted === false">
       <strong> {{ userName ? userName : "Admin" }}</strong>
@@ -43,8 +43,8 @@
 
 <div class="container">
   <div class="main-content"> 
-  <p v-if="gamePin" class="big-text">Game PIN: {{ gamePin }}</p>
-  <p v-else class="big-text">Loading Game PIN...</p>
+  <p v-if="gamePin" class="big-text">{{ uiLabels.CustomGamesView.pinGame }} {{ gamePin }}</p>
+  <p v-else class="big-text">{{ uiLabels.CustomGamesView.loadingGamePin }}</p>
   
   <div class="admin-player">
     <h2>{{ uiLabels.CustomGamesView.chooseYourRole }}</h2>
@@ -70,22 +70,18 @@
       />
     </div>
 </div>
-  <div>
-      
-    
-  <div class= "range">
-    <div class="slider-value">
-      <span> {{ selectedMinutes }}</span>
-    </div>
-    <div class="field">
-      <div class="value left"><strong>-</strong></div>
+
+      <div class="range">
+        <div class="slider-value">
+          <span> {{ selectedMinutes }}</span>
+        </div>
+      <div class="field">
+        <div class="value left"><strong>-</strong></div>
       <input type="range" v-model=selectedMinutes min="10" max="120" step="10" />
       <div class="value right"><strong>+</strong></div>
 
-    </div>
-  
   </div>
-    <p>Playingtime: <strong> {{ selectedMinutes }}</strong> minutes</p>
+    <p>{{ uiLabels.CustomGamesView.playTime }} <strong> {{ selectedMinutes }}</strong> {{ uiLabels.CustomGamesView.minutes }}</p>
   </div>
 
   
@@ -160,55 +156,48 @@ data: function() {
   return {
     lang: sessionStorage.getItem("lang") || "en",
     selectedMinutes: 10,
-    games: [
-      // { id: 'General Quiz', name: 'Quiz 1'} ,
-      // { id: 'Who´s most likely', name: 'Quiz 2'},
-      // { id: 'Music quiz', name: 'Quiz 3'},
-      // { id: 'This or that', name: 'Quiz 4'}
-      { id: 'generalQuiz', name: 'General Quiz'} ,
-      { id: 'whosMostLikelyTo', name: 'Who´s most likely to'},
-      { id: 'thisOrThat', name: 'This or that'}
-    ],
+    uiLabels: {},
+
     selectedGames: [],
     participants: [],
     gamePin: '',
-    currentGame: null, // Används denna? /sebbe
+    currentGame: null, 
     customQuestions: {},
-    // useCustomQuestions: false,
-    active: true, // Används denna? /sebbe
     userName: '',
     userRole: 'host',
-    uiLabels: {},
     showGameExistsPopup: false,
     shouldRestoreState: false,
     gameStarted: false,
     isParticipantListVisible: false,
     isButtonVisible: false,
-   
-    
-
     isAlertOpen: false,
     alertMessage: "",
-    
-
   };
+},
+computed: {
+  games() {
+    if (!this.uiLabels.CustomGamesView) return [];
+    return [
+      { id: 'generalQuiz', name: this.uiLabels.CustomGamesView.generalQuiz },
+      { id: 'whosMostLikelyTo', name: this.uiLabels.CustomGamesView.whosMostLikelyTo },
+      { id: 'thisOrThat', name: this.uiLabels.CustomGamesView.thisOrThat }
+    ];
+  },
 },
 
 created: function () {
-  //this.dismantleSocket(); //kanske ta bort? / sebbe
   socket.on( "uiLabels", labels => this.uiLabels = labels );
   socket.emit( "getUILabels", this.lang );
+ 
+  //Should restore
   const shouldRestore = sessionStorage.getItem('shouldRestoreState');
   this.shouldRestoreState = shouldRestore;
-
   console.log("Should restore state:", shouldRestore);
     if (shouldRestore) {
       const savedData = sessionStorage.getItem('savedData');
       if (savedData) {
       try {
-        
         const parsedData = JSON.parse(savedData);
-        // Återställ varje egenskap från det sparade objektet
         this.selectedGames = parsedData.selectedGames || [];
         this.participants = parsedData.participants || [];
         this.customQuestions = parsedData.customQuestions || {};
@@ -216,45 +205,23 @@ created: function () {
         this.userRole = parsedData.userRole || 'host';
         this.selectedMinutes = parsedData.selectedMinutes || 60;
       } catch (error) {
-        console.error("Fel vid tolkning av sparad data:", error);
+        console.error("Fel vid inläsning av sessionstorage:", error);
       }
     }
+    //
     sessionStorage.removeItem('shouldRestoreState');
     sessionStorage.removeItem('savedData');
 
     console.log("Restored data:", this.selectedGames, this.participants, this.customQuestions, this.userName);
   }
 
-  // socket.on("updateGameData", (gameData) => {
-        
-        // console.log("Game data received: ", gameData);
-        // // this.customQuestions = gameData.customQuestions;
-        // // this.useStandardQuestions = gameData.useStandardQuestions;
-        // // this.useOwnQuestions = gameData.useOwnQuestions;
-        // this.selectedGames = gameData.selectedGames;
-        // this.participants = gameData.participants;
-        // this.selectedMinutes = gameData.selectedMinutes;
-        // // this.customQuestions = gameData.customQuestions;
-        // // this.useCustomQuestions = gameData.useCustomQuestions;
-        // console.log("Updated gameData, participants: ", this.participants);
-        // });
+
   if (!this.$route.params.gamePin) { 
     socket.on('gameCreated', pin => {
       this.gamePin = pin
       console.log("GamePin created: ", this.gamePin);
       socket.emit('joinSocketRoom', pin); //joins the socket room 'gamePin'
       this.$router.replace({ path: `/customgames/${pin}` });
-      
-      // socket.on("updateGameData", (gameData) => {
-        
-      //   console.log("Game data received: ", gameData);
-      //   this.selectedGames = gameData.selectedGames;
-      //   this.participants = gameData.participants;
-      //   this.selectedMinutes = gameData.selectedMinutes;
-      //   this.customQuestions = gameData.customQuestions;
-      //   console.log("Updated gameData, gamedata: ", gameData);
-      //   });
-
       });
   console.log("Listener for 'updateGameData' in CustomGamesView.vue is active");
   socket.emit("createGame", this.lang);
@@ -265,7 +232,6 @@ created: function () {
       socket.on("gameAlreadyExists", (gamepin)=> {
         console.log("Game already exists, gamepin: ", gamepin);
         this.showGameExistsPopup = true;
-
       })
       socket.emit("adminStartedWithExisitingPin", this.gamePin, this.lang) //behöver listener?
       socket.emit("joinSocketRoom",this.gamePin); // lägga denna tidigare?
@@ -355,29 +321,29 @@ methods: {
     console.log("playerRole: ", this.playerRole);
 
     if(this.isNameTaken(this.userName)){
-      this.triggerValidationError("Name is taken, please choose another one");
+      this.triggerValidationError(this.uiLabels?.CustomGamesView?.nameTakenChooseNew);
       return;
     }
 
     if (this.selectedGames.length === 0) {
-      this.triggerValidationError("Please select at least one game.");
+      this.triggerValidationError(this.uiLabels?.CustomGamesView?.selectAtLeastOneGame);
       return;
     }
 
     if (this.participants.length === 0 && this.userRole === 'play') {
-      this.triggerValidationError("No players have joined yet. At least two players are required to start the game.");
+      this.triggerValidationError(this.uiLabels?.CustomGamesView?.noPlayersJoined);
       return;
     }
     if(this.participants.length < 2 && this.userRole === 'host'){
       this.triggerValidationError(
-          "Only one player has joined. At least two players are required to start the game."
+          this.uiLabels?.CustomGamesView?.notEnoughPlayers
         );
       return;
     }
 
     if (this.userRole === 'play') {
       if (!this.userName) {
-        this.triggerValidationError("Please enter your username.");
+        this.triggerValidationError(this.uiLabels?.CustomGamesView?.enterUserame);
         return;
       }
     
@@ -515,14 +481,14 @@ methods: {
 
 
 <style>
+
+
  .container {
     align-items: flex-start;
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
     justify-content: space-between;
-    padding: 20px;
-    
   }
 
   .main-content {
@@ -651,7 +617,6 @@ methods: {
   );
   border-radius: 5px;
   outline: none;
- 
 }
 
 .range .field input::-webkit-slider-thumb {
@@ -672,7 +637,8 @@ methods: {
   display: flex;
   flex-direction: column;
   align-items: center; /* Centrera alla rader horisontellt */
-  gap: 15px; /* Mellanrum mellan rader */
+  gap: 10px; /* Mellanrum mellan rader */
+  margin: 20px; /* Avstånd från föregående element */
 }
 
 .game-option {
@@ -860,8 +826,7 @@ methods: {
 .popup-content button:hover {
   background-color: #45a049;
 }
-.startbutton-container {
-  margin-top: 40px; /* Ger mer marginal mellan spelen och startknappen */
+.startbutton-container { /* Ger mer marginal mellan spelen och startknappen */
   display: flex;
   justify-content: center; /* Centrerar knappen */
 }
@@ -881,4 +846,85 @@ methods: {
   transform: scale(1.1); /* Gör knappen större vid hover */
 }
 
+@media (max-width: 500px) { 
+  .container {
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+  }
+  .main-content {
+    text-align: center;
+    margin: 0 auto;
+  }
+  .big-text {
+    font-size: rem;
+    margin: 10px 0;
+  }
+  .admin-player {
+    max-width: 80%;
+    margin: 5px auto;
+  }
+  .game-option {
+    width: 90%;
+    font-size: 0.9rem;
+    padding: 5px 8px;
+    gap: 3px;
+  }
+  .range {
+    width: 90%;
+  }
+
+  .popup-content {
+    width: 85%;
+    padding: 10px;
+    margin: 5px auto;
+  }
+
+  .participants-sidebar {
+    z-index: -1;
+    width: 70%;
+    right: -70%;
+  }
+
+  .participants-sidebar.visible {
+    z-index: 9999;
+    transform: translateX(-70%);
+  }
+
+  .participants-toggle button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    box-shadow: none;
+  }
+
+  .participants-toggle button:hover {
+    transform: scale(1.0); 
+  }
+  .game-label {
+    padding-left: 3px;
+    font-size: 0.8rem;
+  }
+  .button.blue {
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    border-radius: 6px;
+  }
+  .popup-content h2 {
+    font-size: 1rem;
+    margin: 5px 0;
+  }
+  .popup-content p {
+    font-size: 0.8rem;
+    margin: 5px 0;
+  }
+  .popup-content button {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+.participants-sidebar button{
+  width: 50%;
+  margin-left: 40px;
+  text-align: center; 
+}
+}
 </style>

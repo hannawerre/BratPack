@@ -1,39 +1,15 @@
 @import './base.css';
 
 #app {
-  font-family: Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  justify-content: center;
-  background: linear-gradient(to bottom right,#ff8c42, #457b9d, #a8dadc, #f1faee, #de9263);
-  border-radius: 10px;
-  box-sizing: border-box;
-
-  /* Centering and responsive resizing */
   position: absolute;
-  top: 10px; /* 10px gap from the top */
-  left: 10px; /* 10px gap from the left */
-  right: 10px; /* 10px gap from the right */
+  top: 10px; 
+  left: 10px; 
+  right: 10px; 
   bottom: 10px; 
   padding: 15px;
   padding-bottom: 20px;
-  position: absolute;
-  top: 10px; /* 10px gap from the top */
-  left: 10px; /* 10px gap from the left */
-  right: 10px; /* 10px gap from the right */
-  bottom: 10px; 
-  padding: 15px;
-  overflow: hidden;
+
 }
-
-
-
-.button.small {
-  font-size: 16px;
-  padding: 5px 10px;
-}
-
 
 
 .button.blue {
@@ -52,7 +28,7 @@
 }
 
 .button.blue:hover {
-  background: linear-gradient(45deg, #a1c3cc, #68a7b9); /* --our-lightBlue till --our-blue */
+  background: linear-gradient(45deg, #a1c3cc, #68a7b9);
   transform: scale(1.05);
   box-shadow: 0 0 15px 5px var(--our-lightBlue);
 }
@@ -66,47 +42,12 @@
   margin: 5px;
 }
 
-
-
-/* TOGGLE BUTTON */
-.toggle-button {
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3px;
-  font-size: 1.2rem;
-  background-color: var(--our-blue); /* Bakgrundsfärg för knappen */
-  border-radius: 5px;
-  font-size: 12px;
-  margin-bottom: 15px;
-}
-.toggle-button:hover {
-  background-color: var(--our-lightBlue); /* Bakgrundsfärg för knappen vid hover */
-}
-.toggle-button span {
-  display: inline-block; /* Visa som inline-block för att kunna styra visuellt */
-}
-
-.toggle-button span:first-child {
-  display: inline; /* Första delen av knappen syns alltid */
-}
-
-.toggle-button span:last-child {
-  display: none; /* Andra delen döljs */
-}
-
-.toggle-button[style*="none"] span:last-child {
-  display: inline; /* Visa pilen när listan är synlig */
-}
-
-.toggle-button[style*="none"] span:first-child {
-  display: none; /* Dölj pilen när listan är dold */
-}
 .big-text{
-  font-size: 50px;
+  font-size: 30px;
   font-weight: 700;
+  margin: 15px;
 }
+
 /*RESPONSIVE DESIGN*/
 @media (max-width: 768px) {
   #app {
@@ -163,7 +104,7 @@
   overflow-y: auto;
   
   background-color: var(--our-orange);
-  color: #000; /* Dark text for contrast on orange */
+  color: #000; 
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -228,13 +169,6 @@
   font-size: 2rem;
   cursor: pointer;
   line-height: 1;
-
-  /* Om du vill ha en rund bakgrund när man hovrar:
-  border-radius: 50%;
-  padding: 0.25rem 0.5rem;
-  */
-
-  /* Transition för en smidig hover-effekt */
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -413,32 +347,32 @@ button {
   align-items: center;
   padding: 3px;
   font-size: 1.2rem;
-  background-color: var(--our-blue); /* Bakgrundsfärg för knappen */
+  background-color: var(--our-blue); 
   border-radius: 5px;
   font-size: 12px;
   margin-bottom: 15px;
 }
 .toggle-button:hover {
-  background-color: var(--our-lightBlue); /* Bakgrundsfärg för knappen vid hover */
+  background-color: var(--our-lightBlue); 
 }
 .toggle-button span {
-  display: inline-block; /* Visa som inline-block för att kunna styra visuellt */
+  display: inline-block; 
 }
 
 .toggle-button span:first-child {
-  display: inline; /* Första delen av knappen syns alltid */
+  display: inline; 
 }
 
 .toggle-button span:last-child {
-  display: none; /* Andra delen döljs */
+  display: none;
 }
 
 .toggle-button[style*="none"] span:last-child {
-  display: inline; /* Visa pilen när listan är synlig */
+  display: inline; 
 }
 
 .toggle-button[style*="none"] span:first-child {
-  display: none; /* Dölj pilen när listan är dold */
+  display: none;
 }
 
 @media (max-width: 1024px) {
@@ -464,33 +398,24 @@ button {
 
 .questions-list {
   position: fixed;
-  /* Set the top to the same height as toggle-button */
   top: 50px;
   left: 0;
   width: 100%;
-
-  /* Start hidden above the screen */
   transform: translateY(-100%);
   transition: transform 0.3s ease;
   z-index: 9999;
-  
-  /* Hide horizontal overflow in case the content is wide */
   overflow-y: auto;
   overflow-x: hidden;
-
-  /* Subtract the toggle-button height from 100vh if you want to avoid overlap */
   max-height: calc(100vh - 50px);
   border-radius: 0;
   margin: 0;
   box-sizing: border-box;
 }
 
-/* When isListVisible is true, slide it down */
 .questions-list.limited-height {
   transform: translateY(0);
 }
 
-/* The modal-edit wrapper etc. can remain as is */
 .modal-edit-wrapper {
   position: fixed;
   top: 0;
@@ -518,14 +443,12 @@ button {
     cursor: pointer;
     line-height: 1;
     border: none;
-    /* Ev. rund bakgrund: border-radius: 50%; */
-    /* Ev. liten padding för en cirkulär knapp: padding: 0.25rem 0.5rem; */
-  } 
+}
 
 
 input[type="radio"],
   input[type="checkbox"] {
     transform: scale(1.7);
-    margin: 10px;     /* Ännu större på mobil */
+    margin: 10px;     
   }
 }

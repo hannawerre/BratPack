@@ -229,6 +229,14 @@ export default {
     mounted() {
         this.displayRules();
     },
+    unmounted(){
+      if(this.countdown){
+        clearInterval(this.countdown);
+      }
+      this.socket.off('roundUpdate');
+      this.socket.off('nextRound');
+    }
+    
 }
 
 </script>

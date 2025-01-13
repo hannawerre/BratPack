@@ -41,9 +41,20 @@
 		"chooseYourCustomGamesBelow": "Välj dina egna spel nedan:",
 		"startGame": "Starta spelet",
 		"participants": "Deltagare",
+		"players": "Spelare",
 		"hideParticipants": "Dölj deltagare",
 		"showParticipants": "Visa deltagare",
-		"admin": "Admin"
+		"admin": "Admin",
+		"playTime": "Speltid:",
+		"minutes": "minuter",
+		"generalQuiz": "Frågesport",
+		"thisOrThat": "Pest eller kolera",
+		"whosMostLikelyTo": "Pekleken",
+		"nameTakenChooseNew":"Namnet är upptaget, vänligen välj ett annat",
+		"selectAtLeastOneGame": "Vänligen välj minst ett spel.",
+        "noPlayersJoined": "Inga spelare har anslutit än. Minst två spelare krävs för att starta spelet.",
+        "notEnoughPlayers": "Endast en spelare har anslutit. Minst två spelare krävs för att starta spelet.",
+		"enterUsername": "Vänligen ange ditt användarnamn."
 	  },
 
 	  "EditQuizComponent": {
