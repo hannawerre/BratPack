@@ -98,7 +98,7 @@ nav {
   box-sizing: border-box;
 }
 #Logo img {
-  height: 50px;
+  height: 100px;
   cursor: pointer;
 }
 

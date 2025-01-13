@@ -771,7 +771,7 @@ methods: {
 
 .participants-toggle {
   position: fixed;
-  top: 5%; /* Vertikalt centrerad */
+  top: 15%; /* Vertikalt centrerad */
   right: 10px; /* Nära högra kanten */
   transform: translateY(-50%);
   z-index: 1000;

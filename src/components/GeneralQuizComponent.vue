@@ -351,10 +351,12 @@ export default {
 
 .countdown-bar {
   width: 100%;
-  height: 20px;
+  height: 8px;
   background-color: #ddd;
   position: relative;
   margin-top: 10px;
+  border-radius: 5px;
+
 }
 
 .progress {
