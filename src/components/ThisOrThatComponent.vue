@@ -5,7 +5,7 @@
         <!-- TODO: Fixa så regler syns i rätt språk. -->
          <h3>{{ uiLabels.ThisOrThat.rules1 }}</h3>
          <h3>{{ uiLabels.ThisOrThat.rules2 }}</h3>
-         <h3>{{ uiLabels.ThisOrThat.ruels3 }}</h3>
+         <h3>{{ uiLabels.ThisOrThat.rules3 }}</h3>
         <div class="countdown-bar">
         <div class="progress" :style="{ width: countdownProgress + '%' }"></div>
       </div>
