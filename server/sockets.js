@@ -202,22 +202,8 @@ socket.on('requestGameTime', (gamePin, callback) => {
     };
   });
 
-// socket.on("adminLeftGame", (gamePin, userName) => {
-//     console.log(`Admin left for gamepin: ${gamePin}`);
+  
 
-//     data.setAdminRejoined(gamePin, false);
-
-//   setTimeout(() => {
-//     if (!adminRejoined) {
-//         console.log(`No admin rejoined. Deleting game for gamepin: ${gamePin}`);
-//         data.deleteGame(gamePin); // Delete the game if no admin rejoined
-//     } else {
-//         console.log(`Gamepin ${gamePin} continues with a new admin.`);
-//     }
-// }, 10000); 
-
-
-// });
 
 }
 

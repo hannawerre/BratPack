@@ -6,6 +6,11 @@
     :gameActive="true"
     />
     
+     <button
+        v-if="isAdmin"
+  class="button blue"
+        @click="goBackToMenu()">Go back to meny</button> 
+
 
     <!--Game Components-->
     <div v-if="activeGame && isPlaying"> 
@@ -52,7 +57,7 @@
                    :key="gameName"
                    >
                <button
-               v-if="!playedGames.includes(gameName)"
+               v-if="!gameIsPlayed(gameName)"
                class="button blue"
                    @click="playMiniGame(gameName)"
                   
@@ -125,6 +130,7 @@
             window.addEventListener("beforeunload", this.handleWindowClose);
         },
         methods: {
+
             setup: function(){
                 this.gamePin = this.$route.params.gamePin;
                 this.userName = sessionStorage.getItem('userName');
@@ -158,6 +164,20 @@
                this.playedGames.push(this.activeGame);
                console.log("spelet som är playedGames är ", this.playedGames);
                this.activeGame = '';
+            },
+            goBackToMenu() {
+                this.playedGames.push(this.activeGame);
+                this.activeGame = '';
+                this.socket.emit("startMiniGame", {
+                        gameName: '', 
+                        gamePin: this.gamePin
+                })
+                
+        
+            },
+
+            gameIsPlayed(gameName) {
+                return this.playedGames.includes(gameName);
             },
             // Delete user on window close / refresh
             handleWindowClose(event) {
