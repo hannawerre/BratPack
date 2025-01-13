@@ -40,9 +40,12 @@
 		"chooseYourCustomGamesBelow": "Choose your custom games below:",	
 		"startGame": "Start Game",
 		"participants": "Participants",
+		"players": "Players",
 		"hideParticipants": "Hide participants",
 		"showParticipants": "Show participants",
-		"admin": "Admin"
+		"admin": "Admin",
+		"playTime": "Playingtime:",
+		"minutes": "minutes"
 	  },
 
 	  "EditQuizComponent": {

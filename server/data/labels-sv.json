@@ -41,9 +41,12 @@
 		"chooseYourCustomGamesBelow": "Välj dina egna spel nedan:",
 		"startGame": "Starta spelet",
 		"participants": "Deltagare",
+		"players": "Spelare",
 		"hideParticipants": "Dölj deltagare",
 		"showParticipants": "Visa deltagare",
-		"admin": "Admin"
+		"admin": "Admin",
+		"playTime": "Speltid:",
+		"minutes": "minuter"
 	  },
 
 	  "EditQuizComponent": {

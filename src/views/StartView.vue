@@ -148,17 +148,17 @@ export default {
   color: black;
   font-weight: 500;
   position: absolute; 
-  top: 7px; 
-  right: 10px; 
-  margin: 30px;
+  top: 3px; 
+  right: 5px; 
+  margin: 5px;
   z-index: 9000; 
 }
 
 #flagFrame {
   width: 40px;
   height: 40px;
-  margin-left: 5px;
-  margin-right: 10px;
+  margin-left: 0px;
+  margin-right: 0px;
   border-radius: 50%;
   overflow: hidden;
 }
