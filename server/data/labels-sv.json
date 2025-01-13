@@ -8,7 +8,9 @@
     "changeLanguage": "Change to English",
     "lang": "Svenska",
     "createPoll": "Skapa undersökning",
-    "about": "Om oss"
+    "about": "Om oss",
+	"or": "eller",
+	"gameDoesNotExist": "Game PIN finns inte!"
 	},
 
 

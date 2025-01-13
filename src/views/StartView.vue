@@ -73,10 +73,10 @@
             v-model="gamePin"
             @input="removeError"
             @keyup.enter="checkGameExists(gamePin)"
-            :placeholder="'Game Pin'"
+            :placeholder="uiLabels.StartView.gamePinPlaceholder"
           />
           <!-- uilabels! -->
-          <p class="error-message" v-if="showError">Game doesn't exist</p>
+          <p class="error-message" v-if="showError">{{ uiLabels.StartView.gameDoesNotExist }}</p>
         </div>
         <button
           class="submit-button"
@@ -85,11 +85,15 @@
         >
         {{ uiLabels.StartView.joinButton }}
         </button>
+  
+        <p class="separator">{{ uiLabels.StartView.or }}</p>
+
+        <router-link to="/customgames/">
+          <button class="button secondary"> {{ uiLabels.StartView.createGameButton }}</button>
+        </router-link>
       </div>
-    
-      <router-link to="/customgames/">
-        <button class="button orange"> {{ uiLabels.StartView.createGameButton }}</button>
-      </router-link>
+
+      
     </div>
   </div>
 </template>
@@ -139,7 +143,7 @@ export default {
       console.log("Game created with PIN:", data.pin);
       this.$router.push({ name: 'CustomGamesView', query: { gamePin: data.pin } });
   });*/
-}, //genererar gamepin, lyssnar på backend
+  }, //genererar gamepin, lyssnar på backend
 
     switchLanguage: function() {
       if (this.lang === "en") {
@@ -255,6 +259,7 @@ export default {
   top: 7px; 
   right: 10px; 
   margin: 30px;
+  z-index: 9000; 
 }
 
 #flagFrame {
@@ -271,9 +276,6 @@ export default {
   height: 100%;
   object-fit: cover;
 }
-  
-  .content-wrapper {
-  }
   .join-game-container {
   display: flex;
   flex-direction: column;
@@ -355,6 +357,30 @@ export default {
   50% {
     transform: translateX(5px);
   }
+}
+.separator {
+  text-align: center;
+  color: #457b9d;
+  margin: 16px 0;
+  font-size: 0.9rem;
+}
+.button.secondary {
+  width: 100%; /* Matches the width of the Join button */
+  padding: 12px 16px;
+  background-color: transparent;
+  color: #457b9d; /* Blue color in your theme */
+  border: 2px solid #457b9d; /* Blue border */
+  border-radius: 8px; /* Matches the input field's and Join button's style */
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button.secondary:hover {
+  background-color: #457b9d; /* Blue background on hover */
+  color: white; /* White text on hover */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
 }
 /* 
 .button {

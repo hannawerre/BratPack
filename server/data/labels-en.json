@@ -8,7 +8,9 @@
     "changeLanguage": "Byt till svenska",
     "lang": "English",
     "createPoll": "Create Poll",
-    "about": "About"
+    "about": "About",
+	"or": "or",
+	"gameDoesNotExist": "Game doesn't exist!"
 	},
 
 	"LobbyView": {
