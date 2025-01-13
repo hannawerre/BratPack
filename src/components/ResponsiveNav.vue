@@ -89,7 +89,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 70px; /* Adjust the height of the navbar */
+  height: 70px; 
   padding: 0 1rem;
   box-sizing: border-box;
 }
@@ -108,7 +108,7 @@ nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%; /* Säkerställ att wrappern tar hela bredden */
+  width: 100%; 
 }
 
 
@@ -121,14 +121,14 @@ nav {
 
 #GamePin {
   font-size: 1.2rem;
-  color: #1d3557; /* Change this to match the style you prefer */
+  color: #1d3557; 
   margin: 0;
   font-weight: bold;
 }
 
 #UserName h1 {
   font-size: 1.2rem;
-  color: #1d3557; /* Adjust color for visibility */
+  color: #1d3557;
   font-weight: bold;
   margin: 0;
 }
