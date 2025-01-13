@@ -24,7 +24,8 @@
 	"participateInPoll": "Delta",
 	"Hide Players": "Dölj Spelare",
 	"Show Players": "Visa Spelare",
-	"nameTaken": "Namn upptaget!"
+	"nameTaken": "Namn upptaget!",
+	"lobbyID": "Spel-PIN"
 	},
 
 	"CustomGamesView": {
