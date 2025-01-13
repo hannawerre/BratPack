@@ -177,7 +177,7 @@ Data.prototype.getQuestions = function (lang, gamePin, whichQuiz) {
   }
   return standardQuestions;
 };
-
+// --------------------------------------------------------------------------------------------------
 // - ThisOrThat -------------------------------------------------------------------------------------
 Data.prototype.getQuestions_ThisOrThat = function(lang) {
   if (!["en", "sv"].some( el => el === lang)) 
@@ -258,6 +258,7 @@ Data.prototype.correctQuestion_ThisOrThat = function(gamePin) {
   const correctPlayers = this._getCorrectPlayersExcludingChosen(game, qId, correctAnswer);
   this._distributePoints_ThisOrThat(game, correctPlayers);
 };
+
 Data.prototype._getCorrectPlayersExcludingChosen = function(game, questionId, correctAnswer) {
   let correctPlayers = [];
   for (const [playerName, data] of Object.entries(game.ThisOrThat.participants)) {
@@ -270,6 +271,7 @@ Data.prototype._getCorrectPlayersExcludingChosen = function(game, questionId, co
   }
   return correctPlayers;
 };
+
 Data.prototype._distributePoints_ThisOrThat = function(game, correctPlayers) {
   
   if (correctPlayers.length === 0) return;
@@ -298,6 +300,7 @@ Data.prototype.roundInProgress = function(gamePin, isActive = null) {
     this.customGames[gamePin].ThisOrThat.roundInProgress = isActive;
   }
 };
+
 Data.prototype.startGame_ThisOrThat = function(gamePin) {
   let elapsedSeconds = 0;
 
@@ -307,7 +310,7 @@ Data.prototype.startGame_ThisOrThat = function(gamePin) {
       
       this.correctQuestion_ThisOrThat(gamePin, this.customGames[gamePin].ThisOrThat.currentQuestion);
       this.newChosenParticipant(gamePin);
-      this.customGames[gamePin].ThisOrThat.currentQuestion++; //TODO: När den kört 15 eller 20 frågor borde spelet vara klart.
+      this.customGames[gamePin].ThisOrThat.currentQuestion++; 
 
       io.to(gamePin).emit("roundUpdate", this.customGames[gamePin].ThisOrThat)
     }
@@ -316,9 +319,8 @@ Data.prototype.startGame_ThisOrThat = function(gamePin) {
     }
   }, 1000); 
 };
-// -------------------------------------------------------------------------------------------------
-
-//WhosMostLikely------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------
+// - WhosMostLikely ------------------------------------------------------------------------------------
 
 Data.prototype.setUpWhosMostLikely = function (gamePin) {
   if(this.customGames[gamePin].whosMostLikely) return this.customGames[gamePin].whosMostLikely;
@@ -338,21 +340,22 @@ Data.prototype.setUpWhosMostLikely = function (gamePin) {
 
 Data.prototype.generateAnswerAlternatives = function(participants){
   const namesOfParticipant = Object.keys(participants);
-  // Skapa en kopia av arrayen (om du vill undvika att påverka 'namesOfParticipant')
+
+  // Create a copy of the array to avoid changing it.
   const listOfParticipantsNames = [...namesOfParticipant]; 
 
-  // Om fler än 4 deltagare, shuffla och ta ut 4 av dem:
+  // If less than 4 participants, shuffle and take 4
   if (listOfParticipantsNames.length > 4) {
     for (let i = listOfParticipantsNames.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      // Korrekt sätt att byta plats på två element
+
       [listOfParticipantsNames[i], listOfParticipantsNames[j]] 
         = [listOfParticipantsNames[j], listOfParticipantsNames[i]];
     }
-    // Returnera 4 slumpmässiga deltagare
+    // Return 4 random participants
     return listOfParticipantsNames.slice(0, 4);
   } else {
-    // Om färre än 4 deltagare
+    // If less than 4 participants
     return listOfParticipantsNames;
   }
 };
@@ -370,20 +373,20 @@ Data.prototype.addAnswerAlternatives = function(questionObj, participants) {
       }));
   });
   return questionObj.questions
-}
+};
 
 Data.prototype.storeAnswer = function(gamePin, userName, answerObj) {
   const game = this.customGames[gamePin];
   if (!game || !game.whosMostLikely) {
-    console.error(`Spelet med PIN ${gamePin} existerar inte eller är inte konfigurerat för "WhosMostLikely".`);
+    console.error(`Game with PIN ${gamePin} does not exist`);
     return null;
-  }
+  };
 
   const questionId = answerObj.questionId -1;
   game.whosMostLikely.participants[userName].answers[questionId] = answerObj;
   console.log(game.whosMostLikely.participants[userName].answers[questionId])
+};
 
-}
 Data.prototype.calculateCorrectAnswer = function(gamePin) {
   const game = this.customGames[gamePin];
   const currentQuestionIndex = game.whosMostLikely.currentQuestionIndex;
@@ -392,7 +395,7 @@ Data.prototype.calculateCorrectAnswer = function(gamePin) {
     console.log(`Fråga ${currentQuestionIndex} är redan beräknad, avbryter...`);
   
     return game.whosMostLikely.correctAnswers[currentQuestionIndex].winningAnswers;
-  }
+  };
 
   const participants = game.whosMostLikely.participants;
   // 1) Gather answers
@@ -423,13 +426,13 @@ Data.prototype.calculateCorrectAnswer = function(gamePin) {
     `\nDet mest valda svaret för fråga ${currentQuestionIndex} är "${winningAnswers}" med ${maxCount} röster.`
   );
 
-  // 3) Ge 500 poäng
+  // 3) Give 500 points
   for (const [playerName, data] of Object.entries(participants)) {
     const playerAnswer = data.answers[currentQuestionIndex]?.answerText;
     if (playerAnswer && winningAnswers.includes(playerAnswer)) {
       const generalParticipant = game.participants.find(p => p.name === playerName);
       if (generalParticipant) {
-        generalParticipant.scoreGame2 += 500; // Du kan byta fält om du vill
+        generalParticipant.scoreGame2 += 500;
         console.log("Uppdaterar poäng", generalParticipant.scoreGame2);
       }
     }
@@ -438,17 +441,13 @@ Data.prototype.calculateCorrectAnswer = function(gamePin) {
   return winningAnswers;
 };
 
-
-
-
-
 Data.prototype.nextQuestionWhosMostLikelyTo = function (gamePin) {
   const game = this.customGames[gamePin];
   game.whosMostLikely.currentQuestionIndex++;
   return game.whosMostLikely.currentQuestionIndex
 }
 //--------------------------------------------------------------------------------------------------
-// Timer -------------------------------------------------------------------------------------------
+// - Timer -----------------------------------------------------------------------------------------
 Data.prototype.startCountDown = function() {
   // Loop through all games and decrease remainingTime each second.
   this.countDown = setInterval(() => {
@@ -456,33 +455,30 @@ Data.prototype.startCountDown = function() {
       if (customGame.remainingTime > 0) {
         customGame.remainingTime--;
       }
-      // TODO: Delete customGame if it reaches 0?
+      // TODO: Delete customGame if it reaches 0
     }
 }, 1000);
 };
 Data.prototype.getGameTime = function (gamePin) { 
   try {
-    // console.log("Timer: --> this.customGames[gamePin] =", this.customGames[gamePin]);
-    // console.log("Timer: --> returning remainingTime: ", this.customGames[gamePin].remainingTime, " for gamePin: ", gamePin);
     return this.customGames[gamePin].remainingTime;
   } catch (error) {
-    console.error("Error accessing game data for gamePin:", gamePin, "Error details:", error);
+    console.error("Error accessing this.customGames[gamePin].remainingTime for gamePin:", gamePin, "Error details:", error);
     return null; 
   }
 };
 // -------------------------------------------------------------------------------------------------
 
 Data.prototype.setScore = function(gamePin, userName, newScore){
-  console.log("går in i setscore")
-  let game = this.customGames[gamePin]
-  console.log("spelet är:", game );
   
- if (!game) {
+  let game = this.customGames[gamePin]
+  
+  if (!game) {
     return;
   }
+
   const participant = game.participants.find(p => p.name === userName);
   participant.scoreGame1 = newScore;
-  console.log("spelet efter uppdaterad poäng:", this.customGames[gamePin])
 };
 
 Data.prototype.saveQuestions = function(gamePin, customQuestions, useCustomQuestions, whichQuiz) {
@@ -503,12 +499,9 @@ Data.prototype.saveQuestions = function(gamePin, customQuestions, useCustomQuest
   };
 
   console.log("Saved questions: ", this.customGames[gamePin].allCustomQuestions[whichQuiz]);
- 
-  console.log("SNälla fungera", this.customGames[gamePin])
-  console.log("original getquestions", this.getQuestions("en", gamePin, whichQuiz));
-
-  //console.log("seb getquestions", this.getQuestions_ThisOrThat("en", gamePin, whichQuiz));
 };
+
+// Currently not used, but stays for future purposes
 Data.prototype.deleteGame = function(gamePin) {
   console.log("Deleting game with pin: ", gamePin);
 
