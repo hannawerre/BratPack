@@ -17,7 +17,7 @@
       </div>
 
     <div class="questions-list" @click.stop :class="{ 'limited-height': isListVisible && isSmallScreen }">
-      <h2>{{  uiLabels.EditQuizComponent.question }}<</h2>
+      <h2>{{  uiLabels.EditQuizComponent.question }}</h2>
       <ul>
         <li v-for="(question, index) in savedQuestions" :key="index" class="question-item" v-show="!isSmallScreen || isListVisible">
           <div class="question-container">

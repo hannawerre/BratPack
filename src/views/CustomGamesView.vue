@@ -126,7 +126,7 @@
 
 
   <div class="startbutton-container">
-      <button class="button orange" @click="startGame">{{ uiLabels.CustomGamesView.startGame }}</button>
+      <button class="button blue" @click="startGame">{{ uiLabels.CustomGamesView.startGame }}</button>
   </div>
 
 </div>
@@ -867,7 +867,7 @@ methods: {
   justify-content: center; /* Centrerar knappen */
 }
 
-.button.orange {
+.button.blue {
   background: linear-gradient(45deg, #1d3557, #457b9d); /* Mörkblå gradient */
   font-size: 24px; /* Gör knappen större */
   padding: 15px 30px; /* Mer padding för att göra knappen större */
@@ -876,7 +876,7 @@ methods: {
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-.button.orange:hover {
+.button.blue:hover {
   background: linear-gradient(45deg, #457b9d, #a8dadc); /* Ljusare blå vid hover */
   box-shadow: 0 0 15px 5px #457b9d;
   transform: scale(1.1); /* Gör knappen större vid hover */
