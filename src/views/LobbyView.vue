@@ -127,7 +127,7 @@ export default {
     },
     validateInput() {
       this.nameTaken = this.participants.some(participant => participant.name === this.userName);
-      this.showError = false; // Reset error state on new input
+      this.showError = false; 
     },
 
     // Delete user on window close / refresh
@@ -135,7 +135,8 @@ export default {
       console.log("Window closed!!! Deleting user")
       socket.emit('deleteUser', this.gamePin, this.userName);
     },
-    // Denna används inte för tillfället. Kan komma att användas om vi ska fixa så att användare inte raderas vid refresh! /sebbe
+    
+    // TODO: Currently not used, but saving it for later purposes. /sebbe
     checkIfRefreshPage() {
     // Check if there already is a name in sessionStorage. If there is, user will pick it up and join the lobby with it.
       let storageName = sessionStorage.getItem('userName');
@@ -146,27 +147,19 @@ export default {
         socket.emit("requestParticipants", this.gamePin);
         console.log("Checking if refresh... storageName =", storageName, "with this.userName =", this.userName);
         console.log("Current participants: ", this.participants);
-        // TODO: Senare när vi sparar mer än bara userName, måste vi ha nån sorts getmetod här som hämtar all relevant data
-        // kopplad till userName från Data.js
       }
       else {
         console.log("No userName found in sessionStorage.");
-        this.joined = false; // Default value if userName doesn't exist
-        this.userName = ""; // Ensure userName is initialized to an empty string
+        this.joined = false;  
+        this.userName = ""; 
       }
     },
   },
   mounted() {
     window.addEventListener("beforeunload", this.handleWindowClose);
-    //this.checkIfRefreshPage();
   },  
   beforeDestroy() {
     window.removeEventListener("beforeunload", this.handleWindowClose);
-    // if (this.socket) {
-    //             this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
-    //             this.socket.disconnect(); // Disconnect the socket
-    //             this.socket = null;
-    //         }
     },
 }
 </script>
@@ -209,6 +202,7 @@ export default {
   font-size: 1rem;
   outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
 }
 
 .join-game-input:focus {
@@ -257,7 +251,6 @@ export default {
 }
 
 .waitingRoom div{
-  /* how do i get it to be centered? */
   background-color: lightblue;
   border-radius: 15px;
   border: 2px solid var(--our-darkBlue);
@@ -268,7 +261,7 @@ export default {
   padding: 10px;
 }
 
-.waitingRoom p { /* vill ha som i customGamesView men de fungrar ej*/
+.waitingRoom p {
   padding: 5px 0;
   border-bottom: 1px solid var(--our-darkBlue);
 }

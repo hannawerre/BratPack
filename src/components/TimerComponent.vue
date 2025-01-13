@@ -91,7 +91,7 @@
       clearInterval(this.localTimer);
       clearInterval(this.syncInterval);
     },
-    unmounted() { // TODO: behövs den?
+    unmounted() {
         // Disconnect socket when component is destroyed or view is changed
         if (this.socket) {
             this.socket.emit('leaveSocketRoom', this.gamePin); // Leave the room
@@ -114,22 +114,22 @@
   
   /* Timer Styling */
   .timer {
-    font-size: 2.2rem; /* 20% smaller than before */
-    font-family: 'Roboto', 'Arial', sans-serif; /* Nice font */
+    font-size: 2.2rem; 
+    font-family: 'Roboto', 'Arial', sans-serif; 
     font-weight: bold;
-    color: #1d3557; /* Black text */
+    color: #1d3557; 
     background-color: transparent;
-    text-shadow: none; /* No shadow for black text */
-    margin-right: 0; /* Removed margin between the timer and button */
+    text-shadow: none; 
+    margin-right: 0; 
     padding: 10px 20px;
     border-radius: 10px;
-    transition: color 0.3s ease; /* Transition for color change */
+    transition: color 0.3s ease; 
   }
   
   /* Flashing Timer Styling */
   .timer.flashing {
-    color: red; /* Red color when flashing */
-    animation: flash 2s infinite; /* Flash effect */
+    color: red; 
+    animation: flash 2s infinite; 
   }
   
   @keyframes flash {
@@ -152,38 +152,38 @@
   
   /* Mute Button Styling */
   .mute-button {
-    background-color: transparent; /* No background */
+    background-color: transparent; 
     border: none;
     cursor: pointer;
-    font-size: 24px; /* 20% smaller mute button */
+    font-size: 24px; 
     padding: 12px;
-    border-radius: 50%; /* Rounded button */
+    border-radius: 50%; 
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease-in-out; /* Smooth transition */
-    margin-left: 0; /* No space between timer and mute button */
+    transition: all 0.3s ease-in-out; 
+    margin-left: 0; 
   }
   
   /* Mute Button Hover Effect (removed background) */
   .mute-button:hover {
-    transform: scale(1.1); /* Slight zoom effect */
+    transform: scale(1.1); 
   }
   
   /* Speaker icon (unmuted) */
   .icon-unmuted::before {
-    content: "\f028"; /* FontAwesome speaker icon code */
+    content: "\f028"; 
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
-    color: #1d3557; /* Dark color for the speaker icon */
+    color: #1d3557; 
   }
   
   /* Speaker icon with a line (muted) */
   .icon-muted::before {
-    content: "\f6a9"; /* FontAwesome speaker icon with a line code */
+    content: "\f6a9"; 
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
-    color: #1d3557; /* Dark color for the muted icon */
+    color: #1d3557; 
   }
   </style>
   

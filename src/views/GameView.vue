@@ -7,6 +7,11 @@
     :gameActive="true"
     />
     
+     <button
+        v-if="isAdmin"
+  class="button blue"
+        @click="goBackToMenu()">{{ uiLabels.GameView.menu }}</button> 
+
 
     <!--Game Components-->
     <div v-if="activeGame && isPlaying"> 
@@ -73,8 +78,6 @@
 </template>
 
 <script>
-
-    //const socket = io("localhost:3000");
     import io from 'socket.io-client';
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
@@ -193,7 +196,6 @@
   border: none;
   cursor: pointer;
 }
-
 
 
 </style>

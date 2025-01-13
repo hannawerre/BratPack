@@ -62,8 +62,6 @@
 
 <script>
 import QuestionComponent from './QuestionComponent.vue';
-//const socket = io("localhost:3000");
-import io from 'socket.io-client'; 
 
 export default {
     name: 'ThisOrThatComponent',
@@ -113,14 +111,13 @@ export default {
         }
     },
     created: function() {
-        //this.socket = io("localhost:3000"); // Initialize component-specific socket
         this.socket.emit('joinSocketRoom', this.gamePin);
 
         this.socket.on('roundUpdate', (ThisOrThat) => {
-            // console.log("XXXXX Recieving roundUpdate in gamePin: ", this.gamePin, " with ThisOrThat: ", ThisOrThat)
+
             this.roundUpdate(ThisOrThat)});
             this.socket.on("nextRound", (nextQuestion, chosenParticipant) => {
-            console.log("--> socket.on(nextRound) with nextQuestion:", nextQuestion, " and chosenParticipant:", chosenParticipant)
+            
             this.startRound(nextQuestion, chosenParticipant)
         });
             
@@ -139,14 +136,13 @@ export default {
             this.startCountdown(30, "rules")
         },
         startRound(nextQuestion, chosenParticipant) {
-            console.log("--> startRound with nextQuestion:", nextQuestion, " and chosenParticipant:", chosenParticipant)
+
             // If out of sync, this will clear the old progress bar.
             clearInterval(this.countdown);
 
             this.showChosenParticipantNoAnswer = false;
             this.chosenParticipant = chosenParticipant;
             this.currentQuestion = nextQuestion;
-            console.log("--> inside startRound with this.questions.questions=", this.questions.questions)
 
             if(this.currentQuestion < this.questions.questions.length){
                 
@@ -209,7 +205,7 @@ export default {
             }
         },
         onAnswer(answerData) { 
-            // TODO: Just nu används inte questionId! /sebbe
+            
             this.socket.emit('answer_ThisOrThat', this.gamePin, this.userName, answerData.answerId)
             console.log("User: ", this.userName, "just answered");
         },
@@ -217,10 +213,9 @@ export default {
             const correctParticipants = [];
 
             for(let [key, value] of Object.entries(this.participants)){
-                console.log("---> inside setCorrectParticipants for-loop with key: ", key, ", value: ", value, ", currentQuestion:", this.currentQuestion, ", correctAnswer: ", this.correctAnswer);
+
                 if(value.answers[this.currentQuestion] && value.answers[this.currentQuestion] === this.correctAnswer){ 
                     correctParticipants.push(key);
-                    console.log("---> added participant: ", key, "to correctParticipants: ", correctParticipants);
                 }
             }
             this.correctParticipants = correctParticipants;
@@ -229,6 +224,14 @@ export default {
     mounted() {
         this.displayRules();
     },
+    unmounted(){
+      if(this.countdown){
+        clearInterval(this.countdown);
+      }
+      this.socket.off('roundUpdate');
+      this.socket.off('nextRound');
+    }
+    
 }
 
 </script>

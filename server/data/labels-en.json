@@ -45,7 +45,15 @@
 		"showParticipants": "Show participants",
 		"admin": "Admin",
 		"playTime": "Playingtime:",
-		"minutes": "minutes"
+		"minutes": "minutes",
+		"generalQuiz": "General Quiz",
+		"thisOrThat": "This or That",
+		"whosMostLikelyTo": "Who's most likely to",
+		"nameTakenChooseNew":"Name is taken, please choose another one",
+		"selectAtLeastOneGame": "Please select at least one game.",
+        "noPlayersJoined": "No players have joined yet. At least two players are required to start the game.",
+        "notEnoughPlayers": "Only one player has joined. At least two players are required to start the game.",
+		"enterUsername": "Please enter your username."
 	  },
 
 	  "EditQuizComponent": {
@@ -81,7 +89,8 @@
 		"showResults": "Show results",
 		"scoreboard": "Scoreboard",
 		"points": "points",
-		"with": "with"
+		"with": "with",
+		"menu":"Go back to menu"
 	  },
 
 	  "ThisOrThat": {
