@@ -1,5 +1,5 @@
 <template>
-
+  
     <div id="LanguageSwitcher">
       <button @click="switchLanguage">
         <div id="flagFrame">
@@ -14,7 +14,7 @@
     </div>
   </header>
 
-  <div class="content-wrapper">
+  <div>
       <div class="join-game-container">
         <div
           class="join-game-wrapper"
@@ -109,7 +109,7 @@ export default {
 </script>
 
 <style scoped>
-  
+
   header {
     position: relative;
     width: auto;
@@ -155,8 +155,8 @@ export default {
 }
 
 #flagFrame {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   margin-left: 5px;
   margin-right: 10px;
   border-radius: 50%;
