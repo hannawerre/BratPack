@@ -9,7 +9,9 @@
 
     <!-- Timer (Always Centered) -->
     <div id="Timer" v-if="this.gameActive">
-      <TimerComponent :gamePin="gamePin" />
+      <div class="timer-wrapper">
+        <TimerComponent :gamePin="gamePin" />
+      </div>
     </div>
 
     <!-- Game Pin and Username (Clustered on Top Right) -->
@@ -102,8 +104,17 @@ nav {
 
 #Timer {
   flex-grow: 1;
+  display: flex;
   text-align: center;
+  align-items: center;
 }
+.timer-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Säkerställ att wrappern tar hela bredden */
+}
+
 
 #UserInfo {
   text-align: right;

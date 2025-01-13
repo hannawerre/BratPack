@@ -3,11 +3,11 @@
     <!-- Från denna sparning så funkar allt förutom att få svarsalternativ -->
       <!-- Start Phase -->
       <div v-if="currentPhase === 'startPhase'">
-        <h1> {{ uiLabels.generalTrivia }}</h1>
+        <h1> {{ uiLabels.GameView.generalTrivia }}</h1>
         <div v-if="isAdmin">
-          <button @click="startQuiz" class="button orange"> {{ uiLabels.startQuiz }}</button>
+          <button @click="startQuiz" class="button orange"> {{ uiLabels.GameView.startQuiz }}</button>
         </div>
-        <div v-else> {{ uiLabels.waitingOnAdmin }}</div>
+        <div v-else> {{ uiLabels.GameView.waitingOnAdmin }}</div>
       </div>
 
       <!-- Intro Phase  -->
@@ -33,32 +33,29 @@
         </div>
       </div>
 
-
-      
-      
       <!-- Feedback Phase -->
       <div v-else-if="currentPhase === 'feedbackPhase'">
         
         <div v-if="checkCorrectAnswer" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
-          <p> {{ uiLabels.youAnsweredRight }}</p>
+          <p> {{ uiLabels.GameView.youAnsweredRight }}</p>
           
          </div>
         <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.youWereWrong }}</p>
+          <p> {{ uiLabels.GameView.youWereWrong }}</p>
           </div>
 
         <!-- Om användaren inte hann svara -->
         <div v-else class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.tooSlow }}</p>
+          <p> {{ uiLabels.GameView.tooSlow }}</p>
           
         </div>
   
         <div v-if="isAdmin">
-          <button v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.nextQuestion }}</button>
-          <button v-else @click="nextQuestion"> {{ uiLabels.showResults }}</button>
+          <button v-if="!isLastQuestion" @click="nextQuestion">{{ uiLabels.GameView.nextQuestion }}</button>
+          <button v-else @click="nextQuestion"> {{ uiLabels.GameView.showResults }}</button>
         </div>
       
       </div>

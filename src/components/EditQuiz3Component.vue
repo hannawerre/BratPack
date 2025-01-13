@@ -13,11 +13,11 @@
         style="background: var(--border-orange)"
         @click="toggleListVisibility"
       >
-        <p>{{ isListVisible ? 'Hide Questions ▲' : 'Show Questions ▼' }}</p>
+        <p>{{ isListVisible ? uiLabels.EditQuizComponent.hideQuestions + '&#9650;' : uiLabels.EditQuizComponent.showQuestions + '&#9660;' }}</p>
       </div>
 
         <div class="questions-list" @click.stop :class="{ 'limited-height': isListVisible && isSmallScreen }">
-          <h2>Questions</h2>
+          <h2>{{ uiLabels.EditQuizComponent.question }}</h2>
           <ul>
             <li v-for="(question, index) in savedQuestions" :key="index" class="question-item" v-show="!isSmallScreen || isListVisible">
               <div class="question-container">
@@ -43,13 +43,14 @@
         </div>
   
         <div class="modal-content" @click.stop>
+        
 
           <button class="modal-close-button" @click="closeModal">
             &times;
           </button>
 
-          <h1>Edit {{ GameName }}</h1>
-          <p>Here you can add questions to the game</p>
+          <h1>{{ uiLabels.EditQuizComponent.edit }} {{ GameName }}</h1>
+          <p>{{ uiLabels.EditQuizComponent.hereAddQuestion }}</p>
           <br />
           <div class="radio-buttons-container">
             <label>
@@ -58,7 +59,7 @@
                 :value="false"
                 v-model="useCustomQuestions"
                 />
-                Use standard questions
+                {{ uiLabels.EditQuizComponent.standardQuestions }}
             </label>
             <label>
                 <input 
@@ -66,7 +67,7 @@
                 :value="true"
                 v-model="useCustomQuestions"
                 />
-                Use own questions
+                {{ uiLabels.EditQuizComponent.ownQuestions }}
             </label>
             </div>
           <br />
@@ -74,15 +75,15 @@
           <div v-for="(alt, index) in alternatives" :key="index" class="alternative-row">
             <input
               v-model="alt.text"
-              :placeholder="`Alternative`"
+              :placeholder="uiLabels.EditQuizComponent.alternative"
             />
           </div>
   
           <button @click="addAlternative" id="alternatative-button">
-            Add alternative
+            {{ uiLabels.EditQuizComponent.addAlternative }}
           </button>
           <button @click="saveQuestion" id="save-button">
-            Save alternatives
+            {{ uiLabels.EditQuizComponent.saveAlternatives }}
           </button>
 
         </div>
@@ -95,7 +96,8 @@
   import AlertModal from '@/components/AlertModal.vue';
 
   const props = defineProps({
-    GameName: String
+    GameName: String,
+    uiLabels: Object
   });
   
   const emit = defineEmits([
@@ -108,8 +110,10 @@
     const isAlertOpen = ref(false);
     
     const isModalOpen = ref(false);
+
     const isListVisible = ref(false);
     const toggleText = ref("Show questions");
+
     const useCustomQuestions = ref(false);
 
     const alternatives = ref([
@@ -142,11 +146,7 @@
       window.removeEventListener("resize", handleResize);
     });
 
-    const toggleListVisibility = () => {
-      isListVisible.value = !isListVisible.value;
-      toggleText.value = isListVisible.value ? "Hide questions" : "Show questions";
-    };
-
+    
     const savedQuestions = ref([]);
 
     const addAlternative = () => {
@@ -160,6 +160,11 @@
     const openModal = () => {
         isModalOpen.value = true;
         emit('modal-opened');
+    };
+
+    const toggleListVisibility = () => {
+        isListVisible.value = !isListVisible.value;
+        toggleText.value = isListVisible.value ? "Hide questions" : "Show questions";
     };
 
     const saveQuestion = () => {

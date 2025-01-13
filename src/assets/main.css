@@ -6,12 +6,18 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   justify-content: center;
-  background: linear-gradient(to bottom right, #CFE8EF, #9eb5bc, #98c4d1);
-  border: double 10px var(--our-orange);
+  background: linear-gradient(to bottom right,#ff8c42, #457b9d, #a8dadc, #f1faee, #de9263);
   border-radius: 10px;
   box-sizing: border-box;
 
   /* Centering and responsive resizing */
+  position: absolute;
+  top: 10px; /* 10px gap from the top */
+  left: 10px; /* 10px gap from the left */
+  right: 10px; /* 10px gap from the right */
+  bottom: 10px; 
+  padding: 15px;
+  padding-bottom: 20px;
   position: absolute;
   top: 10px; /* 10px gap from the top */
   left: 10px; /* 10px gap from the left */
@@ -220,6 +226,10 @@
 
 .toggle-button[style*="none"] span:first-child {
   display: none; /* Dölj pilen när listan är dold */
+}
+.big-text{
+  font-size: 50px;
+  font-weight: 700;
 }
 /*RESPONSIVE DESIGN*/
 @media (max-width: 768px) {
