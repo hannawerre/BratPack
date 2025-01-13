@@ -5,7 +5,7 @@
       <div v-if="currentPhase === 'startPhase'">
         <h1> {{ uiLabels.GameView.generalTrivia }}</h1>
         <div v-if="isAdmin">
-          <button @click="startQuiz" class="button orange"> {{ uiLabels.GameView.startQuiz }}</button>
+          <button @click="startQuiz" class="button blue small"> {{ uiLabels.GameView.startQuiz }}</button>
         </div>
         <div v-else> {{ uiLabels.GameView.waitingOnAdmin }}</div>
       </div>
