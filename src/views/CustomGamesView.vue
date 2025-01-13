@@ -1,10 +1,11 @@
 <template>
-  <Nav :hideNav="false"
+<Nav 
   :uiLabels="uiLabels"
   :lang="lang"
   :showLangSwitch="true"
   @language-changed="handleLanguageChange">
-  </Nav>
+</Nav>
+
 <div v-if="showGameExistsPopup && !shouldRestoreState" class="popup-overlay">
       <div class="popup-content">
         <h2>{{ uiLabels.CustomGamesView.gameAlreadyInSession }}</h2>
@@ -12,12 +13,13 @@
         <button @click="mainMenu">{{ uiLabels.CustomGamesView.ok }}</button>
       </div>
 </div>
+
 <AlertModal
       :title="'Alert'"
       :message="alertMessage"
       :isOpen="isAlertOpen"
       @close="handleModalClose"
-    />
+/>
 
 <div class="participants-toggle">
   <button @click="toggleParticipants">
@@ -40,7 +42,7 @@
 
 
 <div class="container">
-  <div class="main-content">
+  <div class="main-content"> 
   <p v-if="gamePin" class="big-text">Game PIN: {{ gamePin }}</p>
   <p v-else class="big-text">Loading Game PIN...</p>
   
@@ -55,7 +57,6 @@
         <label class="radio-option">
           <input type="radio" value="host" v-model="userRole" />
           {{ uiLabels.CustomGamesView.hostOnly }}
-          Host
         </label>
       </div>
     </div>
@@ -487,11 +488,7 @@ methods: {
       }
     console.log("Checking if refresh... storagePin =", storagePin, "with this.gamePin =", this.gamePin);
     },
-    handleLanguageChange(newLang) {
-      this.lang = newLang;
-      localStorage.setItem("lang", newLang);
-      socket.emit("getUILabels", this.lang);
-    },
+
     // dismantleSocket(){ //TODO kanske ta bort
     //   console.log("-->before if-statement in dismantleSocket in CustomGamesView")
     //   if(socket) {
@@ -546,7 +543,7 @@ methods: {
 .admin-player h2 {
   font-size: 1.2rem;
   margin-bottom: 10px;
-  color: #333;
+  color: #000000;
 }
 
 .radio-group {
@@ -560,7 +557,7 @@ methods: {
   align-items: center;
   gap: 8px;
   font-size: 1rem;
-  color: #555;
+  color: #000000;
 }
 
 .radio-option input[type="radio"] {
@@ -685,7 +682,7 @@ methods: {
   align-items: center; /* Vertikal centrering */
   width: 300px; /* Anpassad bredd för knappen */
   padding: 10px 15px;
-  background-color: #457b9d; /* Blå bakgrund */
+  background-color: #2e607f; /* Blå bakgrund */
   border-radius: 8px;
   color: white; /* Vit text */
   font-size: 1.2rem;
@@ -821,7 +818,7 @@ methods: {
   transform: scale(1.05); /* Förstora knappen lite vid hover */
 }
 
-popup-overlay {
+.popup-overlay {
   position: fixed;
   top: 0;
   left: 0;

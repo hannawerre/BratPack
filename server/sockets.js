@@ -180,7 +180,7 @@ function sockets(io, socket, data) {
   socket.on("adminStartedWithExisitingPin", function(gamePin, lang) {
     if(!data.customGameExists(gamePin)){
       console.log("Admin rejoined UNEXISTING game with pin: ", gamePin);
-      const customGame = data.createCustomGameAlt(gamePin, lang);
+      const customGame = data.createCustomGameAlt(gamePin);
       socket.emit('updateGameData', customGame);
       console.log("Game created with pin: ", gamePin);
     }else{
