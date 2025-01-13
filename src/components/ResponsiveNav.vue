@@ -1,5 +1,5 @@
 <template>
-  <nav :class="{'hide': hideNav}">
+  <nav>
     <!-- Home Button (Logo) -->
     <div id="Logo">
       <router-link to="/">
@@ -44,10 +44,6 @@ export default {
     TimerComponent
   },
   props: {
-    hideNav: {
-      type: Boolean,
-      default: false
-    },
     uiLabels: {
       type: Object,
       default: () => ({ home: 'Home', about: 'About', changeLanguage: 'Change Language' })

@@ -382,8 +382,7 @@ methods: {
         name: this.userName,
         scoreGame1: 0,
         scoreGame2: 0,
-        scoreGame3: 0,
-        scoreGame4: 0
+        scoreGame3: 0
       }
       console.log("adminName: ", adminName);
       // socket.emit( "participateInCustomGame", this.gamePin,  adminName);
