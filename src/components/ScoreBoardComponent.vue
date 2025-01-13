@@ -38,7 +38,7 @@
     },
     computed: {
       sortedParticipants() {
-        // Calculate total score and sort participants in descending order
+
         return this.participants
           .map((participant) => ({
             ...participant,
@@ -53,7 +53,7 @@
   };
   </script>
   <style scoped>
-  /* Scoreboard container styling */
+
   .scoreboard-container {
     max-width: 400px;
     margin: 20px auto;
@@ -71,7 +71,7 @@
     font-size: 1.5rem;
   }
   
-  /* Scoreboard list styling */
+
   .scoreboard {
     list-style-type: none;
     padding: 0;
@@ -97,8 +97,7 @@
     transform: translateY(-5px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
-  
-  /* Player name and score styling */
+
   .player-name {
     flex: 1;
     text-align: left;
@@ -110,7 +109,7 @@
     color: #f1faee;
   }
   
-  /* Fade animation for reordering */
+ 
   .fade-enter-active,
   .fade-leave-active {
     transition: all 0.5s ease;
@@ -121,19 +120,38 @@
     opacity: 0;
     transform: translateY(-20px);
   }
-/* Green shine effect */
+
 .scoreboard-item.highlight {
-  color: #2d6a4f; /* Green text color */
+  color: #2d6a4f; 
   animation: greenText 2s ease-in-out;
 }
 
 @keyframes greenText {
   0% {
-    color: #f4f4f9; /* Default color */
+    color: #f4f4f9; 
   }
   100% {
-    color: #2d6a4f; /* Green text */
+    color: #2d6a4f; 
   }
 }
-  </style>
-  
+
+@media (max-width: 650px) {
+  .scoreboard-container {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 10px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+
+  .scoreboard-item {
+    font-size: 1rem;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+  </style>  

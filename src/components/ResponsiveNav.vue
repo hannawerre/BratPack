@@ -1,20 +1,17 @@
 <template>
   <nav>
-    <!-- Home Button (Logo) -->
     <div id="Logo">
       <router-link to="/">
         <img src="/img/logo_pwr_hour2.0.png" alt="Logo" />
       </router-link>
     </div>
 
-    <!-- Timer (Always Centered) -->
     <div id="Timer" v-if="this.gameActive">
       <div class="timer-wrapper">
         <TimerComponent :gamePin="gamePin" />
       </div>
     </div>
 
-    <!-- Game Pin and Username (Clustered on Top Right) -->
     <div id="UserInfo" v-if="this.gamePin || this.userName">
       <div id="GamePin">Pin: {{ this.gamePin }}</div>
       <div id="UserName" v-if="this.userName">
@@ -22,7 +19,6 @@
       </div>
     </div>
 
-    <!-- Language Switcher (Top Right) -->
     <div v-if="showLangSwitch" id="Language">
       <LanguageSwitcher 
         :lang="lang" 
@@ -89,7 +85,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 70px; /* Adjust the height of the navbar */
+  height: 70px; 
   padding: 0 1rem;
   box-sizing: border-box;
 }
@@ -108,7 +104,7 @@ nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%; /* Säkerställ att wrappern tar hela bredden */
+  width: 100%; 
 }
 
 
@@ -121,14 +117,14 @@ nav {
 
 #GamePin {
   font-size: 1.2rem;
-  color: #1d3557; /* Change this to match the style you prefer */
+  color: #1d3557; 
   margin: 0;
   font-weight: bold;
 }
 
 #UserName h1 {
   font-size: 1.2rem;
-  color: #1d3557; /* Adjust color for visibility */
+  color: #1d3557; 
   font-weight: bold;
   margin: 0;
 }

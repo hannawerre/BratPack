@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Från denna sparning så funkar allt förutom att få svarsalternativ -->
       <!-- Start Phase -->
       <div v-if="currentPhase === 'startPhase'">
         <h1> {{ uiLabels.GameView.generalTrivia }}</h1>
@@ -69,15 +68,7 @@
 </template>
   
   <script>
-  /* 
-  
-  GLÖM EJ ATT ÄNDRA SPRÅKET TILL LOCALSTORAGE
-  
-  
-  
-  
-  
-  */
+ 
   
   import QuestionComponent from './QuestionComponent.vue';
   import Nav from './ResponsiveNav.vue';
@@ -290,8 +281,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 300px; /* Sätt höjd så att siffran är centrerad */
-    background: black; /* Kanske bakgrundsfärg för "filmisk" känsla */
+    height: 300px; 
+    background: black; 
   }
   
   .countdown-number {
@@ -299,8 +290,8 @@
     font-size: 8rem;
     font-weight: bold;
   }
-  
-  /* Övergångsklasser för namnet "countdown-flash" */
+ 
+
   .countdown-flash-enter-active,
   .countdown-flash-leave-active {
     transition: opacity 0.5s, transform 0.5s;
@@ -332,34 +323,32 @@
   
   .feedback-icon-wrapper {
     display: flex;
-    flex-direction: column; /* Ikon överst, text under */
+    flex-direction: column; 
     align-items: center;
     justify-content: center;
     margin-top: 20px;
   }
   
-  /* Själva cirkeln */
+
   .icon-circle {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;     /* Storlek på bocken/krysset */
-    width: 100px;        /* Bredd/höjd på cirkeln */
+    font-size: 3rem;    
+    width: 100px;        
     height: 100px;
-    border-radius: 50%;  /* Gör den rund */
-    color: #fff;         /* Vit text */
-    margin-bottom: 10px; /* Liten space under cirkeln */
+    border-radius: 50%;  
+    color: #fff;         
+    margin-bottom: 10px; 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   }
-  
-  /* Grön cirkel (rätt) */
+
   .icon-correct {
-    background-color: #4caf50; /* Grön */
+    background-color: #4caf50; 
   }
   
-  /* Röd cirkel (fel) */
   .icon-wrong {
-    background-color: #f44336; /* Röd */
+    background-color: #f44336;
   }
   
   .top-player {

@@ -77,7 +77,7 @@ ul {
 }
 
 li.answer-option {
-  flex: 1 1 calc(50% - 20px); /* Två knappar per rad */
+  flex: 1 1 calc(50% - 20px); 
   max-width: calc(50% - 20px); 
   display: flex;
   justify-content: center; 
@@ -85,24 +85,24 @@ li.answer-option {
 
 /* Anpassning för exakt fyra knappar */
 ul:has(li:nth-child(4)) li.answer-option {
-  flex: 1 1 calc(50% - 20px); /* Två knappar per rad */
+  flex: 1 1 calc(50% - 20px); 
   max-width: calc(50% - 20px);
 }
 
 /* Anpassning för färre än fyra knappar */
 ul:not(:has(li:nth-child(4))) li.answer-option {
-  flex: 1 1 calc(50% - 20px); /* Även här två knappar per rad */
+  flex: 1 1 calc(50% - 20px); 
   max-width: calc(50% - 20px);
 }
 
 /* Anpassning för små skärmar */
 @media (max-width: 480px) {
   ul {
-    max-width: 100%; /* Tillåt full bredd på små skärmar */
+    max-width: 100%; 
   }
 
   li.answer-option {
-    flex: 1 1 100%; /* En knapp per rad på små skärmar */
+    flex: 1 1 100%; 
     max-width: 100%;
   }
 }
@@ -131,14 +131,14 @@ button:active {
 }
 
 .selected button {
-  background: linear-gradient(45deg, #da6822, #b5511a); /* --border-orange till en mörkare nyans */
+  background: linear-gradient(45deg, #da6822, #b5511a); 
   transform: scale(1.1);
   color: white;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
 
 .dimmed button {
-  background: linear-gradient(45deg, #ff8c42, #b5511a); /* --our-orange till en mörkare nyans */
+  background: linear-gradient(45deg, #ff8c42, #b5511a); 
   opacity: 0.6;
   pointer-events: none;
 }
