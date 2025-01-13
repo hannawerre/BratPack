@@ -33,9 +33,6 @@
         </div>
       </div>
 
-
-      
-      
       <!-- Feedback Phase -->
       <div v-else-if="currentPhase === 'feedbackPhase'">
         
