@@ -122,7 +122,7 @@
 
 
   <div class="startbutton-container">
-      <button class="button blue" @click="startGame">{{ uiLabels.CustomGamesView.startGame }}</button>
+      <button class="button green" @click="startGame">{{ uiLabels.CustomGamesView.startGame }}</button>
   </div>
 
 </div>
@@ -805,20 +805,9 @@ methods: {
   justify-content: center; 
 }
 
-.button.blue {
-  background: linear-gradient(45deg, #1d3557, #457b9d); 
-  font-size: 24px; 
-  padding: 15px 30px; 
-  border-radius: 10px;
-  border: 2px solid #1d3557; 
-  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-}
 
-.button.blue:hover {
-  background: linear-gradient(45deg, #457b9d, #a8dadc); 
-  box-shadow: 0 0 15px 5px #457b9d;
-  transform: scale(1.1); 
-}
+
+
 
 @media (max-width: 500px) { 
   .container {
@@ -869,6 +858,7 @@ methods: {
     padding: 5px 10px;
     font-size: 0.8rem;
     box-shadow: none;
+    top: 30%;
   }
 
   .participants-toggle button:hover {

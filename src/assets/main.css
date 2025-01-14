@@ -42,10 +42,32 @@
   margin: 5px;
 }
 
+.button.green {
+  background: linear-gradient(45deg, #228B22, #32CD32); 
+  font-size: 24px; 
+  padding: 15px 30px; 
+  border-radius: 10px;
+  border: 2px solid #228B22; 
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button.green:hover {
+  background: linear-gradient(45deg, #32CD32, #7CFC00); 
+  box-shadow: 0 0 20px 5px #32CD32;
+  transform: scale(1.1); 
+}
+
+
 .big-text{
-  font-size: 30px;
+  font-size: 45px;
   font-weight: 700;
   margin: 15px;
+}
+.medium-text{
+  font-size: 25px;
 }
 
 /*RESPONSIVE DESIGN*/

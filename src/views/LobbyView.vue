@@ -32,7 +32,7 @@
     </button>
   </div>
     <div class="waitingRoom" v-if="joined">
-      <p>{{ uiLabels.LobbyView.waitingForHost }}</p>
+     
       <div>
         <h3>{{ this.uiLabels.players }}</h3>
         <p v-for="participant in participants" :key="participant.name">{{ participant.name }}</p>
@@ -177,9 +177,10 @@ export default {
 }
 
 .lobby-id {
-  font-size: 1.2rem;
+  font-size: 3rem;
   color: #1d3557;
-  margin-bottom: 20px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 
 .join-game-wrapper {
@@ -251,25 +252,41 @@ export default {
 }
 
 .waitingRoom div{
-  background-color: lightblue;
+  background-color: #1d3557;
   border-radius: 15px;
-  border: 2px solid var(--our-darkBlue);
+  
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
   width: 70%;
   margin: 3% 0% 0% 15%;
   box-sizing: border-box;
   padding: 10px;
+  color: rgb(225, 220, 220);
 }
 
 .waitingRoom p {
-  padding: 5px 0;
-  border-bottom: 1px solid var(--our-darkBlue);
+  padding: 10px;
+  margin: 5px 0;
+  background-color: rgba(69, 123, 157, 0.1);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
-@media (max-width: 768px) {
-  .waitingRoom {
-    min-width: 90%;
-    margin: 5% auto;
+
+@media (max-width: 500px) {
+  .lobby-id {
+    font-size: 2rem;
+  }
+  .join-game-input {
+    font-size: 0.9rem;
+    width: 80%;
+  }
+  .submit-button {
+    font-size: 0.9rem;
+    padding: 10px;
+    width:80%;
   }
 }
+
 </style>

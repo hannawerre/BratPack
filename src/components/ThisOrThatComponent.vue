@@ -38,9 +38,14 @@
     <h2 v-if="showChosenParticipantNoAnswer" class="no-answer-message">
       {{ uiLabels.ThisOrThat.chosenParticipant }} {{ this.chosenParticipant }} {{ uiLabels.ThisOrThat.didntAnswer }}
     </h2>
-    <h2 v-else class="correct-answer-message">
-      {{ uiLabels.ThisOrThat.correctAnswer }}: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
-    </h2>
+    <div v-else-if="this.correctAnswer" class="feedback-icon-wrapper">
+        <div class="icon-circle icon-correct">✔</div>
+        {{ uiLabels.ThisOrThat.correctAnswer }}: {{ questions.questions[currentQuestion].answers[correctAnswer-1].answer }}
+    </div>
+    <div v-else class="feedback-icon-wrapper">
+        <div class="icon-circle icon-wrong">✖</div>
+
+    </div>
 
     <!-- Countdown Bar -->
     <div class="countdown-bar">
@@ -265,6 +270,37 @@ h2.no-answer-message {
 p {
   font-size: 1rem;
   color: #333;
+}
+.feedback-icon-wrapper {
+  display: flex;
+  flex-direction: column; /* Ikon överst, text under */
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Själva cirkeln */
+.icon-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;     
+  width: 100px;        
+  height: 100px;
+  border-radius: 50%; 
+  color: #fff;        
+  margin-bottom: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+
+.icon-correct {
+  background-color: #4caf50; 
+}
+
+
+.icon-wrong {
+  background-color: #f44336; 
 }
 </style>
 

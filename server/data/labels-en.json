@@ -79,7 +79,7 @@
 		"waitingOnAdmin": "Waiting for admin to start the quiz...",
 		"youHaveAnswered": "You have answered!",
 		"waitForTimeToRunOut": "Waiting for time to run out...",
-		"youAnsweredRight": "You answered right",
+		"correct": "Correct",
 		"yourPointsRightNow": "Your points right now:",
 		"yourRankRightNow": "You are in position",
 		"youAreBehind" : "You are behind",
@@ -90,7 +90,10 @@
 		"scoreboard": "Scoreboard",
 		"points": "points",
 		"with": "with",
-		"menu":"Go back to menu"
+		"menu":"Go back to menu",
+		"place":"Place",
+		"youAreIn": "You're in",
+		"gameOver": "Game Over"
 	  },
 
 	  "ThisOrThat": {

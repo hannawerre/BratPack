@@ -38,23 +38,22 @@
       <div v-else-if="currentPhase === 'feedbackPhase'">
         <div v-if="currentAnswer && currentAnswer.isCorrect  && this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
-          <p class="medium-text"> {{getPlayerRank(userName)}}{{getLettersForRank(userName)}} place </p>
           <p class="big-text"> {{ uiLabels.GameView.correct }}</p>
           <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{getPlayerAhead(userName)}} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
         </div>
 
         <div v-else-if="currentAnswer  && this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p class="medium-text"> {{getPlayerRank(userName)}}{{ getLettersForRank(userName)}} place 
+
           <br>
-           {{ uiLabels.GameView.wrong }}</p>
+           <p>{{ uiLabels.GameView.wrong }}</p>
           <p v-if="getPlayerRank(userName)!=1">{{uiLabels.GameView.youAreBehind}}{{getPlayerAhead(userName)}} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
         </div>
 
         <!-- Om användaren inte hann svara -->
         <div v-else-if="this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p class="medium-text"> {{ getPlayerRank(userName) }}{{getLettersForRank(userName)}} place </p>
+        
           <p> {{ uiLabels.GameView.tooSlow }}</p>
           <p v-if="getPlayerRank(userName)!=1"> {{ uiLabels.GameView.youAreBehind }}{{ getPlayerAhead(userName) }} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }}</p>
         </div>
@@ -68,7 +67,7 @@
       
  <!-- Score board--> 
       <div v-else-if="currentPhase === 'scoreBoard'">
-        <p class="big-text">Quizet är slut</p>
+        <p class="big-text">{{ uiLabels.GameView.gameOver }}</p>
       </div>
   </div> 
 </template>
@@ -152,18 +151,18 @@ export default {
   
       },
       handleLanguageChange(newLang) {
-      this.lang = newLang;
-      sessionStorage.setItem("lang", newLang);
-      socket.emit("getUILabels", this.lang);
+        this.lang = newLang;
+        sessionStorage.setItem("lang", newLang);
+        socket.emit("getUILabels", this.lang);
     },
       onAnswer(answerData) {
-      this.currentAnswer = answerData;
-      
-      if (answerData.isCorrect) {
-        const points = Math.floor((this.countdownProgress / 100) * 1000);
-        this.playerAnsweredRight = true;
-        this.localPoints += points;
+        this.currentAnswer = answerData;
         
+        if (answerData.isCorrect) {
+          const points = Math.floor((this.countdownProgress / 100) * 1000);
+          this.playerAnsweredRight = true;
+          this.localPoints += points;
+          
       }
     },
     updatePoints() {
@@ -262,17 +261,8 @@ export default {
         const rank = this.sortedParticipants.findIndex(p => p.name === userName) + 1;
         return rank || "N/A"; 
       },
-      getLettersForRank(userName){
-        const rank = this.getPlayerRank(userName)
-        if(rank === 1){
-          return ':st'
-        }else if(rank===2){
-          return ':nd'
-        }
-        else if(rank===3){
-          return ':rd'
-        }else{return ':th'}
-      },
+    
+
       getPointsBehind(userName) {
         const sorted = this.sortedParticipants; // Använd den sorterade listan
         const rank = sorted.findIndex(p => p.name === userName); // Hitta spelarens rank (0-indexerad)

@@ -37,19 +37,21 @@
         
         <div v-if="checkCorrectAnswer && this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
-          <p> {{ uiLabels.GameView.youAnsweredRight }}</p>
+          <p class="big-text"> {{ uiLabels.GameView.correct }}</p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{getPlayerAhead(userName)}} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
           
          </div>
         <div v-else-if="currentAnswer  && this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.GameView.youWereWrong }}</p>
+          <p class="big-text"> {{ uiLabels.GameView.youWereWrong }}</p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{getPlayerAhead(userName)}} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
           </div>
 
         <!-- Om användaren inte hann svara -->
         <div v-else-if= "this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.GameView.tooSlow }}</p>
-          
+          <p class="big-text"> {{ uiLabels.GameView.tooSlow }}</p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{getPlayerAhead(userName)}} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>      
         </div>
   
         <div v-if="isAdmin">
@@ -62,7 +64,7 @@
 
  <!-- Score board--> 
       <div v-else-if="currentPhase === 'scoreBoard'">
-            <p>Final Result</p>
+            <p>{{ uiLabels.GameView.gameOver }}</p>
       </div>
   </div> 
 </template>
@@ -277,8 +279,35 @@
             )
        
           },
-         
-    }
+          getPlayerRank(userName) {
+            const rank = this.sortedParticipants.findIndex(p => p.name === userName) + 1;
+            return rank || "N/A"; 
+          },
+
+
+          getPointsBehind(userName) {
+            const sorted = this.sortedParticipants;
+            const rank = sorted.findIndex(p => p.name === userName); 
+            
+            if (rank > 0) {
+              const pointsBehind = sorted[rank - 1].scoreGame1 - sorted[rank].scoreGame1;
+              return pointsBehind;
+            }
+
+            
+            return null;
+        },
+        getPlayerAhead(userName) {
+          const sorted = this.sortedParticipants; 
+          const rank = sorted.findIndex(p => p.name === userName); 
+            
+          if (rank > 0) {
+            return sorted[rank - 1].name;
+            }
+          return null;
+          },
+            
+      }
 
     }
   </script>
