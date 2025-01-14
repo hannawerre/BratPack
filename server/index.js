@@ -1,14 +1,33 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
+import express from "express";
 
-const httpServer = createServer();
-const io = new Server(httpServer, {
+let httpServer;
+let io;
+
+if (process.env.NODE_ENV === 'production') {
+    const app = express();
+    httpServer = createServer(app);
+    io = new Server(httpServer);
+    let path = import.meta.dirname.split("/");
+    path.pop();
+    app.use(express.static(path.join("/") + '/dist/'));
+    app.get('*', (req, res) => {
+        res.sendFile(path.join("/") +'/dist/index.html');
+    });
+
+}
+    
+else {  
+httpServer = createServer();
+io = new Server(httpServer, {
     cors: {
-      origin: "http://localhost:5173",
-      methods: ["GET"],
-      credentials: true
+    origin: "*",
+    methods: ["GET"],
+    credentials: true
   }
 });
+}
 
 // Read in the "class" to store all our data on the server side
 // If you need to change how data is handled, check the Data.js file!
