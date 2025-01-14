@@ -35,18 +35,18 @@
       <!-- Feedback Phase -->
       <div v-else-if="currentPhase === 'feedbackPhase'">
         
-        <div v-if="checkCorrectAnswer" class="feedback-icon-wrapper">
+        <div v-if="checkCorrectAnswer && this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
           <p> {{ uiLabels.GameView.youAnsweredRight }}</p>
           
          </div>
-        <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
+        <div v-else-if="currentAnswer  && this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
           <p> {{ uiLabels.GameView.youWereWrong }}</p>
           </div>
 
         <!-- Om användaren inte hann svara -->
-        <div v-else class="feedback-icon-wrapper">
+        <div v-else-if= "this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
           <p> {{ uiLabels.GameView.tooSlow }}</p>
           
@@ -87,6 +87,7 @@
       uiLabels: { type: Object, required: true },
       userName: { type: String, required: true},
       isAdmin: { type: Boolean, required: true },
+      isPlaying: {type: Boolean, required:true}
       
     },
   
@@ -134,7 +135,13 @@
       this.setUpGame();
       
       socket.on("sendingQuestionsWho", questions =>{
+
         this.questions = questions
+        if(!this.isPlaying){
+          this.questions.forEach(question=> {
+            question.answers = [];
+          })
+        }
       })
         
       socket.on("startQuestion", (currentQuestionIndex) =>{

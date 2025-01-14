@@ -36,26 +36,27 @@
       
       <!-- Feedback Phase -->
       <div v-else-if="currentPhase === 'feedbackPhase'">
-        
-        <div v-if="currentAnswer && currentAnswer.isCorrect" class="feedback-icon-wrapper">
+        <div v-if="currentAnswer && currentAnswer.isCorrect  && this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-correct">✔</div>
-          <p> {{ uiLabels.GameView.youAnsweredRight }}</p>
-          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{ getPlayerAhead(userName) }} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
+          <p class="medium-text"> {{getPlayerRank(userName)}}{{getLettersForRank(userName)}} place </p>
+          <p class="big-text"> {{ uiLabels.GameView.correct }}</p>
+          <p v-if="getPlayerRank(userName)!=1"> {{uiLabels.GameView.youAreBehind}} <strong> {{getPlayerAhead(userName)}} {{ " " }}</strong> {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
         </div>
 
-        <div v-else-if="currentAnswer" class="feedback-icon-wrapper">
+        <div v-else-if="currentAnswer  && this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
-          <p> {{ uiLabels.GameView.youWereWrong }}</p>
-          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.GameView.youAreBehind}}{{ getPlayerAhead(userName) }} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
+          <p class="medium-text"> {{getPlayerRank(userName)}}{{ getLettersForRank(userName)}} place 
+          <br>
+           {{ uiLabels.GameView.wrong }}</p>
+          <p v-if="getPlayerRank(userName)!=1">{{uiLabels.GameView.youAreBehind}}{{getPlayerAhead(userName)}} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }} </p>
         </div>
 
         <!-- Om användaren inte hann svara -->
-        <div v-else class="feedback-icon-wrapper">
+        <div v-else-if="this.isPlaying" class="feedback-icon-wrapper">
           <div class="icon-circle icon-wrong">✖</div>
+          <p class="medium-text"> {{ getPlayerRank(userName) }}{{getLettersForRank(userName)}} place </p>
           <p> {{ uiLabels.GameView.tooSlow }}</p>
-          <p>{{ uiLabels.GameView.yourPointsRightNow }} {{ this.gameData.participants.find(p => p.name === userName).scoreGame1 }}</p>
-          <p> {{uiLabels.GameView.yourRankRightNow}} {{ getPlayerRank(userName) }} </p>
-          <p v-if="getPlayerRank(userName)!=1"> {{ uiLabels.GameView.youAreBehind }} {{ getPlayerAhead(userName) }} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }}</p>
+          <p v-if="getPlayerRank(userName)!=1"> {{ uiLabels.GameView.youAreBehind }}{{ getPlayerAhead(userName) }} {{ uiLabels.GameView.with }} {{ getPointsBehind(userName) }} {{ uiLabels.GameView.points }}</p>
         </div>
   
         <div v-if="isAdmin">
@@ -67,30 +68,13 @@
       
  <!-- Score board--> 
       <div v-else-if="currentPhase === 'scoreBoard'">
-        <h2>{{ uiLabels.GameView.scoreboard }}</h2>
-          <ul>
-            <li 
-               v-for="(p, index) in sortedParticipants" 
-              :key="index" 
-              :class="{ 'top-player': index === 0 }"
-            >
-              #{{ index + 1 }} {{ p.name }}: {{ p.scoreGame1 }} {{ uiLabels.GameView.points }}
-            </li>
-          </ul>
+        <p class="big-text">Quizet är slut</p>
       </div>
   </div> 
 </template>
 
 <script>
-/* 
 
-GLÖM EJ ATT ÄNDRA SPRÅKET TILL LOCALSTORAGE
-
-
-
-
-
-*/
 
 import QuestionComponent from './QuestionComponent.vue';
 const socket = io("localhost:3000");
@@ -106,7 +90,8 @@ export default {
     gamePin: { type: String, required: true },
     uiLabels: { type: Object, required: true },
     isAdmin: { type: Boolean, required: true },
-    userName: { type: Boolean, required: true}
+    userName: { type: String, required: true},
+    isPlaying: { type: Boolean, required: true}
   
   },
 
@@ -142,6 +127,11 @@ export default {
     // När servern skickar frågorna, sätt dem i `questions`
     socket.on('sendingQuestions', quizQuestions => {
       this.questions = quizQuestions.questions;
+      if(!this.isPlaying){
+        this.questions.forEach((question=> {
+          question.answers = [];
+        }))
+      }
     });
       
     socket.on("startQuestion", (currentQuestionIndex) =>{
@@ -153,11 +143,13 @@ export default {
   },
  
   methods: {
+  
     startQuiz(){
       socket.emit("startingQuestion", {
           gamePin: this.gamePin, 
           currentQuestionIndex: this.currentQuestionIndex
         })
+  
       },
       handleLanguageChange(newLang) {
       this.lang = newLang;
@@ -175,13 +167,14 @@ export default {
       }
     },
     updatePoints() {
-      console.log("updated points:", this.localPointsnpok)
+      
+      if(this.isPlaying){
       socket.emit("updatePlayerPoints", {
         gamePin: this.gamePin,
         userName: this.userName,
         newScore: this.localPoints
       })
-    },
+    }},
     nextQuestion() {
       this.currentQuestionIndex++;
       socket.emit("startingQuestion", {
@@ -267,7 +260,18 @@ export default {
         },
       getPlayerRank(userName) {
         const rank = this.sortedParticipants.findIndex(p => p.name === userName) + 1;
-        return rank || "N/A"; // Returnerar "N/A" om spelaren inte hittas
+        return rank || "N/A"; 
+      },
+      getLettersForRank(userName){
+        const rank = this.getPlayerRank(userName)
+        if(rank === 1){
+          return ':st'
+        }else if(rank===2){
+          return ':nd'
+        }
+        else if(rank===3){
+          return ':rd'
+        }else{return ':th'}
       },
       getPointsBehind(userName) {
         const sorted = this.sortedParticipants; // Använd den sorterade listan
@@ -342,6 +346,8 @@ export default {
   height: 100%;
   background-color: #4caf50;
   transition: width 0.2s ease;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 .feedback-icon-wrapper {
@@ -376,10 +382,6 @@ export default {
   background-color: #f44336; /* Röd */
 }
 
-.top-player {
-  font-weight: bold;
-  color: gold;
-}
 
 </style>
 

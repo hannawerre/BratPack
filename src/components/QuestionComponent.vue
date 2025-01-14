@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>{{ question.question }}</h3>
+    <h3 class="question-text">{{ question.question }}</h3>
     <ul>
       <li
       class="answer-option"
@@ -75,6 +75,16 @@ ul {
   max-width: 400px;  
   margin: 0 auto; 
 }
+.question-text {
+  font-size: 2rem; /* Gör texten större */
+  font-weight: bold; /* Lägg till fetstil */
+  text-align: center; /* Centrera texten */
+  margin: 20px 0; /* Lägg till mellanrum runt texten */
+  color: black; /* Välj en färg som passar designen */
+}
+
+
+
 
 li.answer-option {
   flex: 1 1 calc(50% - 20px); 
@@ -105,6 +115,14 @@ ul:not(:has(li:nth-child(4))) li.answer-option {
     flex: 1 1 100%; 
     max-width: 100%;
   }
+
+
+
+  .question-text {
+    font-size: 1.5rem; /* Mindre textstorlek för små skärmar */
+  }
+
+
 }
 
 button {

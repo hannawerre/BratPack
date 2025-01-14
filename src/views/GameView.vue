@@ -14,7 +14,7 @@
 
 
     <!--Game Components-->
-    <div v-if="activeGame && isPlaying"> 
+    <div v-if="activeGame"> 
         <GeneralQuizComponent
             v-if="activeGame === 'generalQuiz'"
             :gameData="gameData"
@@ -22,10 +22,11 @@
             :uiLabels="uiLabels"
             :isAdmin="isAdmin"
             :userName="userName"
+            :isPlaying="isPlaying"
             @gameCompleted="onGameCompleted"
         />
         <ThisOrThatComponent 
-            v-if="activeGame === 'thisOrThat'" 
+            v-if="activeGame === 'thisOrThat' && isPlaying" 
             :socket="socket"
             :lang="lang"
             :gameData="gameData" 
@@ -42,6 +43,7 @@
             :uiLabels="uiLabels"
             :userName="userName"
             :isAdmin="isAdmin" 
+            :isPlaying="isPlaying"
             @gameCompleted="onGameCompleted"
             />
     </div>
