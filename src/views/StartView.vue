@@ -52,7 +52,8 @@
 import io from 'socket.io-client'; 
 import ResponsiveNav from '@/components/ResponsiveNav.vue';
 //const socket = io("localhost:3000");
-//sessionStorage.setItem
+sessionStorage.setItem("dataServer", "");
+const socket = io(sessionStorage.getItem("dateServer")); 
 
 export default {
   name: 'StartView',
