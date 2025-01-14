@@ -81,11 +81,14 @@
 
 <script>
     import io from 'socket.io-client';
+     
     import GeneralQuizComponent from '../components/GeneralQuizComponent.vue';
     import ThisOrThatComponent from '../components/ThisOrThatComponent.vue';
     import WhosMostLikelyToComponent from '../components/WhosMostLikelyToComponent.vue';
     import ResponsiveNav from '../components/ResponsiveNav.vue';
     import ScoreBoardComponent from '../components/ScoreBoardComponent.vue';
+    sessionStorage.setItem("dataServer", "");
+    const socket = io(sessionStorage.getItem("dateServer"));
 
     export default{
         name: 'GameView',
