@@ -74,7 +74,9 @@
   
   import QuestionComponent from './QuestionComponent.vue';
   import Nav from './ResponsiveNav.vue';
-  const socket = io("localhost:3000");
+ // const socket = io("localhost:3000");
+        sessionStorage.setItem("dataServer", "");
+    const socket = io(sessionStorage.getItem("dateServer"));
   import io from 'socket.io-client'; 
   
   export default {
