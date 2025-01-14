@@ -133,8 +133,10 @@
 </template>
 
 <script>
-const socket = io("localhost:3000");
+//const socket = io("localhost:3000");
 import io from 'socket.io-client'; 
+sessionStorage.setItem("dataServer", "");
+const socket = io(sessionStorage.getItem("dateServer"));
 import EditQuiz1Component from '../components/EditQuiz1Component.vue';
 import EditQuiz2Component from '../components/EditQuiz2Component.vue';
 import EditQuiz3Component from '../components/EditQuiz3Component.vue';
